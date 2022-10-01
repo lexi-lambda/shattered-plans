@@ -1,0 +1,15 @@
+package funorb.client;
+
+public enum LoginState {
+  C1,
+  LOGGED_IN,
+  C3,
+  C4,
+  SERVER_HANDSHAKE_FAILED,
+  C6,
+  READY_TO_LOG_IN,
+  LOGIN_REQUEST_SUCCESSFUL,
+  LOGIN_REQUEST_SENT,
+  C10,
+  SERVER_HANDSHAKE_SUCCESS
+}
