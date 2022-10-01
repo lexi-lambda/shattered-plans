@@ -6,7 +6,7 @@ Shattered Plans is a turn-based strategy game by [Jagex Ltd.][jagex] It was orig
 
 ## Running the game
 
-Running Shattered Plans requires [Java 17 or newer][download-java] and the latest version of the game JAR. You can then run the game by running the following command:
+Running Shattered Plans requires [Java 17 or newer][download-java] and [the latest version of the game JAR][download-shattered-plans]. You can then run the game by running the following command:
 
 ```sh
 java -jar shattered-plans-0.0.5.jar --local-server
@@ -38,13 +38,20 @@ All singleplayer functionality should work flawlessly. Most multiplayer function
 
 There are also some very minor improvements over the original game, but these will most likely not even be noticeable to most players.
 
-## Community
+## More information
 
-If you’d like to find people to play with, or if you have any questions, [join the FunOrb discord server!][funorb-discord] This is obviously a small hobby project, so I cannot guarantee my time, but I’ll do my best to be helpful.
+The game includes both an in-game tutorial and in-game instructions to teach you how to play the game. Some additional information is also available [on the FunOrb wiki][funorb-wiki:shattered-plans].
 
-[screenshot.png]: docs/screenshot.png
+If you’d like to find people to play with, or if you have any further questions, consider joining [the FunOrb discord server][funorb-discord]. This is obviously a small hobby project, so I cannot guarantee my time, but I’ll do my best to be helpful.
+
+## Acknowledgments and disclaimers
+
+Shattered Plans and FunOrb are the property of [Jagex Ltd.][jagex] This project is a fan effort to keep a wonderful, creative game from being permanently lost. I do not commercially benefit from this project in any way, and it does not compete in any way with any of Jagex’s current commercial offerings, none of which are even remotely similar to Shattered Plans.
 
 [download-java]: https://www.oracle.com/java/technologies/downloads/
+[download-shattered-plans]: https://github.com/lexi-lambda/shattered-plans/releases/download/v0.0.5/shatteredplans-0.0.5.jar
 [FunOrb]: https://en.wikipedia.org/wiki/FunOrb
 [funorb-discord]: https://discord.gg/MGfDrDf
+[funorb-wiki:shattered-plans]: https://funorb.fandom.com/wiki/Shattered_Plans
 [jagex]: https://www.jagex.com/
+[screenshot.png]: docs/screenshot.png
