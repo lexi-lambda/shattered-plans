@@ -1943,7 +1943,7 @@ public final class ShatteredPlansClient extends JagexApplet {
               ContextMenu.setChatFilter(channel, ChatMessage.FilterLevel.FRIENDS);
             }
 
-            C2SPacket.sendChatMessage(currentChatChannel, ContextMenu.recipientPlayerName, message);
+            C2SPacket.sendChatMessage(channel, ContextMenu.recipientPlayerName, message);
           }
         }
 
