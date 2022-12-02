@@ -7,7 +7,7 @@ import funorb.commonui.Resources;
 import funorb.commonui.form.CreateAccountForm;
 import funorb.commonui.form.DialogForm;
 import funorb.commonui.form.Under13DialogForm;
-import funorb.commonui.kj_;
+import funorb.commonui.AccountResponse;
 import funorb.shatteredplans.StringConstants;
 import funorb.shatteredplans.client.JagexApplet;
 
@@ -26,7 +26,7 @@ public final class CreateAccountFrame extends AccountFrame {
     CommonUI.loggingInFromCreateAccount = true;
   }
 
-  private static kj_ a752br() {
+  private static AccountResponse a752br() {
     if (CommonUI._eel == Enum1.C1) {
       throw new IllegalStateException();
     } else if (CommonUI._eel == Enum1.C2) {
@@ -50,7 +50,7 @@ public final class CreateAccountFrame extends AccountFrame {
   @Override
   public void tickAnimations() {
     if (this.isActive && !this._Hb) {
-      final kj_ var2 = a752br();
+      final AccountResponse var2 = a752br();
       if (var2 != null) {
         this.a122(false, var2);
       }
@@ -58,7 +58,7 @@ public final class CreateAccountFrame extends AccountFrame {
     super.tickAnimations();
   }
 
-  private void a122(final boolean var2, final kj_ response) {
+  private void a122(final boolean var2, final AccountResponse response) {
     this._Hb = true;
 
     String message;
@@ -66,7 +66,7 @@ public final class CreateAccountFrame extends AccountFrame {
       message = StringConstants.ACCOUNT_CREATED_SUCCESSFULLY;
     } else if (response.suggestedUsernames == null) {
       message = response.errorMessage;
-      if (response.code == kj_.Code.INELIGIBLE) {
+      if (response.code == AccountResponse.Code.INELIGIBLE) {
         if (!var2) {
           CreateAccountForm.accountCreationFailed();
         }
@@ -92,16 +92,16 @@ public final class CreateAccountFrame extends AccountFrame {
     } else {
       if (this._Eb) {
         dialog.addButton(StringConstants.CONT, this);
-      } else if (response.code == kj_.Code.C5) {
+      } else if (response.code == AccountResponse.Code.C5) {
         dialog.addActionButton(StringConstants.RELOAD_GAME, CommonUI.TickResult.RELOAD);
         dialog.addActionButton(StringConstants.QUIT_TO_WEBSITE, CommonUI.TickResult.QUIT_TO_WEBSITE);
       } else {
         dialog.addActionButton(StringConstants.BACK, null);
       }
 
-      if (response.code == kj_.Code.C3) {
+      if (response.code == AccountResponse.Code.C3) {
         dialog.addActionButton(StringConstants.TO_SERVER_LIST, CommonUI.TickResult.TO_SERVER_LIST);
-      } else if (response.code == kj_.Code.C6) {
+      } else if (response.code == AccountResponse.Code.C6) {
         dialog.addActionButton(StringConstants.TO_CUSTOMER_SUPPORT, CommonUI.TickResult.TO_CUSTOMER_SUPPORT);
       }
     }
@@ -110,6 +110,6 @@ public final class CreateAccountFrame extends AccountFrame {
   }
 
   public void f487() {
-    this.a122(true, kj_.a431ck(kj_.Code.INELIGIBLE, StringConstants.CREATE_INELIGIBLE));
+    this.a122(true, AccountResponse.a431ck(AccountResponse.Code.INELIGIBLE, StringConstants.CREATE_INELIGIBLE));
   }
 }

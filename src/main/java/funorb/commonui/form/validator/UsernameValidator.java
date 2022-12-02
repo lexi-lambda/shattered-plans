@@ -4,13 +4,13 @@ import funorb.Strings;
 import funorb.commonui.CommonUI;
 import funorb.commonui.Enum1;
 import funorb.commonui.AbstractTextField;
-import funorb.commonui.kj_;
+import funorb.commonui.AccountResponse;
 import funorb.shatteredplans.StringConstants;
 
 import java.util.stream.IntStream;
 
 public final class UsernameValidator extends StringValidator {
-  public static kj_ _ija;
+  public static AccountResponse _ija;
   public static String _gpb;
   private String _n;
   private boolean _o = false;
@@ -85,7 +85,7 @@ public final class UsernameValidator extends StringValidator {
     }
   }
 
-  private static kj_ a382ji(final String var1) {
+  private static AccountResponse a382ji(final String var1) {
     if (CommonUI._fjs == Enum1.C3) {
       return null;
     } else if (CommonUI._fjs == Enum1.C2 && var1.equals(_gpb)) {
@@ -147,7 +147,7 @@ public final class UsernameValidator extends StringValidator {
     }
 
     if (!username.equals(this._n)) {
-      final kj_ var3 = a382ji(username);
+      final AccountResponse var3 = a382ji(username);
       if (var3 == null || var3.errorMessage != null) {
         return ValidationState.CHECKING_1;
       }
@@ -168,7 +168,7 @@ public final class UsernameValidator extends StringValidator {
     final String var3 = a150nn(var2);
     if (var3 == null) {
       if (!var2.equals(this._n)) {
-        final kj_ var4 = a382ji(var2);
+        final AccountResponse var4 = a382ji(var2);
         if (var4 == null || var4.errorMessage != null) {
           return null;
         }

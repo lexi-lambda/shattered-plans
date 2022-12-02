@@ -2,7 +2,7 @@ package funorb.commonui;
 
 import org.intellij.lang.annotations.MagicConstant;
 
-public final class kj_ {
+public final class AccountResponse {
   public final boolean success;
   public final boolean under13;
   public final String[] suggestedUsernames;
@@ -10,7 +10,7 @@ public final class kj_ {
   public final int code;
   public final String errorMessage;
 
-  private kj_(final boolean success, final boolean under13, final String[] suggestedUsernames, @MagicConstant(valuesFromClass = Code.class) final int code, final String errorMessage) {
+  private AccountResponse(final boolean success, final boolean under13, final String[] suggestedUsernames, @MagicConstant(valuesFromClass = Code.class) final int code, final String errorMessage) {
     this.success = success;
     this.under13 = under13;
     this.suggestedUsernames = suggestedUsernames;
@@ -18,16 +18,16 @@ public final class kj_ {
     this.errorMessage = errorMessage;
   }
 
-  public static kj_ createSuccess(final boolean var0) {
-    return new kj_(true, var0, null, Code.SUCCESS, null);
+  public static AccountResponse createSuccess(final boolean var0) {
+    return new AccountResponse(true, var0, null, Code.SUCCESS, null);
   }
 
-  public static kj_ a612tc(final String[] var0) {
-    return new kj_(false, false, var0, Code.C100, null);
+  public static AccountResponse a612tc(final String[] var0) {
+    return new AccountResponse(false, false, var0, Code.C100, null);
   }
 
-  public static kj_ a431ck(@MagicConstant(valuesFromClass = Code.class) final int code, final String message) {
-    return new kj_(false, false, null, code, message);
+  public static AccountResponse a431ck(@MagicConstant(valuesFromClass = Code.class) final int code, final String message) {
+    return new AccountResponse(false, false, null, code, message);
   }
 
   public static final class Code {

@@ -34,7 +34,7 @@ import funorb.commonui.form.CreateAccountForm;
 import funorb.commonui.form.CreateDisplayNameForm;
 import funorb.commonui.form.DobToEnableChatForm;
 import funorb.commonui.form.validator.UsernameValidator;
-import funorb.commonui.kj_;
+import funorb.commonui.AccountResponse;
 import funorb.io.Buffer;
 import funorb.io.CipheredBuffer;
 import funorb.io.DuplexStream;
@@ -91,7 +91,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
   public static final Buffer loginPacket = new Buffer(256);
   protected static final Queue<GetProfileRequest> getProfileResponses = new ArrayDeque<>();
   public static final SecureRandom secureRandom = new SecureRandom();
-  public static kj_ _tplc;
+  public static AccountResponse _tplc;
   public static boolean isAnonymous = true;
   protected static boolean _vmNb;
   @MagicConstant(valuesFromClass = KeyState.Code.class)
@@ -716,27 +716,27 @@ public abstract class JagexApplet extends JagexBaseApplet {
     CommonUI._wha.a540(var0);
   }
 
-  private static void a077wo(@MagicConstant(valuesFromClass = kj_.Code.class) final int var0, final String[] var2, final String var3) {
+  private static void a077wo(@MagicConstant(valuesFromClass = AccountResponse.Code.class) final int var0, final String[] var2, final String var3) {
     CommonUI._fjs = Enum1.C2;
-    if (var0 == kj_.Code.SUCCESS) {
-      UsernameValidator._ija = kj_.createSuccess(CreateAccountForm.ageFieldNum < 13);
+    if (var0 == AccountResponse.Code.SUCCESS) {
+      UsernameValidator._ija = AccountResponse.createSuccess(CreateAccountForm.ageFieldNum < 13);
       a786jp(null);
-    } else if (var0 >= kj_.Code.C100 && var0 <= kj_.Code.C105) {
+    } else if (var0 >= AccountResponse.Code.C100 && var0 <= AccountResponse.Code.C105) {
       a786jp(var2);
-      UsernameValidator._ija = kj_.a612tc(var2);
+      UsernameValidator._ija = AccountResponse.a612tc(var2);
     } else {
-      UsernameValidator._ija = kj_.a431ck(var0, var3);
+      UsernameValidator._ija = AccountResponse.a431ck(var0, var3);
     }
   }
 
-  private static void a453va(final String[] var0, @MagicConstant(valuesFromClass = kj_.Code.class) final int code, final String errorMessage) {
+  private static void a453va(final String[] var0, @MagicConstant(valuesFromClass = AccountResponse.Code.class) final int code, final String errorMessage) {
     CommonUI._eel = Enum1.C2;
-    if (code == kj_.Code.SUCCESS) {
-      _tplc = kj_.createSuccess(CreateAccountForm.ageFieldNum < 13);
-    } else if (code >= kj_.Code.C100 && code <= kj_.Code.C105) {
-      _tplc = kj_.a612tc(var0);
+    if (code == AccountResponse.Code.SUCCESS) {
+      _tplc = AccountResponse.createSuccess(CreateAccountForm.ageFieldNum < 13);
+    } else if (code >= AccountResponse.Code.C100 && code <= AccountResponse.Code.C105) {
+      _tplc = AccountResponse.a612tc(var0);
     } else {
-      _tplc = kj_.a431ck(code, errorMessage);
+      _tplc = AccountResponse.a431ck(code, errorMessage);
     }
   }
 
@@ -1679,14 +1679,14 @@ public abstract class JagexApplet extends JagexBaseApplet {
     }
   }
 
-  @MagicConstant(valuesFromClass = kj_.Code.class)
+  @MagicConstant(valuesFromClass = AccountResponse.Code.class)
   private int a425si(final int var0, final int var1, final e_ var2, final e_ var3, final String var4, final boolean var5) {
     final String var6 = var3.a983();
     final String var7 = var2.a983();
     if (serverConnection1 == null) {
       final boolean var8 = this.initializeServerConnection(false);
       if (!var8) {
-        return kj_.Code.NONE;
+        return AccountResponse.Code.NONE;
       }
     }
 
@@ -1744,7 +1744,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
           accountErrorMessage = StringConstants.CREATE_UNABLE;
           shutdownServerConnection();
           _kej = false;
-          return kj_.Code.INELIGIBLE;
+          return AccountResponse.Code.INELIGIBLE;
         }
 
         if (var12 == 99) {
@@ -1774,7 +1774,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
           shutdownServerConnection();
           _kej = false;
           //noinspection MagicConstant
-          return kj_.Code.C100 + var15;
+          return AccountResponse.Code.C100 + var15;
         }
       }
     }
@@ -1803,7 +1803,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
           }
 
           _kej = false;
-          return kj_.Code.CONNECTION_FAILED;
+          return AccountResponse.Code.CONNECTION_FAILED;
         }
 
         final int var12 = this.gamePort1Primary;
@@ -1812,18 +1812,18 @@ public abstract class JagexApplet extends JagexBaseApplet {
         _kej = true;
       }
 
-      return kj_.Code.NONE;
+      return AccountResponse.Code.NONE;
     }
   }
 
-  @MagicConstant(valuesFromClass = kj_.Code.class)
+  @MagicConstant(valuesFromClass = AccountResponse.Code.class)
   private int a968sr(final String usernameOrEmail, final int affId, final int var3, final String password, final String var5, final boolean var6) {
     final e_ var7 = new e_(usernameOrEmail);
     final e_ var8 = new e_(var5);
     return this.a425si(affId, var3, var8, var7, password, var6);
   }
 
-  @MagicConstant(valuesFromClass = kj_.Code.class)
+  @MagicConstant(valuesFromClass = AccountResponse.Code.class)
   private int a031wi(final e_ var0, final e_ var1) {
     return this.a425si(0, 0, var0, var1, null, false);
   }
@@ -2100,9 +2100,9 @@ public abstract class JagexApplet extends JagexBaseApplet {
   protected final int tickCommonUI(final boolean alreadyLoggedIn) {
     final CommonUI.TickResult action = CommonUI.tick();
     if (action == CommonUI.TickResult.R1) {
-      @MagicConstant(valuesFromClass = kj_.Code.class)
+      @MagicConstant(valuesFromClass = AccountResponse.Code.class)
       final int var5 = this.a031wi(j083bp(), new e_(getUsernameOrEmail(), CommonUI._fjs == Enum1.C3));
-      if (var5 != kj_.Code.NONE) {
+      if (var5 != AccountResponse.Code.NONE) {
         a077wo(var5, _aee, accountErrorMessage);
         _aee = null;
         accountErrorMessage = null;
@@ -2115,9 +2115,9 @@ public abstract class JagexApplet extends JagexBaseApplet {
     }
 
     if (action == CommonUI.TickResult.R2) {
-      @MagicConstant(valuesFromClass = kj_.Code.class)
+      @MagicConstant(valuesFromClass = AccountResponse.Code.class)
       final int code = this.a968sr(getUsernameOrEmail(), this.affId, CreateAccountForm.ageFieldNum, CommonUI.getPassword(), a983of(), CreateAccountForm.optInCheckboxActive);
-      if (code != kj_.Code.NONE) {
+      if (code != AccountResponse.Code.NONE) {
         a453va(_aee, code, accountErrorMessage);
         _aee = null;
         accountErrorMessage = null;
