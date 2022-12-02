@@ -1,15 +1,14 @@
 package funorb.commonui.form.validator;
 
 import funorb.Strings;
-import funorb.commonui.form.field.AbstractDateField;
-import funorb.commonui.g_;
 import funorb.commonui.AbstractTextField;
+import funorb.commonui.form.field.AbstractDateField;
 import funorb.commonui.listener.TextFieldListener;
 import funorb.shatteredplans.StringConstants;
 
 import java.util.Date;
 
-public final class DateOfBirthValidator extends AbstractInputValidator implements TextFieldListener, g_ {
+public final class DateOfBirthValidator extends AbstractInputValidator implements TextFieldListener {
   private static final int[] _jab = new int[]{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   public AbstractDateField _m;
 
