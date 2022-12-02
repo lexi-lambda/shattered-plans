@@ -18,8 +18,8 @@ import org.jetbrains.annotations.Nullable;
 
 public final class CommonUI {
   public static RootFrame root;
-  public static AccountFrame _jiG;
-  public static ContentFrame _aef;
+  public static AccountFrame accountFrame;
+  public static ContentFrame contentFrame;
   public static ks_ _wha;
   private static LoadingFrame loadingFrame;
 
@@ -31,7 +31,7 @@ public final class CommonUI {
 
   private static boolean loggingIn = false;
   public static boolean wasConnected;
-  public static boolean _nsbD = false;
+  public static boolean loggingInFromCreateAccount = false;
   public static Enum1 _eel;
   public static Enum1 _fjs;
 
@@ -98,15 +98,15 @@ public final class CommonUI {
     f150fe();
     root.popAll();
     LoginForm.instance = new LoginForm(enteredUsername, wasConnected, canCreateAccount, isInitialLogin);
-    _aef = new ContentFrame(root, LoginForm.instance, 33, 20, 30);
-    root.pushActive(_aef);
+    contentFrame = new ContentFrame(root, LoginForm.instance, 33, 20, 30);
+    root.pushActive(contentFrame);
   }
 
-  public static void setStateLoggingIn(final String message, final boolean var2) {
-    _nsbD = var2;
+  public static void setStateLoggingIn(final String message, final boolean fromCreateAccount) {
     loggingIn = true;
-    _jiG = new AccountFrame(root, Resources.AREZZO_14_BOLD, message, wasConnected, _nsbD);
-    root.pushActive(_jiG);
+    loggingInFromCreateAccount = fromCreateAccount;
+    accountFrame = new AccountFrame(root, Resources.AREZZO_14_BOLD, message, wasConnected, loggingInFromCreateAccount);
+    root.pushActive(accountFrame);
   }
 
   public static void handleServerDisconnect() {
@@ -132,7 +132,7 @@ public final class CommonUI {
     loggingIn = false;
     loadingNotificationMessage = null;
     if (wasConnected) {
-      _jiG.p150();
+      accountFrame.p150();
     } else {
       final int var1 = _tfn;
       if (var1 > 0) {
@@ -145,14 +145,14 @@ public final class CommonUI {
         loadingNotificationMessage = a547lr(new CharSequence[]{loadingNotificationMessage, "<br>", StringConstants.VISIT_ACCOUNT_MANAGEMENT});
       }
 
-      _jiG.i423();
+      accountFrame.i423();
       switchToLoading();
     }
   }
 
   public static void handleLoginFailed(@MagicConstant(valuesFromClass = LoginResult.class) int var0, String var1) {
     loggingIn = false;
-    if (_jiG != null && _jiG.isActive) {
+    if (accountFrame != null && accountFrame.isActive) {
       if (var0 == LoginResult.R8) {
         var0 = LoginResult.R2;
         if (wasConnected) {
@@ -169,11 +169,11 @@ public final class CommonUI {
         f150mm();
       }
       if (var2) {
-        if (_nsbD) {
+        if (loggingInFromCreateAccount) {
           var1 = StringConstants.PLEASE_TRY_AGAIN;
         }
 
-        _jiG.handleFailure(var0, var1);
+        accountFrame.handleFailure(var0, var1);
       }
       if (var0 != LoginResult.PROTOCOL_ERROR && var0 != LoginResult.R10 && !wasConnected) {
         LoginForm.instance.l150();
@@ -182,11 +182,11 @@ public final class CommonUI {
   }
 
   private static void f150mm() {
-    if (_jiG != null) {
-      _jiG.i423();
+    if (accountFrame != null) {
+      accountFrame.i423();
     }
     _sjb = new CreateDisplayNameForm();
-    _aef.setNextContent(_sjb);
+    contentFrame.setNextContent(_sjb);
   }
 
   private static String a547lr(final CharSequence[] var0) {
@@ -259,7 +259,7 @@ public final class CommonUI {
   }
 
   public static void b423ol() {
-    _aef.setNextContent(new JustPlayForm());
+    contentFrame.setNextContent(new JustPlayForm());
   }
 
   public static ks_ a661os(final String var1) {
@@ -267,6 +267,12 @@ public final class CommonUI {
       _wha = new ks_(var1);
     }
     return _wha;
+  }
+
+  public static void a584ai(final String username, final String password, final boolean fromCreateAccount) {
+    enteredUsername = username;
+    enteredPassword = password;
+    setStateLoggingIn(StringConstants.LOGGING_IN, fromCreateAccount);
   }
 
   public enum TickResult {

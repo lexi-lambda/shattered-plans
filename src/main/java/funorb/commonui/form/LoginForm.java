@@ -10,7 +10,6 @@ import funorb.commonui.Resources;
 import funorb.commonui.form.field.TextField;
 import funorb.commonui.listener.ButtonListener;
 import funorb.commonui.listener.TextFieldListener;
-import funorb.commonui.frame.CreateAccountFrame;
 import funorb.commonui.pg_;
 import funorb.commonui.renderer.ButtonRenderer;
 import funorb.commonui.renderer.LinkRenderer;
@@ -119,11 +118,11 @@ public final class LoginForm extends ListContainer implements TextFieldListener,
   }
 
   public static void a667ce(final String username) {
-    if (CommonUI._jiG != null) {
-      CommonUI._jiG.i423();
+    if (CommonUI.accountFrame != null) {
+      CommonUI.accountFrame.i423();
     }
     instance = new LoginForm(username, false, true, true);
-    CommonUI._aef.setNextContent(instance);
+    CommonUI.contentFrame.setNextContent(instance);
   }
 
   public static void a487la() {
@@ -152,7 +151,7 @@ public final class LoginForm extends ListContainer implements TextFieldListener,
 
   private void submit() {
     if (CommonUI.wasConnected || (this.usernameField.text.length() > 0 && this.passwordField.text.length() > 0)) {
-      CreateAccountFrame.a584ai(this.usernameField.text, this.passwordField.text, false);
+      CommonUI.a584ai(this.usernameField.text, this.passwordField.text, false);
     }
   }
 

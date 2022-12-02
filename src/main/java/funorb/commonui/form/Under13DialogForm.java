@@ -1,9 +1,12 @@
-package funorb.commonui;
+package funorb.commonui.form;
 
 import funorb.Strings;
 import funorb.awt.KeyState;
+import funorb.commonui.Button;
+import funorb.commonui.Component;
+import funorb.commonui.Label;
+import funorb.commonui.Resources;
 import funorb.commonui.container.ListContainer;
-import funorb.commonui.form.CreateAccountForm;
 import funorb.commonui.frame.CreateAccountFrame;
 import funorb.commonui.listener.ButtonListener;
 import funorb.commonui.listener.LinkedTextListener;
@@ -12,32 +15,30 @@ import funorb.graphics.Drawing;
 import funorb.graphics.Font;
 import funorb.shatteredplans.StringConstants;
 
-public final class pe_ extends ListContainer implements LinkedTextListener, ButtonListener {
-  private final Button _H;
-  private final CreateAccountFrame _I;
+public final class Under13DialogForm extends ListContainer implements LinkedTextListener, ButtonListener {
+  private final CreateAccountFrame createAccountFrame;
+  private final Button continueButton;
 
-  public pe_(final CreateAccountFrame var1) {
+  public Under13DialogForm(final CreateAccountFrame createAccountFrame) {
     super(0, 0, 288, 0);
-    this._I = var1;
-    this._H = new Button(StringConstants.CONT, null);
+    this.createAccountFrame = createAccountFrame;
+    this.continueButton = new Button(StringConstants.CONT, null);
     final String var2 = Strings.format(StringConstants.CREATE_U13_TERMS, "<u=2164A2><col=2164A2>", "</col></u>");
     final byte var3 = 20;
     final TextRenderer var4 = new TextRenderer(Resources.AREZZO_14, 0, 0, 0, 0, Drawing.WHITE, Font.HorizontalAlignment.JUSTIFY, Font.VerticalAlignment.TOP, Resources.AREZZO_14.ascent, true);
-    final Label _G = new Label(var2, var4);
-    _G.tooltip = "";
-    _G.setHotspotTooltip(0, StringConstants.OPEN_IN_POPUP_WINDOW);
-    _G.setHotspotTooltip(1, StringConstants.OPEN_IN_POPUP_WINDOW);
-    _G.listener = this;
-    _G.width = this.width - 40;
-    _G.setBounds(26, var3, this.width - 40);
-    final int var7 = var3 + _G.height + 15;
-    this.addChild(_G);
-    final byte var5 = 4;
-    final short var6 = 200;
-    this._H.setBounds(50, var7, var6, 40);
-    this._H.listener = this;
-    this.addChild(this._H);
-    this.setBounds(0, 0, 300, var7 + 55 + var5);
+    final Label label = new Label(var2, var4);
+    label.tooltip = "";
+    label.setHotspotTooltip(0, StringConstants.OPEN_IN_POPUP_WINDOW);
+    label.setHotspotTooltip(1, StringConstants.OPEN_IN_POPUP_WINDOW);
+    label.listener = this;
+    label.width = this.width - 40;
+    label.setBounds(26, var3, this.width - 40);
+    final int var7 = var3 + label.height + 15;
+    this.addChild(label);
+    this.continueButton.setBounds(50, var7, 200, 40);
+    this.continueButton.listener = this;
+    this.addChild(this.continueButton);
+    this.setBounds(0, 0, 300, var7 + 55 + 4);
   }
 
   @Override
@@ -64,10 +65,9 @@ public final class pe_ extends ListContainer implements LinkedTextListener, Butt
 
   @Override
   public void handleButtonClicked(final Button button) {
-    if (button == this._H) {
+    if (button == this.continueButton) {
       CreateAccountFrame.b150rm();
-      this._I.i423();
+      this.createAccountFrame.i423();
     }
-
   }
 }

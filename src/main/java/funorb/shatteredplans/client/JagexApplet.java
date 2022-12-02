@@ -27,10 +27,8 @@ import funorb.client.lobby.ContextMenu;
 import funorb.client.lobby.PlayerListEntry;
 import funorb.client.lobby.QuickChatResponse;
 import funorb.client.lobby.QuickChatResponses;
-import funorb.client.lobby.ScrollPane;
 import funorb.client.r_;
 import funorb.commonui.CommonUI;
-import funorb.commonui.frame.CreateAccountFrame;
 import funorb.commonui.Enum1;
 import funorb.commonui.form.CreateAccountForm;
 import funorb.commonui.form.CreateDisplayNameForm;
@@ -180,7 +178,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
   protected static DuplexStream serverConnection1;
   private int gamePort2Primary;
   private int gamePort2Secondary;
-  private static String _nlc;
+  private static String accountErrorMessage;
   public static boolean cannotChat = true;
   protected static long _bqe;
   private static boolean _mdB;
@@ -718,27 +716,27 @@ public abstract class JagexApplet extends JagexBaseApplet {
     CommonUI._wha.a540(var0);
   }
 
-  private static void a077wo(final int var0, final String[] var2, final String var3) {
+  private static void a077wo(@MagicConstant(valuesFromClass = kj_.Code.class) final int var0, final String[] var2, final String var3) {
     CommonUI._fjs = Enum1.C2;
-    if (var0 == 255) {
-      UsernameValidator._ija = ScrollPane.a705(CreateAccountForm.ageFieldNum < 13);
+    if (var0 == kj_.Code.SUCCESS) {
+      UsernameValidator._ija = kj_.createSuccess(CreateAccountForm.ageFieldNum < 13);
       a786jp(null);
-    } else if (var0 >= 100 && var0 <= 105) {
+    } else if (var0 >= kj_.Code.C100 && var0 <= kj_.Code.C105) {
       a786jp(var2);
-      UsernameValidator._ija = a612tc(var2);
+      UsernameValidator._ija = kj_.a612tc(var2);
     } else {
-      UsernameValidator._ija = CreateAccountFrame.a431ck(var3, var0);
+      UsernameValidator._ija = kj_.a431ck(var0, var3);
     }
   }
 
-  private static void a453va(final String[] var0, final int var1, final String var2) {
+  private static void a453va(final String[] var0, @MagicConstant(valuesFromClass = kj_.Code.class) final int code, final String errorMessage) {
     CommonUI._eel = Enum1.C2;
-    if (var1 == 255) {
-      _tplc = ScrollPane.a705(CreateAccountForm.ageFieldNum < 13);
-    } else if (var1 >= 100 && var1 <= 105) {
-      _tplc = a612tc(var0);
+    if (code == kj_.Code.SUCCESS) {
+      _tplc = kj_.createSuccess(CreateAccountForm.ageFieldNum < 13);
+    } else if (code >= kj_.Code.C100 && code <= kj_.Code.C105) {
+      _tplc = kj_.a612tc(var0);
     } else {
-      _tplc = CreateAccountFrame.a431ck(var2, var1);
+      _tplc = kj_.a431ck(code, errorMessage);
     }
   }
 
@@ -1360,12 +1358,6 @@ public abstract class JagexApplet extends JagexBaseApplet {
     shutdownServerConnection();
   }
 
-  private static kj_ a612tc(final String[] var0) {
-    final kj_ var1 = new kj_(false);
-    var1._d = var0;
-    return var1;
-  }
-
   private static DisplayMode[] listDisplayModes() {
     final MailboxMessage message = MessagePumpThread.instance.sendListDisplayModesMessage();
     if (message.busyAwait() == MailboxMessage.Status.FAILURE) {
@@ -1687,13 +1679,14 @@ public abstract class JagexApplet extends JagexBaseApplet {
     }
   }
 
+  @MagicConstant(valuesFromClass = kj_.Code.class)
   private int a425si(final int var0, final int var1, final e_ var2, final e_ var3, final String var4, final boolean var5) {
     final String var6 = var3.a983();
     final String var7 = var2.a983();
     if (serverConnection1 == null) {
       final boolean var8 = this.initializeServerConnection(false);
       if (!var8) {
-        return -1;
+        return kj_.Code.NONE;
       }
     }
 
@@ -1748,10 +1741,10 @@ public abstract class JagexApplet extends JagexBaseApplet {
       } else {
         if (var12 == 248) {
           CreateAccountForm.accountCreationFailed();
-          _nlc = StringConstants.CREATE_UNABLE;
+          accountErrorMessage = StringConstants.CREATE_UNABLE;
           shutdownServerConnection();
           _kej = false;
-          return 248;
+          return kj_.Code.INELIGIBLE;
         }
 
         if (var12 == 99) {
@@ -1774,13 +1767,14 @@ public abstract class JagexApplet extends JagexBaseApplet {
         if (s2cBytesAvailable(var9)) {
           final int var15 = _aee.length;
 
-          for (int var11 = 0; var15 > var11; ++var11) {
-            _aee[var11] = s2cPacket.readNullBracketedString();
+          for (int i = 0; i < var15; ++i) {
+            _aee[i] = s2cPacket.readNullBracketedString();
           }
 
           shutdownServerConnection();
           _kej = false;
-          return 100 + var15;
+          //noinspection MagicConstant
+          return kj_.Code.C100 + var15;
         }
       }
     }
@@ -1792,23 +1786,24 @@ public abstract class JagexApplet extends JagexBaseApplet {
           _cju = var14;
         }
       } else {
-        _nlc = s2cPacket.readNullTerminatedString();
+        accountErrorMessage = s2cPacket.readNullTerminatedString();
       }
 
       shutdownServerConnection();
       _kej = false;
+      //noinspection MagicConstant
       return ShatteredPlansClient.currentS2cPacketType;
     } else {
       if (serverConnection1 == null) {
         if (_kej) {
           if (hasConnectionTimedOut()) {
-            _nlc = StringConstants.LOGIN_M3;
+            accountErrorMessage = StringConstants.LOGIN_M3;
           } else {
-            _nlc = StringConstants.LOGIN_M2;
+            accountErrorMessage = StringConstants.LOGIN_M2;
           }
 
           _kej = false;
-          return 249;
+          return kj_.Code.CONNECTION_FAILED;
         }
 
         final int var12 = this.gamePort1Primary;
@@ -1817,16 +1812,18 @@ public abstract class JagexApplet extends JagexBaseApplet {
         _kej = true;
       }
 
-      return -1;
+      return kj_.Code.NONE;
     }
   }
 
+  @MagicConstant(valuesFromClass = kj_.Code.class)
   private int a968sr(final String usernameOrEmail, final int affId, final int var3, final String password, final String var5, final boolean var6) {
     final e_ var7 = new e_(usernameOrEmail);
     final e_ var8 = new e_(var5);
     return this.a425si(affId, var3, var8, var7, password, var6);
   }
 
+  @MagicConstant(valuesFromClass = kj_.Code.class)
   private int a031wi(final e_ var0, final e_ var1) {
     return this.a425si(0, 0, var0, var1, null, false);
   }
@@ -2015,7 +2012,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
           ShatteredPlansClient.currentS2cPacketType = 3;
         }
 
-        _nlc = s2cPacket.readNullTerminatedString();
+        accountErrorMessage = s2cPacket.readNullTerminatedString();
         _kej = false;
         //noinspection MagicConstant
         return ShatteredPlansClient.currentS2cPacketType;
@@ -2024,9 +2021,9 @@ public abstract class JagexApplet extends JagexBaseApplet {
       if (serverConnection1 == null) {
         if (_kej) {
           if (hasConnectionTimedOut()) {
-            _nlc = StringConstants.LOGIN_M3;
+            accountErrorMessage = StringConstants.LOGIN_M3;
           } else {
-            _nlc = StringConstants.LOGIN_M2;
+            accountErrorMessage = StringConstants.LOGIN_M2;
           }
 
           _kej = false;
@@ -2103,11 +2100,12 @@ public abstract class JagexApplet extends JagexBaseApplet {
   protected final int tickCommonUI(final boolean alreadyLoggedIn) {
     final CommonUI.TickResult action = CommonUI.tick();
     if (action == CommonUI.TickResult.R1) {
+      @MagicConstant(valuesFromClass = kj_.Code.class)
       final int var5 = this.a031wi(j083bp(), new e_(getUsernameOrEmail(), CommonUI._fjs == Enum1.C3));
-      if (var5 != -1) {
-        a077wo(var5, _aee, _nlc);
+      if (var5 != kj_.Code.NONE) {
+        a077wo(var5, _aee, accountErrorMessage);
         _aee = null;
-        _nlc = null;
+        accountErrorMessage = null;
       }
 
       final Boolean var6 = j653fr();
@@ -2117,11 +2115,12 @@ public abstract class JagexApplet extends JagexBaseApplet {
     }
 
     if (action == CommonUI.TickResult.R2) {
-      final int var5 = this.a968sr(getUsernameOrEmail(), this.affId, CreateAccountForm.ageFieldNum, CommonUI.getPassword(), a983of(), CreateAccountForm.optInCheckboxActive);
-      if (var5 != -1) {
-        a453va(_aee, var5, _nlc);
+      @MagicConstant(valuesFromClass = kj_.Code.class)
+      final int code = this.a968sr(getUsernameOrEmail(), this.affId, CreateAccountForm.ageFieldNum, CommonUI.getPassword(), a983of(), CreateAccountForm.optInCheckboxActive);
+      if (code != kj_.Code.NONE) {
+        a453va(_aee, code, accountErrorMessage);
         _aee = null;
-        _nlc = null;
+        accountErrorMessage = null;
       }
     }
 
@@ -2143,8 +2142,8 @@ public abstract class JagexApplet extends JagexBaseApplet {
             isAnonymous = false;
             connectionState = ConnectionState.CONNECTED;
           } else {
-            CommonUI.handleLoginFailed(loginResult, _nlc);
-            _nlc = null;
+            CommonUI.handleLoginFailed(loginResult, accountErrorMessage);
+            accountErrorMessage = null;
           }
         }
       }
@@ -2484,7 +2483,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
         this.redirectToErrorPage("reconnect");
       }
       CommonUI.handleServerDisconnect();
-      CommonUI.handleLoginFailed(var2, _nlc);
+      CommonUI.handleLoginFailed(var2, accountErrorMessage);
       _mdB = true;
       _ipb = PseudoMonotonicClock.currentTimeMillis() + 15000L;
     }

@@ -129,7 +129,7 @@ public final class CreateAccountForm extends ListContainer implements LinkedText
 
   public static void a423tl() {
     _anb = new CreateAccountForm();
-    CommonUI._aef.setNextContent(_anb);
+    CommonUI.contentFrame.setNextContent(_anb);
   }
 
   @Override
@@ -233,10 +233,10 @@ public final class CreateAccountForm extends ListContainer implements LinkedText
         } catch (final NumberFormatException var4) {}
 
         if (CommonUI._eel == Enum1.C1) {
-          final CreateAccountFrame var6 = new CreateAccountFrame(CommonUI.root, this);
-          CommonUI.root.pushActive(var6);
+          final CreateAccountFrame createAccountFrame = new CreateAccountFrame(CommonUI.root, this);
+          CommonUI.root.pushActive(createAccountFrame);
           if (a591js(JagexBaseApplet.getInstance())) {
-            var6.f487();
+            createAccountFrame.f487();
           } else {
             CommonUI._eel = Enum1.C3;
             optInCheckboxActive = this.optInCheckbox.active;

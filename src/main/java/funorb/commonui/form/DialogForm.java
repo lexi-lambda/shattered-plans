@@ -1,5 +1,7 @@
-package funorb.commonui;
+package funorb.commonui.form;
 
+import funorb.commonui.Button;
+import funorb.commonui.CommonUI;
 import funorb.commonui.container.ListContainer;
 import funorb.commonui.frame.AccountFrame;
 import funorb.commonui.listener.ButtonListener;
@@ -8,7 +10,7 @@ import funorb.graphics.Drawing;
 import funorb.graphics.Font;
 import org.jetbrains.annotations.Nullable;
 
-public final class cf_ extends ListContainer implements ButtonListener {
+public final class DialogForm extends ListContainer implements ButtonListener {
   private final AccountFrame accountFrame;
   private final Font font;
   private final String statusMessage;
@@ -16,7 +18,7 @@ public final class cf_ extends ListContainer implements ButtonListener {
   private Button[] buttons;
   private @Nullable CommonUI.TickResult[] buttonActions;
 
-  public cf_(final AccountFrame accountFrame, final Font font, final String statusMessage) {
+  public DialogForm(final AccountFrame accountFrame, final Font font, final String statusMessage) {
     super(0, 0, 288, 0);
     this.font = font;
     this.accountFrame = accountFrame;

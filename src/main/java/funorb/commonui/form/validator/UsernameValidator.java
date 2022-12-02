@@ -148,11 +148,11 @@ public final class UsernameValidator extends StringValidator {
 
     if (!username.equals(this._n)) {
       final kj_ var3 = a382ji(username);
-      if (var3 == null || var3._g != null) {
+      if (var3 == null || var3.errorMessage != null) {
         return ValidationState.CHECKING_1;
       }
 
-      this._o = var3._h;
+      this._o = var3.success;
       this._n = username;
     }
 
@@ -169,12 +169,12 @@ public final class UsernameValidator extends StringValidator {
     if (var3 == null) {
       if (!var2.equals(this._n)) {
         final kj_ var4 = a382ji(var2);
-        if (var4 == null || var4._g != null) {
+        if (var4 == null || var4.errorMessage != null) {
           return null;
         }
 
         this._n = var2;
-        this._o = var4._h;
+        this._o = var4.success;
       }
 
       return !this._o ? StringConstants.CREATE_USERNAME_UNAVAILABLE : StringConstants.CREATE_USERNAME_AVAILABLE;

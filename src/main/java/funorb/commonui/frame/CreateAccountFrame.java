@@ -4,35 +4,26 @@ import funorb.commonui.Button;
 import funorb.commonui.CommonUI;
 import funorb.commonui.Enum1;
 import funorb.commonui.Resources;
-import funorb.commonui.cf_;
 import funorb.commonui.form.CreateAccountForm;
+import funorb.commonui.form.DialogForm;
+import funorb.commonui.form.Under13DialogForm;
 import funorb.commonui.kj_;
-import funorb.commonui.pe_;
-import funorb.shatteredplans.client.JagexApplet;
 import funorb.shatteredplans.StringConstants;
-
-import java.util.Objects;
+import funorb.shatteredplans.client.JagexApplet;
 
 public final class CreateAccountFrame extends AccountFrame {
-  private final CreateAccountForm _Db;
+  private final CreateAccountForm form;
   private boolean _Eb;
   private boolean _Hb;
 
-  public CreateAccountFrame(final RootFrame var1, final CreateAccountForm var2) {
-    super(var1, Resources.AREZZO_14_BOLD, StringConstants.CREATING_YOUR_ACCOUNT, false, false);
-    this._Db = var2;
-  }
-
-  public static kj_ a431ck(final String var0, final int var1) {
-    final kj_ var3 = new kj_(false);
-    var3._c = var1;
-    var3._g = var0;
-    return var3;
+  public CreateAccountFrame(final RootFrame root, final CreateAccountForm form) {
+    super(root, Resources.AREZZO_14_BOLD, StringConstants.CREATING_YOUR_ACCOUNT, false, false);
+    this.form = form;
   }
 
   public static void b150rm() {
-    a584ai(CreateAccountForm.emailFieldText, CreateAccountForm.passwordFieldText, true);
-    CommonUI._nsbD = true;
+    CommonUI.a584ai(CreateAccountForm.emailFieldText, CreateAccountForm.passwordFieldText, true);
+    CommonUI.loggingInFromCreateAccount = true;
   }
 
   private static kj_ a752br() {
@@ -44,12 +35,6 @@ public final class CreateAccountFrame extends AccountFrame {
     } else {
       return null;
     }
-  }
-
-  public static void a584ai(final String username, final String password, final boolean var0) {
-    CommonUI.enteredUsername = username;
-    CommonUI.enteredPassword = password;
-    CommonUI.setStateLoggingIn(StringConstants.LOGGING_IN, var0);
   }
 
   @Override
@@ -70,61 +55,61 @@ public final class CreateAccountFrame extends AccountFrame {
         this.a122(false, var2);
       }
     }
-
     super.tickAnimations();
   }
 
-  private void a122(final boolean var2, final kj_ var3) {
+  private void a122(final boolean var2, final kj_ response) {
     this._Hb = true;
-    String var4;
-    if (var3._h) {
-      var4 = StringConstants.ACCOUNT_CREATED_SUCCESSFULLY;
-    } else if (var3._d == null) {
-      var4 = var3._g;
-      if (var3._c == 248) {
+
+    String message;
+    if (response.success) {
+      message = StringConstants.ACCOUNT_CREATED_SUCCESSFULLY;
+    } else if (response.suggestedUsernames == null) {
+      message = response.errorMessage;
+      if (response.code == kj_.Code.INELIGIBLE) {
         if (!var2) {
           CreateAccountForm.accountCreationFailed();
         }
 
-        var4 = StringConstants.CREATE_INELIGIBLE;
+        message = StringConstants.CREATE_INELIGIBLE;
         this._Eb = true;
       }
     } else {
-      var4 = StringConstants.CREATE_USERNAME_UNAVAILABLE;
-      if (this._Db != null) {
-        this._Db.a150();
+      message = StringConstants.CREATE_USERNAME_UNAVAILABLE;
+      if (this.form != null) {
+        this.form.a150();
       }
     }
 
-    final cf_ var5 = new cf_(this, Resources.AREZZO_14_BOLD, var4);
-    if (var3._h) {
-      if (var3._b) {
-        this.setNextContent(new pe_(this));
+    final DialogForm dialog = new DialogForm(this, Resources.AREZZO_14_BOLD, message);
+    if (response.success) {
+      if (response.under13) {
+        this.setNextContent(new Under13DialogForm(this));
         return;
       }
 
-      var5.addButton(StringConstants.CONT, this);
+      dialog.addButton(StringConstants.CONT, this);
     } else {
       if (this._Eb) {
-        var5.addButton(StringConstants.CONT, this);
-      } else if (var3._c == 5) {
-        var5.addActionButton(StringConstants.RELOAD_GAME, CommonUI.TickResult.RELOAD);
-        var5.addActionButton(StringConstants.QUIT_TO_WEBSITE, CommonUI.TickResult.QUIT_TO_WEBSITE);
+        dialog.addButton(StringConstants.CONT, this);
+      } else if (response.code == kj_.Code.C5) {
+        dialog.addActionButton(StringConstants.RELOAD_GAME, CommonUI.TickResult.RELOAD);
+        dialog.addActionButton(StringConstants.QUIT_TO_WEBSITE, CommonUI.TickResult.QUIT_TO_WEBSITE);
       } else {
-        var5.addActionButton(StringConstants.BACK, null);
+        dialog.addActionButton(StringConstants.BACK, null);
       }
 
-      if (var3._c == 3) {
-        var5.addActionButton(StringConstants.TO_SERVER_LIST, CommonUI.TickResult.TO_SERVER_LIST);
-      } else if (var3._c == 6) {
-        var5.addActionButton(StringConstants.TO_CUSTOMER_SUPPORT, CommonUI.TickResult.TO_CUSTOMER_SUPPORT);
+      if (response.code == kj_.Code.C3) {
+        dialog.addActionButton(StringConstants.TO_SERVER_LIST, CommonUI.TickResult.TO_SERVER_LIST);
+      } else if (response.code == kj_.Code.C6) {
+        dialog.addActionButton(StringConstants.TO_CUSTOMER_SUPPORT, CommonUI.TickResult.TO_CUSTOMER_SUPPORT);
       }
     }
 
-    this.setNextContent(var5);
+    this.setNextContent(dialog);
   }
 
   public void f487() {
-    this.a122(true, Objects.requireNonNull(a431ck(StringConstants.CREATE_INELIGIBLE, 248)));
+    this.a122(true, kj_.a431ck(kj_.Code.INELIGIBLE, StringConstants.CREATE_INELIGIBLE));
   }
 }

@@ -1,7 +1,5 @@
 package funorb.client.lobby;
 
-import funorb.commonui.kj_;
-
 public final class ScrollPane<T extends Component<?>> extends Component<Component<?>> {
   public final Component<T> content;
   public final Component<Component<?>> viewport;
@@ -15,12 +13,6 @@ public final class ScrollPane<T extends Component<?>> extends Component<Componen
     this.addChild(this.scrollBar);
     this.content = content;
     this.viewport.addChild(content);
-  }
-
-  public static kj_ a705(final boolean var0) {
-    final kj_ var1 = new kj_(true);
-    var1._b = var0;
-    return var1;
   }
 
   private void processScrollBar(final int mouseWheelRotation, final int buttonScrollAmount, final int slideRegionScrollAmount, final boolean var2) {
