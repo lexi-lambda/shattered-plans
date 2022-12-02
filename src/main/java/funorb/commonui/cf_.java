@@ -1,6 +1,7 @@
 package funorb.commonui;
 
 import funorb.commonui.container.ListContainer;
+import funorb.commonui.frame.AccountFrame;
 import funorb.commonui.listener.ButtonListener;
 import funorb.commonui.listener.ComponentListener;
 import funorb.graphics.Drawing;
@@ -8,17 +9,17 @@ import funorb.graphics.Font;
 import org.jetbrains.annotations.Nullable;
 
 public final class cf_ extends ListContainer implements ButtonListener {
-  private final AccountPage accountPage;
+  private final AccountFrame accountFrame;
   private final Font font;
   private final String statusMessage;
   private int buttonCount = 0;
   private Button[] buttons;
   private @Nullable CommonUI.TickResult[] buttonActions;
 
-  public cf_(final AccountPage accountPage, final Font font, final String statusMessage) {
+  public cf_(final AccountFrame accountFrame, final Font font, final String statusMessage) {
     super(0, 0, 288, 0);
     this.font = font;
-    this.accountPage = accountPage;
+    this.accountFrame = accountFrame;
     this.statusMessage = statusMessage;
     final int statusMessageHeight = this.statusMessage != null ? this.font.measureParagraphHeight(this.statusMessage, 260, this.font.ascent) : 0;
     this.setBounds(0, 0, 288, 22 + statusMessageHeight);
@@ -61,7 +62,7 @@ public final class cf_ extends ListContainer implements ButtonListener {
       if (button == this.buttons[i]) {
         final CommonUI.TickResult action = this.buttonActions[i];
         if (action == null) {
-          this.accountPage.i423();
+          this.accountFrame.i423();
         } else {
           CommonUI.nextTickResult = this.buttonActions[i];
         }

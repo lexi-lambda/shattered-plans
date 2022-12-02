@@ -4,6 +4,7 @@ import funorb.Strings;
 import funorb.awt.KeyState;
 import funorb.commonui.container.ListContainer;
 import funorb.commonui.form.CreateAccountForm;
+import funorb.commonui.frame.CreateAccountFrame;
 import funorb.commonui.listener.ButtonListener;
 import funorb.commonui.renderer.TextRenderer;
 import funorb.graphics.Drawing;
@@ -12,9 +13,9 @@ import funorb.shatteredplans.StringConstants;
 
 public final class pe_ extends ListContainer implements op_, ButtonListener {
   private final Button _H;
-  private final CreateAccountPage _I;
+  private final CreateAccountFrame _I;
 
-  public pe_(final CreateAccountPage var1) {
+  public pe_(final CreateAccountFrame var1) {
     super(0, 0, 288, 0);
     this._I = var1;
     this._H = new Button(StringConstants.CONT, null);
@@ -63,7 +64,7 @@ public final class pe_ extends ListContainer implements op_, ButtonListener {
   @Override
   public void handleButtonClicked(final Button button) {
     if (button == this._H) {
-      CreateAccountPage.b150rm();
+      CreateAccountFrame.b150rm();
       this._I.i423();
     }
 

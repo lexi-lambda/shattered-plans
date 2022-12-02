@@ -1,16 +1,18 @@
-package funorb.commonui;
+package funorb.commonui.frame;
 
+import funorb.commonui.ProgressBar;
+import funorb.commonui.Resources;
 import funorb.graphics.Drawing;
 import funorb.graphics.Font;
 
-public final class LoadingBar extends Frame {
+public final class LoadingFrame extends Frame {
   private String progressMessage;
   private final String notificationMessage;
   private final ProgressBar progressBar;
   private boolean failed;
   private boolean animationDisabled;
 
-  public LoadingBar(final RootFrame root, final String notificationMessage) {
+  public LoadingFrame(final RootFrame root, final String notificationMessage) {
     super(root, 300, 120);
     this.notificationMessage = notificationMessage;
     if (this.notificationMessage != null) {

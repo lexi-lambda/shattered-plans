@@ -6,6 +6,10 @@ import funorb.commonui.form.CreateAccountForm;
 import funorb.commonui.form.CreateDisplayNameForm;
 import funorb.commonui.form.JustPlayForm;
 import funorb.commonui.form.LoginForm;
+import funorb.commonui.frame.AccountFrame;
+import funorb.commonui.frame.ContentFrame;
+import funorb.commonui.frame.LoadingFrame;
+import funorb.commonui.frame.RootFrame;
 import funorb.graphics.Drawing;
 import funorb.shatteredplans.StringConstants;
 import funorb.shatteredplans.client.JagexApplet;
@@ -14,10 +18,10 @@ import org.jetbrains.annotations.Nullable;
 
 public final class CommonUI {
   public static RootFrame root;
-  public static AccountPage _jiG;
-  public static FormFrame _aef;
+  public static AccountFrame _jiG;
+  public static ContentFrame _aef;
   public static ks_ _wha;
-  private static LoadingBar loadingBar;
+  private static LoadingFrame loadingFrame;
 
   public static @Nullable TickResult nextTickResult = null;
 
@@ -82,8 +86,8 @@ public final class CommonUI {
     if (root != null) {
       root.expediteRemoval();
     }
-    if (loadingBar != null) {
-      loadingBar.disableAnimation();
+    if (loadingFrame != null) {
+      loadingFrame.disableAnimation();
     }
     if (TooltipManager.INSTANCE != null) {
       TooltipManager.INSTANCE.reset();
@@ -94,14 +98,14 @@ public final class CommonUI {
     f150fe();
     root.popAll();
     LoginForm.instance = new LoginForm(enteredUsername, wasConnected, canCreateAccount, isInitialLogin);
-    _aef = new FormFrame(root, LoginForm.instance, 33, 20, 30);
+    _aef = new ContentFrame(root, LoginForm.instance, 33, 20, 30);
     root.pushActive(_aef);
   }
 
   public static void setStateLoggingIn(final String message, final boolean var2) {
     _nsbD = var2;
     loggingIn = true;
-    _jiG = new AccountPage(root, Resources.AREZZO_14_BOLD, message, wasConnected, _nsbD);
+    _jiG = new AccountFrame(root, Resources.AREZZO_14_BOLD, message, wasConnected, _nsbD);
     root.pushActive(_jiG);
   }
 
@@ -229,10 +233,10 @@ public final class CommonUI {
 
   private static void switchToLoading() {
     root.popAll();
-    if (loadingBar == null) {
-      loadingBar = new LoadingBar(root, loadingNotificationMessage);
+    if (loadingFrame == null) {
+      loadingFrame = new LoadingFrame(root, loadingNotificationMessage);
     }
-    root.pushActive(loadingBar);
+    root.pushActive(loadingFrame);
   }
 
   public static void draw() {
@@ -240,11 +244,11 @@ public final class CommonUI {
   }
 
   public static void drawLoading() {
-    if (loadingBar == null) {
-      loadingBar = new LoadingBar(root, loadingNotificationMessage);
-      root.pushActive(loadingBar);
+    if (loadingFrame == null) {
+      loadingFrame = new LoadingFrame(root, loadingNotificationMessage);
+      root.pushActive(loadingFrame);
     }
-    loadingBar.update(loadingMessage, loadingPercent, loadingFailed);
+    loadingFrame.update(loadingMessage, loadingPercent, loadingFailed);
     Drawing.clear();
     draw();
   }

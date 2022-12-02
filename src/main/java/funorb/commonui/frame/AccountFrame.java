@@ -1,6 +1,11 @@
-package funorb.commonui;
+package funorb.commonui.frame;
 
 import funorb.awt.KeyState;
+import funorb.commonui.Button;
+import funorb.commonui.CommonUI;
+import funorb.commonui.Component;
+import funorb.commonui.ProgressBar;
+import funorb.commonui.cf_;
 import funorb.commonui.form.CreateAccountForm;
 import funorb.commonui.form.LoginForm;
 import funorb.commonui.listener.ButtonListener;
@@ -10,7 +15,7 @@ import funorb.client.JagexBaseApplet;
 import funorb.shatteredplans.StringConstants;
 import org.intellij.lang.annotations.MagicConstant;
 
-public class AccountPage extends FormFrame implements ButtonListener {
+public class AccountFrame extends ContentFrame implements ButtonListener {
   private final boolean isLoginPage;
   private final ProgressBar progressBar;
   private final boolean canRetryOnFailure;
@@ -18,7 +23,7 @@ public class AccountPage extends FormFrame implements ButtonListener {
   private boolean wasProtocolError = false;
   private boolean hasFailed = false;
 
-  public AccountPage(final RootFrame var1, final Font var2, final String var3, final boolean var4, final boolean var5) {
+  public AccountFrame(final RootFrame var1, final Font var2, final String var3, final boolean var4, final boolean var5) {
     super(var1, new cf_(null, var2, var3), 77, 10, 10);
     this.canRetryOnFailure = var4;
     this.isLoginPage = var5;

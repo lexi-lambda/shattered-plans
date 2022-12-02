@@ -1,9 +1,11 @@
-package funorb.commonui;
+package funorb.commonui.frame;
 
 import funorb.awt.KeyState;
+import funorb.commonui.Component;
+import funorb.commonui.TransparentContainer;
 import org.jetbrains.annotations.NotNull;
 
-public class FormFrame extends Frame {
+public class ContentFrame extends Frame {
   private static final int PADDING = 6;
   private static final int PADDING_2 = PADDING * 2;
 
@@ -12,10 +14,10 @@ public class FormFrame extends Frame {
   private final int animateBoundsTicks;
   private Component nextContent;
   private TransparentContainer transparentContent;
-  private @NotNull FormFrame.AnimationState animationState = AnimationState.NONE;
+  private @NotNull ContentFrame.AnimationState animationState = AnimationState.NONE;
   private int currentTick;
 
-  protected FormFrame(final RootFrame root, final Component content, final int paddingTop, final int ticksPerState, final int animateBoundsTicks) {
+  public ContentFrame(final RootFrame root, final Component content, final int paddingTop, final int ticksPerState, final int animateBoundsTicks) {
     super(root, content.width + PADDING_2, content.height + paddingTop + PADDING_2);
     this.paddingTop = paddingTop;
     this.ticksPerState = ticksPerState;

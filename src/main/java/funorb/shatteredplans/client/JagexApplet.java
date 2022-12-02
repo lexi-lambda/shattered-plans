@@ -30,7 +30,7 @@ import funorb.client.lobby.QuickChatResponses;
 import funorb.client.lobby.ScrollPane;
 import funorb.client.r_;
 import funorb.commonui.CommonUI;
-import funorb.commonui.CreateAccountPage;
+import funorb.commonui.frame.CreateAccountFrame;
 import funorb.commonui.Enum1;
 import funorb.commonui.form.CreateAccountForm;
 import funorb.commonui.form.CreateDisplayNameForm;
@@ -727,7 +727,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
       a786jp(var2);
       UsernameValidator._ija = a612tc(var2);
     } else {
-      UsernameValidator._ija = CreateAccountPage.a431ck(var3, var0);
+      UsernameValidator._ija = CreateAccountFrame.a431ck(var3, var0);
     }
   }
 
@@ -738,7 +738,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
     } else if (var1 >= 100 && var1 <= 105) {
       _tplc = a612tc(var0);
     } else {
-      _tplc = CreateAccountPage.a431ck(var2, var1);
+      _tplc = CreateAccountFrame.a431ck(var2, var1);
     }
   }
 

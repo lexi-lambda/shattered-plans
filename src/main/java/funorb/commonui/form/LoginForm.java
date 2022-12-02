@@ -10,7 +10,7 @@ import funorb.commonui.Resources;
 import funorb.commonui.form.field.TextField;
 import funorb.commonui.listener.ButtonListener;
 import funorb.commonui.listener.TextFieldListener;
-import funorb.commonui.CreateAccountPage;
+import funorb.commonui.frame.CreateAccountFrame;
 import funorb.commonui.pg_;
 import funorb.commonui.renderer.ButtonRenderer;
 import funorb.commonui.renderer.LinkRenderer;
@@ -152,7 +152,7 @@ public final class LoginForm extends ListContainer implements TextFieldListener,
 
   private void submit() {
     if (CommonUI.wasConnected || (this.usernameField.text.length() > 0 && this.passwordField.text.length() > 0)) {
-      CreateAccountPage.a584ai(this.usernameField.text, this.passwordField.text, false);
+      CreateAccountFrame.a584ai(this.usernameField.text, this.passwordField.text, false);
     }
   }
 

@@ -1,5 +1,7 @@
-package funorb.commonui;
+package funorb.commonui.frame;
 
+import funorb.commonui.Component;
+import funorb.commonui.Resources;
 import funorb.commonui.container.ListContainer;
 import funorb.graphics.Drawing;
 import funorb.graphics.Sprite;

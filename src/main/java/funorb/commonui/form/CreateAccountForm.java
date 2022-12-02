@@ -23,7 +23,7 @@ import funorb.commonui.form.validator.UsernameValidator;
 import funorb.commonui.form.validator.ValidationState;
 import funorb.commonui.hl_;
 import funorb.commonui.listener.ButtonListener;
-import funorb.commonui.CreateAccountPage;
+import funorb.commonui.frame.CreateAccountFrame;
 import funorb.commonui.op_;
 import funorb.commonui.pg_;
 import funorb.commonui.renderer.LinkRenderer;
@@ -233,7 +233,7 @@ public final class CreateAccountForm extends ListContainer implements op_, Butto
         } catch (final NumberFormatException var4) {}
 
         if (CommonUI._eel == Enum1.C1) {
-          final CreateAccountPage var6 = new CreateAccountPage(CommonUI.root, this);
+          final CreateAccountFrame var6 = new CreateAccountFrame(CommonUI.root, this);
           CommonUI.root.pushActive(var6);
           if (a591js(JagexBaseApplet.getInstance())) {
             var6.f487();

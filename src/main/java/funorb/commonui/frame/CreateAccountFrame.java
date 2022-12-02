@@ -1,17 +1,24 @@
-package funorb.commonui;
+package funorb.commonui.frame;
 
+import funorb.commonui.Button;
+import funorb.commonui.CommonUI;
+import funorb.commonui.Enum1;
+import funorb.commonui.Resources;
+import funorb.commonui.cf_;
 import funorb.commonui.form.CreateAccountForm;
+import funorb.commonui.kj_;
+import funorb.commonui.pe_;
 import funorb.shatteredplans.client.JagexApplet;
 import funorb.shatteredplans.StringConstants;
 
 import java.util.Objects;
 
-public final class CreateAccountPage extends AccountPage {
+public final class CreateAccountFrame extends AccountFrame {
   private final CreateAccountForm _Db;
   private boolean _Eb;
   private boolean _Hb;
 
-  public CreateAccountPage(final RootFrame var1, final CreateAccountForm var2) {
+  public CreateAccountFrame(final RootFrame var1, final CreateAccountForm var2) {
     super(var1, Resources.AREZZO_14_BOLD, StringConstants.CREATING_YOUR_ACCOUNT, false, false);
     this._Db = var2;
   }

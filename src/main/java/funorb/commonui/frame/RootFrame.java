@@ -1,5 +1,6 @@
-package funorb.commonui;
+package funorb.commonui.frame;
 
+import funorb.commonui.Component;
 import funorb.commonui.container.WrapperContainer;
 import funorb.shatteredplans.client.ShatteredPlansClient;
 import org.jetbrains.annotations.Contract;
