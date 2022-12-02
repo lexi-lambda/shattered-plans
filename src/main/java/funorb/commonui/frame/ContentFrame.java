@@ -2,7 +2,7 @@ package funorb.commonui.frame;
 
 import funorb.awt.KeyState;
 import funorb.commonui.Component;
-import funorb.commonui.TransparentContainer;
+import funorb.commonui.container.TransparentContainer;
 import org.jetbrains.annotations.NotNull;
 
 public class ContentFrame extends Frame {

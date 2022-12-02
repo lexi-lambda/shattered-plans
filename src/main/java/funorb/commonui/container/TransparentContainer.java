@@ -1,6 +1,6 @@
-package funorb.commonui;
+package funorb.commonui.container;
 
-import funorb.commonui.container.WrapperContainer;
+import funorb.commonui.Component;
 import funorb.graphics.Sprite;
 
 public final class TransparentContainer extends WrapperContainer {
