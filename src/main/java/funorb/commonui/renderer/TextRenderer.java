@@ -56,7 +56,7 @@ public class TextRenderer implements ITextRenderer {
 
   @Override
   public final void a403(final int var1, final int var2, final int var4, final Component var5) {
-    if (var5.isFocused()) {
+    if (var5.hasFocus()) {
       final AbstractTextLayout var6 = this.updateLayout(var5);
       final int var7 = var6.a543(var1);
       final TextLineMetrics var8 = var6.lineMetrics[var7];
@@ -104,7 +104,7 @@ public class TextRenderer implements ITextRenderer {
   @Override
   public final void a132(final int var1, final int var2, final int var3, final int var4, final Component var6) {
     if (var1 != var4) {
-      if (var6.isFocused()) {
+      if (var6.hasFocus()) {
         final AbstractTextLayout var7 = this.updateLayout(var6);
         final int var8;
         final int var9;

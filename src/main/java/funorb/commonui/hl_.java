@@ -20,7 +20,7 @@ public final class hl_ extends Button {
   }
 
   @Override
-  public boolean focus(final Component previouslyFocused) {
+  public boolean focus(final Component focusRoot) {
     return false;
   }
 

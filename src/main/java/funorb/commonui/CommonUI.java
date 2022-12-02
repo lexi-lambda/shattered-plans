@@ -6,7 +6,6 @@ import funorb.commonui.form.CreateAccountForm;
 import funorb.commonui.form.CreateDisplayNameForm;
 import funorb.commonui.form.JustPlayForm;
 import funorb.commonui.form.LoginForm;
-import funorb.commonui.form.validator.ConfirmEmailValidator;
 import funorb.graphics.Drawing;
 import funorb.shatteredplans.StringConstants;
 import funorb.shatteredplans.client.JagexApplet;
@@ -17,16 +16,17 @@ public final class CommonUI {
   public static NavigationRoot root;
   public static AccountPage _jiG;
   public static FormNavigationPage _aef;
+  public static ks_ _wha;
   private static LoadingBar loadingBar;
 
-  public static @Nullable TickResult _crb = null;
+  public static @Nullable TickResult nextTickResult = null;
 
   private static float loadingPercent;
   private static String loadingMessage;
   private static String loadingNotificationMessage = null;
 
   private static boolean loggingIn = false;
-  public static boolean _nlb;
+  public static boolean wasConnected;
   public static boolean _nsbD = false;
   public static Enum1 _eel;
   public static Enum1 _fjs;
@@ -41,8 +41,8 @@ public final class CommonUI {
 
 
   public static void load(final ResourceLoader spritesLoader, final ResourceLoader fontsLoader, final ResourceLoader dataLoader) {
-    ConfirmEmailValidator._wha = new ks_("");
-    ConfirmEmailValidator._wha.a540(false);
+    _wha = new ks_("");
+    _wha.a540(false);
     Resources.load(spritesLoader, fontsLoader, dataLoader);
     TooltipManager.initialize(Resources.AREZZO_14);
     root = new NavigationRoot();
@@ -59,15 +59,15 @@ public final class CommonUI {
       root.keyTyped(JagexApplet.lastTypedKeyCode, JagexApplet.lastTypedKeyChar);
     }
 
-    if (_crb != null) {
-      final TickResult tmp = _crb;
-      _crb = null;
+    if (nextTickResult != null) {
+      final TickResult tmp = nextTickResult;
+      nextTickResult = null;
       return tmp;
     } else if (loggingIn) {
       return TickResult.LOGGING_IN;
     } else if (_fjs == Enum1.C3) {
       return TickResult.R1;
-    } else if (ConfirmEmailValidator._wha.b154()) {
+    } else if (_wha.b154()) {
       return _eel == Enum1.C3 ? TickResult.R2 : null;
     } else {
       return TickResult.R1;
@@ -75,7 +75,7 @@ public final class CommonUI {
   }
 
   public static String getPassword() {
-    return _eel != Enum1.C3 ? enteredPassword : CreateAccountForm._G;
+    return _eel != Enum1.C3 ? enteredPassword : CreateAccountForm.passwordFieldText;
   }
 
   public static void switchToLoadingScreen() {
@@ -93,22 +93,22 @@ public final class CommonUI {
   public static void switchToLogin(final boolean canCreateAccount, final boolean isInitialLogin) {
     f150fe();
     root.startTransitioningOut();
-    LoginForm._noe = new LoginForm(enteredUsername, _nlb, canCreateAccount, isInitialLogin);
-    _aef = new FormNavigationPage(root, LoginForm._noe, 33, 20, 30);
+    LoginForm.instance = new LoginForm(enteredUsername, wasConnected, canCreateAccount, isInitialLogin);
+    _aef = new FormNavigationPage(root, LoginForm.instance, 33, 20, 30);
     root.pushChild(_aef);
   }
 
   public static void setStateLoggingIn(final String message, final boolean var2) {
     _nsbD = var2;
     loggingIn = true;
-    _jiG = new AccountPage(root, Resources.AREZZO_14_BOLD, message, _nlb, _nsbD);
+    _jiG = new AccountPage(root, Resources.AREZZO_14_BOLD, message, wasConnected, _nsbD);
     root.pushChild(_jiG);
   }
 
   public static void handleServerDisconnect() {
     if (JagexApplet.connectionState == JagexApplet.ConnectionState.CONNECTED) {
       f150fe();
-      _nlb = true;
+      wasConnected = true;
       root.startTransitioningOut();
       setStateLoggingIn(StringConstants.CONNECTION_LOST_RECONNECTING, false);
       JagexApplet.connectionState = JagexApplet.ConnectionState.RECONNECTING;
@@ -118,8 +118,8 @@ public final class CommonUI {
 
   private static void f150fe() {
     loggingIn = false;
-    _nlb = false;
-    _crb = null;
+    wasConnected = false;
+    nextTickResult = null;
     _eel = Enum1.C1;
     _fjs = Enum1.C1;
   }
@@ -127,7 +127,7 @@ public final class CommonUI {
   public static void handleLoginSucceeded() {
     loggingIn = false;
     loadingNotificationMessage = null;
-    if (_nlb) {
+    if (wasConnected) {
       _jiG.p150();
     } else {
       final int var1 = _tfn;
@@ -151,12 +151,12 @@ public final class CommonUI {
     if (_jiG != null && _jiG.isAlive) {
       if (var0 == LoginResult.R8) {
         var0 = LoginResult.R2;
-        if (_nlb) {
+        if (wasConnected) {
           var1 = StringConstants.INVALID_PASS;
         } else {
           var1 = StringConstants.INVALID_USER_OR_PASS;
         }
-        LoginForm._noe.a984(enteredUsername);
+        LoginForm.instance.a984(enteredUsername);
       }
 
       boolean var2 = true;
@@ -169,10 +169,10 @@ public final class CommonUI {
           var1 = StringConstants.PLEASE_TRY_AGAIN;
         }
 
-        _jiG.a503(var1, var0);
+        _jiG.handleFailure(var0, var1);
       }
-      if (var0 != LoginResult.R256 && var0 != LoginResult.R10 && !_nlb) {
-        LoginForm._noe.l150();
+      if (var0 != LoginResult.PROTOCOL_ERROR && var0 != LoginResult.R10 && !wasConnected) {
+        LoginForm.instance.l150();
       }
     }
   }
@@ -182,7 +182,7 @@ public final class CommonUI {
       _jiG.i423();
     }
     _sjb = new CreateDisplayNameForm();
-    _aef.b952(_sjb);
+    _aef.setNextContent(_sjb);
   }
 
   private static String a547lr(final CharSequence[] var0) {
@@ -224,7 +224,7 @@ public final class CommonUI {
 
   public static void a423oo() {
     switchToLoading();
-    _crb = TickResult.R4;
+    nextTickResult = TickResult.R4;
   }
 
   private static void switchToLoading() {
@@ -255,7 +255,14 @@ public final class CommonUI {
   }
 
   public static void b423ol() {
-    _aef.b952(new JustPlayForm());
+    _aef.setNextContent(new JustPlayForm());
+  }
+
+  public static ks_ a661os(final String var1) {
+    if (_wha.b154() && !var1.equals(_wha.getLabel())) {
+      _wha = new ks_(var1);
+    }
+    return _wha;
   }
 
   public enum TickResult {
@@ -280,10 +287,13 @@ public final class CommonUI {
     public static final int SUCCESS = 0;
     public static final int R1 = 1;
     public static final int R2 = 2;
-    public static final int R3 = 3;
-    public static final int R5 = 5;
+    public static final int CONNECTION_LOST = 3;
+    public static final int PLAY_FREE_VERSION = 4;
+    public static final int GAME_UPDATED = 5;
+    public static final int SEE_CUSTOMER_SUPPORT = 6;
     public static final int R8 = 8;
+    public static final int CHANGE_DISPLAY_NAME = 9;
     public static final int R10 = 10;
-    public static final int R256 = 256;
+    public static final int PROTOCOL_ERROR = 256;
   }
 }

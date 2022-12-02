@@ -20,7 +20,7 @@ public final class ButtonRenderer extends TextRenderer {
 
   @Override
   public void draw(final Component component, final int x, final int y, boolean enabled) {
-    final boolean var6 = component.isMouseOver || component.isFocused();
+    final boolean var6 = component.isMouseOver || component.hasFocus();
     if (component instanceof Button) {
       enabled &= ((Button) component).enabled;
     }

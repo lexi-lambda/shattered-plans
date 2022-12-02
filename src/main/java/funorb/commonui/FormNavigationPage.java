@@ -1,129 +1,126 @@
 package funorb.commonui;
 
 import funorb.awt.KeyState;
+import org.jetbrains.annotations.NotNull;
 
 public class FormNavigationPage extends FramedNavigationPage {
-  private final int _jb;
-  private final int _db;
-  private final int _mb;
-  private final int _X;
-  private Enum4 _ab;
-  private Component _ib;
-  private int _Z;
-  private cg_ _eb;
+  private static final int PADDING = 6;
+  private static final int PADDING_2 = PADDING * 2;
 
-  protected FormNavigationPage(final NavigationRoot var1, final Component var2, final int var3, final int var4, final int var5) {
-    super(var1, 12 + var2.width, var2.height + var3 + 12);
-    this._db = var3;
-    this._mb = var5;
-    this._X = this._jb = var4;
-    this.a876(var2);
+  private final int paddingTop;
+  private final int ticksPerState;
+  private final int animateBoundsTicks;
+  private Component nextContent;
+  private TransparentContainer transparentContent;
+  private @NotNull FormNavigationPage.AnimationState animationState = AnimationState.NONE;
+  private int currentTick;
+
+  protected FormNavigationPage(final NavigationRoot root, final Component content, final int paddingTop, final int ticksPerState, final int animateBoundsTicks) {
+    super(root, content.width + PADDING_2, content.height + paddingTop + PADDING_2);
+    this.paddingTop = paddingTop;
+    this.ticksPerState = ticksPerState;
+    this.animateBoundsTicks = animateBoundsTicks;
+    this.setContent(content);
   }
 
-  private void a876(final Component var2) {
-    if (this._eb != null) {
-      this.removeChild(this._eb);
+  private void setContent(final Component content) {
+    if (this.transparentContent != null) {
+      this.removeChild(this.transparentContent);
     }
 
-    if (var2 == null) {
-      this._eb = new cg_();
+    if (content == null) {
+      this.transparentContent = new TransparentContainer();
     } else {
-      var2.setBounds(6, 6 + this._db, var2.width, var2.height);
-      this._eb = new cg_(var2);
+      content.setBounds(PADDING, this.paddingTop + PADDING, content.width, content.height);
+      this.transparentContent = new TransparentContainer(content);
     }
 
-    this.addChild(this._eb);
-    this._ib = null;
+    this.addChild(this.transparentContent);
+    this.nextContent = null;
   }
 
   @Override
-  public boolean a686(final int keyCode, final char keyChar, final Component var4) {
-    if (super.a686(keyCode, keyChar, var4)) {
+  public boolean keyTyped(final int keyCode, final char keyChar, final Component focusRoot) {
+    if (super.keyTyped(keyCode, keyChar, focusRoot)) {
       return true;
-    } else {
-      if (this._eb != null) {
-        if (keyCode == KeyState.Code.UP) {
-          this._eb.focus(var4);
-        }
-
-        if (keyCode == KeyState.Code.DOWN) {
-          this._eb.focus(var4);
-        }
-      }
-
-      return false;
     }
+
+    if (this.transparentContent != null) {
+      if (keyCode == KeyState.Code.UP || keyCode == KeyState.Code.DOWN) {
+        this.transparentContent.focus(focusRoot);
+      }
+    }
+
+    return false;
   }
 
   @Override
-  public final void g423() {
-    if (this._ab != Enum4.C2) {
-      this._Z = 0;
-      this._ab = Enum4.C3;
-      this.a876(this._ib);
-      this._eb._J = 0;
-      this._ib = null;
+  protected final void animateBoundsFinished() {
+    if (this.animationState != AnimationState.FADE_OUT) {
+      this.currentTick = 0;
+      this.animationState = AnimationState.FADE_IN;
+      this.setContent(this.nextContent);
+      this.transparentContent.alpha = 0;
+      this.nextContent = null;
     }
   }
 
   @Override
   public void tick2() {
-    if (this._ab != null) {
-      if (this._ab == Enum4.C2) {
-        if (this._X == ++this._Z) {
-          this._ab = Enum4.C1;
-          this.b115(this._mb, 12 + this._ib.width, this._ib.height + this._db + 12);
-          this._Z = 0;
-          this._eb._J = 0;
-        } else {
-          this._eb._J = -((this._Z << 8) / this._X) + 256;
-        }
-      } else if (this._ab == Enum4.C3) {
-        if (++this._Z == this._jb) {
-          this._eb._J = 256;
-          this._ab = null;
-        } else {
-          this._eb._J = (this._Z << 8) / this._jb;
-        }
+    if (this.animationState == AnimationState.FADE_OUT) {
+      if (++this.currentTick == this.ticksPerState) {
+        this.animationState = AnimationState.BOUNDS;
+        this.animateBounds(this.animateBoundsTicks, this.nextContent.width + PADDING_2, this.nextContent.height + this.paddingTop + PADDING_2);
+        this.currentTick = 0;
+        this.transparentContent.alpha = 0;
+      } else {
+        this.transparentContent.alpha = 256 - ((this.currentTick << 8) / this.ticksPerState);
+      }
+    } else if (this.animationState == AnimationState.FADE_IN) {
+      if (++this.currentTick == this.ticksPerState) {
+        this.transparentContent.alpha = 256;
+        this.animationState = AnimationState.NONE;
+      } else {
+        this.transparentContent.alpha = (this.currentTick << 8) / this.ticksPerState;
       }
     }
 
     super.tick2();
   }
 
-  public final void b952(final Component var1) {
-    this._ib = var1;
-    if (this._ab == Enum4.C1) {
-      this.b115(this._mb, this._ib.width + 12, this._ib.height + this._db + 12);
-      this._Z = 0;
-    } else if (this._ab != Enum4.C2) {
-      this._ab = Enum4.C2;
-      this._Z = 0;
+  public final void setNextContent(final Component content) {
+    this.nextContent = content;
+    if (this.animationState == AnimationState.BOUNDS) {
+      this.animateBounds(this.animateBoundsTicks, this.nextContent.width + PADDING_2, this.nextContent.height + this.paddingTop + PADDING_2);
+      this.currentTick = 0;
+    } else if (this.animationState != AnimationState.FADE_OUT) {
+      this.animationState = AnimationState.FADE_OUT;
+      this.currentTick = 0;
     }
   }
 
   @Override
-  protected final void n150() {
-    if (this._ab != null) {
-      if (this._ab != Enum4.C3) {
-        this.b599(12 + this._db + this._ib.height, 12 + this._ib.width);
-        this.a876(this._ib);
+  protected final void skipAnimations() {
+    if (this.animationState != AnimationState.NONE) {
+      if (this.animationState != AnimationState.FADE_IN) {
+        this.setBoundsCentered(this.nextContent.width + PADDING_2, this.nextContent.height + this.paddingTop + PADDING_2);
+        this.setContent(this.nextContent);
       }
 
-      this._eb._J = 256;
-      this._ab = null;
+      this.transparentContent.alpha = 256;
+      this.animationState = AnimationState.NONE;
     }
 
-    super.n150();
+    super.skipAnimations();
   }
 
   @Override
-  public final boolean k154() {
-    this.n150();
-    return super.k154();
+  public final boolean canBeRemoved() {
+    this.skipAnimations();
+    return super.canBeRemoved();
   }
 
-  private enum Enum4 {
-    C1, C2, C3
+  private enum AnimationState {
+    NONE, FADE_OUT, BOUNDS, FADE_IN
   }
 }

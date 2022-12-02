@@ -1,12 +1,12 @@
 package funorb.commonui;
 
 public final class ks_ {
-  private final String _f;
+  private final String label;
   private boolean _d = false;
   private boolean _g = false;
 
-  public ks_(final String var1) {
-    this._f = var1;
+  public ks_(final String label) {
+    this.label = label;
   }
 
   public boolean b154() {
@@ -22,7 +22,7 @@ public final class ks_ {
     return this._d;
   }
 
-  public String a738() {
-    return this._f;
+  public String getLabel() {
+    return this.label;
   }
 }

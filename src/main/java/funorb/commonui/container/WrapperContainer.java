@@ -9,12 +9,12 @@ import java.util.Hashtable;
 public abstract class WrapperContainer extends Component implements Container {
   protected Component child;
 
-  protected WrapperContainer(final int var1, final int var2, final int var3, final int var4) {
-    super(var1, var2, var3, var4);
+  protected WrapperContainer(final int x, final int y, final int width, final int height) {
+    super(x, y, width, height);
   }
 
   private boolean a948(final Component var1) {
-    return this.child != null && !this.child.isFocused() && this.child.focus(var1);
+    return this.child != null && !this.child.hasFocus() && this.child.focus(var1);
   }
 
   private void putChildDebugString(final Hashtable<Component, Component> cycles, final int nestingLevel, final StringBuilder builder) {
@@ -28,8 +28,8 @@ public abstract class WrapperContainer extends Component implements Container {
   }
 
   @Override
-  public final boolean focus(final Component previouslyFocused) {
-    return this.child != null && this.child.focus(previouslyFocused);
+  public final boolean focus(final Component focusRoot) {
+    return this.child != null && this.child.focus(focusRoot);
   }
 
   @Override
@@ -57,16 +57,16 @@ public abstract class WrapperContainer extends Component implements Container {
 
   @Override
   public final boolean a931(final int var2, final int var3, final Component var4, final int var5, final int var6, final int var7) {
-    return this.child != null && this.child.isFocused() && this.child.a931(var2, var3, var4, var5, var6, var7);
+    return this.child != null && this.child.hasFocus() && this.child.a931(var2, var3, var4, var5, var6, var7);
   }
 
   private boolean a872(final Component var2) {
 
-    return this.child != null && !this.child.isFocused() && this.child.focus(var2);
+    return this.child != null && !this.child.hasFocus() && this.child.focus(var2);
   }
 
   @Override
-  public final boolean isFocused() {
+  public final boolean hasFocus() {
     return this.a274() != null;
   }
 
@@ -106,7 +106,7 @@ public abstract class WrapperContainer extends Component implements Container {
   }
 
   protected Component a274() {
-    return this.child != null && this.child.isFocused() ? this.child : null;
+    return this.child != null && this.child.hasFocus() ? this.child : null;
   }
 
   @Override
@@ -130,11 +130,11 @@ public abstract class WrapperContainer extends Component implements Container {
   }
 
   @Override
-  public final boolean a686(final int keyCode, final char keyChar, final Component var4) {
-    if (this.child != null && this.child.isFocused() && this.child.a686(keyCode, keyChar, var4)) {
+  public final boolean keyTyped(final int keyCode, final char keyChar, final Component focusRoot) {
+    if (this.child != null && this.child.hasFocus() && this.child.keyTyped(keyCode, keyChar, focusRoot)) {
       return true;
     } else if (keyCode == KeyState.Code.TAB) {
-      return !JagexApplet.keysDown[81] ? this.a948(var4) : this.a872(var4);
+      return !JagexApplet.keysDown[81] ? this.a948(focusRoot) : this.a872(focusRoot);
     } else {
       return false;
     }

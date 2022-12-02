@@ -38,9 +38,13 @@ import funorb.shatteredplans.client.JagexApplet;
 import java.applet.Applet;
 
 public final class CreateAccountForm extends ListContainer implements op_, ButtonListener, CreateForm {
-  public static String _G;
+  public static String passwordFieldText;
   public static String _cgF = null;
   public static CreateAccountForm _anb;
+  public static String emailFieldText;
+  public static String usernameFieldText;
+  public static boolean optInCheckboxActive;
+  public static int ageFieldNum;
   private static boolean accountCreationFailed;
 
   public final CreateFormListener _D;
@@ -108,7 +112,7 @@ public final class CreateAccountForm extends ListContainer implements op_, Butto
 
   public static void a984gm(final String var1) {
     _cgF = var1;
-    CommonUI._crb = CommonUI.TickResult.R12;
+    CommonUI.nextTickResult = CommonUI.TickResult.R12;
   }
 
   private static boolean a591js(final Applet var0) {
@@ -125,7 +129,7 @@ public final class CreateAccountForm extends ListContainer implements op_, Butto
 
   public static void a423tl() {
     _anb = new CreateAccountForm();
-    CommonUI._aef.b952(_anb);
+    CommonUI._aef.setNextContent(_anb);
   }
 
   @Override
@@ -194,13 +198,13 @@ public final class CreateAccountForm extends ListContainer implements op_, Butto
   }
 
   @Override
-  public boolean a686(final int keyCode, final char keyChar, final Component var4) {
-    if (super.a686(keyCode, keyChar, var4)) {
+  public boolean keyTyped(final int keyCode, final char keyChar, final Component focusRoot) {
+    if (super.keyTyped(keyCode, keyChar, focusRoot)) {
       return true;
     } else if (keyCode == KeyState.Code.UP) {
-      return this.a611(var4);
+      return this.a611(focusRoot);
     } else {
-      return keyCode == KeyState.Code.DOWN && this.a948(var4);
+      return keyCode == KeyState.Code.DOWN && this.a948(focusRoot);
     }
   }
 
@@ -223,12 +227,10 @@ public final class CreateAccountForm extends ListContainer implements op_, Butto
       CommonUI.b423ol();
     } else if (button == this.createButton) {
       if (this.m154()) {
-        int var2 = -1;
-
+        int ageFieldNum = -1;
         try {
-          var2 = Integer.parseInt(this.ageField.text);
-        } catch (final NumberFormatException var4) {
-        }
+          ageFieldNum = Integer.parseInt(this.ageField.text);
+        } catch (final NumberFormatException var4) {}
 
         if (CommonUI._eel == Enum1.C1) {
           final CreateAccountPage var6 = new CreateAccountPage(CommonUI.root, this);
@@ -237,12 +239,12 @@ public final class CreateAccountForm extends ListContainer implements op_, Butto
             var6.f487();
           } else {
             CommonUI._eel = Enum1.C3;
-            JagexApplet._npm = this.optInCheckbox.active;
-            _G = this.passwordField.text;
-            JagexApplet._umj = this.usernameField.text;
+            optInCheckboxActive = this.optInCheckbox.active;
+            passwordFieldText = this.passwordField.text;
+            usernameFieldText = this.usernameField.text;
+            emailFieldText = this.emailField.text;
+            CreateAccountForm.ageFieldNum = ageFieldNum;
             JagexApplet._tplc = null;
-            JagexApplet._aeg = this.emailField.text;
-            JagexApplet._jmt = var2;
           }
         }
       }

@@ -25,9 +25,9 @@ public final class LinkRenderer implements ComponentRenderer {
 
   @Override
   public void draw(final Component component, final int x, final int y, final boolean enabled) {
-    final int var6 = !component.isMouseOver && !component.isFocused() ? 2188450 : 3249872;
+    final int var6 = !component.isMouseOver && !component.hasFocus() ? 2188450 : 3249872;
     this.font.drawParagraph("<u=" + Integer.toString(var6, 16) + ">" + component.text + "</u>", x + component.x, y + component.y, component.width, component.height, var6, this.horizontalAlignment, this.verticalAlignment, this.font.descent + this.font.ascent);
-    if (component.isFocused()) {
+    if (component.hasFocus()) {
       final int var7 = this.font.measureLineWidth(component.text);
       final int var8 = this.font.ascent + this.font.descent;
       int var9 = component.x + x;

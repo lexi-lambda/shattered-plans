@@ -19,7 +19,7 @@ public class ListContainer extends Component implements Container {
 
   @Override
   public final boolean a931(final int var2, final int var3, final Component var4, final int var5, final int var6, final int var7) {
-    return this.children.stream().anyMatch(child -> child.isFocused() && child.a931(var2, var3, var4, var5, var6, var7));
+    return this.children.stream().anyMatch(child -> child.hasFocus() && child.a931(var2, var3, var4, var5, var6, var7));
   }
 
   @Override
@@ -32,18 +32,18 @@ public class ListContainer extends Component implements Container {
   }
 
   @Override
-  public boolean a686(final int keyCode, final char keyChar, final Component var4) {
-    if (this.children.stream().anyMatch(child -> child.isFocused() && child.a686(keyCode, keyChar, var4))) {
+  public boolean keyTyped(final int keyCode, final char keyChar, final Component focusRoot) {
+    if (this.children.stream().anyMatch(child -> child.hasFocus() && child.keyTyped(keyCode, keyChar, focusRoot))) {
       return true;
     }
     if (keyCode == KeyState.Code.TAB) {
-      return !JagexApplet.keysDown[81] ? this.a948(var4) : this.a611(var4);
+      return !JagexApplet.keysDown[81] ? this.a948(focusRoot) : this.a611(focusRoot);
     }
     return false;
   }
 
   protected Component getFocusedChild() {
-    return this.children.stream().filter(Component::isFocused).findFirst().orElse(null);
+    return this.children.stream().filter(Component::hasFocus).findFirst().orElse(null);
   }
 
   @Override
@@ -61,15 +61,15 @@ public class ListContainer extends Component implements Container {
   }
 
   @Override
-  public final boolean focus(final Component previouslyFocused) {
-    return this.children.stream().anyMatch(child -> child.focus(previouslyFocused));
+  public final boolean focus(final Component focusRoot) {
+    return this.children.stream().anyMatch(child -> child.focus(focusRoot));
   }
 
   protected final boolean a611(final Component var1) {
     if (!this.children.isEmpty()) {
       for (final ListIterator<Component> it1 = this.children.listIterator(this.children.size()); it1.hasPrevious();) {
         final Component child1 = it1.previous();
-        if (child1.isFocused()) {
+        if (child1.hasFocus()) {
           for (final ListIterator<Component> it2 = this.children.listIterator(it1.nextIndex()); it2.hasPrevious();) {
             final Component child2 = it2.previous();
             if (child2.focus(var1)) {
@@ -86,7 +86,7 @@ public class ListContainer extends Component implements Container {
     if (!this.children.isEmpty()) {
       for (final ListIterator<Component> it1 = this.children.listIterator(); it1.hasNext(); ) {
         final Component child1 = it1.next();
-        if (child1.isFocused()) {
+        if (child1.hasFocus()) {
           final ListIterator<Component> it2 = this.children.listIterator(it1.nextIndex());
           while (it2.hasNext()) {
             final Component child2 = it2.next();
@@ -151,7 +151,7 @@ public class ListContainer extends Component implements Container {
   }
 
   @Override
-  public final boolean isFocused() {
+  public final boolean hasFocus() {
     return this.getFocusedChild() != null;
   }
 }

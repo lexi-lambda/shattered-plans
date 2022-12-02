@@ -15,7 +15,7 @@ public final class LoadingBar extends FramedNavigationPage {
     this.notificationMessage = notificationMessage;
     if (this.notificationMessage != null) {
       final int var3 = Resources.AREZZO_14_BOLD.measureParagraphHeight(this.notificationMessage, 260, Resources.AREZZO_14_BOLD.ascent);
-      this.b599(150 + var3, 300);
+      this.setBoundsCentered(300, 150 + var3);
     }
 
     this.progressBar = new ProgressBar();

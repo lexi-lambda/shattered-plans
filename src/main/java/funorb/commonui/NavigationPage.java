@@ -40,7 +40,7 @@ public abstract class NavigationPage extends ListContainer {
     }
   }
 
-  public boolean k154() {
+  public boolean canBeRemoved() {
     this.alpha = this.getTargetAlpha();
     if (this.isAlive) {
       return false;
@@ -71,8 +71,8 @@ public abstract class NavigationPage extends ListContainer {
     return this.alpha == 0 && this.getTargetAlpha() == 0 && !this.isAlive;
   }
 
-  protected final void b599(final int var1, final int var2) {
-    this.setBounds(ShatteredPlansClient.SCREEN_WIDTH - var2 >> 1, ShatteredPlansClient.SCREEN_HEIGHT - var1 >> 1, var2, var1);
+  protected final void setBoundsCentered(final int width, final int height) {
+    this.setBounds((ShatteredPlansClient.SCREEN_WIDTH - width) / 2, (ShatteredPlansClient.SCREEN_HEIGHT - height) / 2, width, height);
   }
 
   private int getTargetAlpha() {

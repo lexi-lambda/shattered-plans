@@ -57,7 +57,7 @@ public final class NavigationRoot extends WrapperContainer {
   }
 
   public void switchToLoadingScreen() {
-    this.children.removeIf(NavigationPage::k154);
+    this.children.removeIf(NavigationPage::canBeRemoved);
   }
 
   @Override

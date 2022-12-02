@@ -19,7 +19,7 @@ public abstract class ArrayContainer extends Component implements Container {
     if (this.children != null) {
       for (int var5 = this.children.length - 1; var5 >= 0; --var5) {
         final Component var6 = this.children[var5];
-        if (var6 != null && var6.isFocused()) {
+        if (var6 != null && var6.hasFocus()) {
           for (var5 -= 1; var5 >= 0; var5 -= 1) {
             final Component var7 = this.children[var5];
             if (var7 != null && var7.focus(var3)) {
@@ -37,13 +37,13 @@ public abstract class ArrayContainer extends Component implements Container {
   public final boolean a931(final int var2, final int var3, final Component var4, final int var5, final int var6, final int var7) {
     if (this.children != null) {
       return Arrays.stream(this.children).anyMatch(var10 ->
-          var10 != null && var10.isFocused() && var10.a931(var2, var3, var4, var5, var6, var7));
+          var10 != null && var10.hasFocus() && var10.a931(var2, var3, var4, var5, var6, var7));
     }
     return false;
   }
 
   @Override
-  public final boolean a686(final int keyCode, final char keyChar, final Component var4) {
+  public final boolean keyTyped(final int keyCode, final char keyChar, final Component focusRoot) {
     if (this.children == null) {
       return false;
     } else {
@@ -51,13 +51,13 @@ public abstract class ArrayContainer extends Component implements Container {
       final Component[] var5 = this.children;
 
       for (final Component var7 : var5) {
-        if (var7 != null && var7.isFocused() && var7.a686(keyCode, keyChar, var4)) {
+        if (var7 != null && var7.hasFocus() && var7.keyTyped(keyCode, keyChar, focusRoot)) {
           return true;
         }
       }
 
       if (keyCode == KeyState.Code.TAB) {
-        return !JagexApplet.keysDown[81] ? this.a948(var4) : this.a872(var4);
+        return !JagexApplet.keysDown[81] ? this.a948(focusRoot) : this.a872(focusRoot);
       } else {
         return false;
       }
@@ -135,14 +135,14 @@ public abstract class ArrayContainer extends Component implements Container {
   private Component a331() {
     if (this.children != null) {
       return Arrays.stream(this.children)
-          .filter(var4 -> var4 != null && var4.isFocused())
+          .filter(var4 -> var4 != null && var4.hasFocus())
           .findFirst().orElse(null);
     }
     return null;
   }
 
   @Override
-  public final boolean isFocused() {
+  public final boolean hasFocus() {
     return this.a331() != null;
   }
 
@@ -163,15 +163,15 @@ public abstract class ArrayContainer extends Component implements Container {
   protected abstract void h150();
 
   @Override
-  public final boolean focus(final Component previouslyFocused) {
-    return Arrays.stream(this.children).anyMatch(var6 -> var6 != null && var6.focus(previouslyFocused));
+  public final boolean focus(final Component focusRoot) {
+    return Arrays.stream(this.children).anyMatch(var6 -> var6 != null && var6.focus(focusRoot));
   }
 
   private boolean a766(final Component var1) {
     if (this.children != null) {
       for (int var4 = 0; this.children.length > var4; ++var4) {
         final Component var5 = this.children[var4];
-        if (var5 != null && var5.isFocused()) {
+        if (var5 != null && var5.hasFocus()) {
           for (var4 += 1; var4 < this.children.length; var4 += 1) {
             final Component var6 = this.children[var4];
             if (var6 != null && var6.focus(var1)) {

@@ -109,14 +109,14 @@ public final class CreateDisplayNameForm extends ListContainer implements Create
   }
 
   @Override
-  public boolean a686(final int keyCode, final char keyChar, final Component var4) {
-    if (super.a686(keyCode, keyChar, var4)) {
+  public boolean keyTyped(final int keyCode, final char keyChar, final Component focusRoot) {
+    if (super.keyTyped(keyCode, keyChar, focusRoot)) {
       return true;
     } else if (keyCode == KeyState.Code.UP) {
-      return this.a611(var4);
+      return this.a611(focusRoot);
     } else {
 
-      return keyCode == KeyState.Code.DOWN && this.a948(var4);
+      return keyCode == KeyState.Code.DOWN && this.a948(focusRoot);
     }
   }
 

@@ -35,7 +35,6 @@ import funorb.commonui.Enum1;
 import funorb.commonui.form.CreateAccountForm;
 import funorb.commonui.form.CreateDisplayNameForm;
 import funorb.commonui.form.DobToEnableChatForm;
-import funorb.commonui.form.validator.ConfirmEmailValidator;
 import funorb.commonui.form.validator.UsernameValidator;
 import funorb.commonui.kj_;
 import funorb.io.Buffer;
@@ -96,7 +95,6 @@ public abstract class JagexApplet extends JagexBaseApplet {
   public static final SecureRandom secureRandom = new SecureRandom();
   public static kj_ _tplc;
   public static boolean isAnonymous = true;
-  public static String _aeg;
   protected static boolean _vmNb;
   @MagicConstant(valuesFromClass = KeyState.Code.class)
   public static int lastTypedKeyCode;
@@ -157,8 +155,6 @@ public abstract class JagexApplet extends JagexBaseApplet {
   public static int modLevel;
   private static int _feJ;
   private static int _se;
-  public static int _jmt;
-  public static boolean _npm;
   private static int _wmc;
   private static int _usb;
   private static LoginCredentials loginCredentials = null;
@@ -172,7 +168,6 @@ public abstract class JagexApplet extends JagexBaseApplet {
   private static String[] _aee;
   private static int _gpc;
   public static int mouseX = 0;
-  public static String _umj;
   protected static LoginState loginState;
   @MagicConstant(valuesFromClass = ConnectionState.class)
   public static int connectionState;
@@ -299,11 +294,11 @@ public abstract class JagexApplet extends JagexBaseApplet {
 
   private static String getUsernameOrEmail() {
     if (CommonUI._eel == Enum1.C3) {
-      return _umj;
+      return CreateAccountForm.usernameFieldText;
     } else if (CommonUI._fjs == Enum1.C3) {
       return UsernameValidator._gpb;
     } else {
-      return ConfirmEmailValidator._wha.b154() ? CommonUI.enteredUsername : UsernameValidator._gpb;
+      return CommonUI._wha.b154() ? CommonUI.enteredUsername : UsernameValidator._gpb;
     }
   }
 
@@ -720,13 +715,13 @@ public abstract class JagexApplet extends JagexBaseApplet {
   }
 
   private static void a813bs(final boolean var0) {
-    ConfirmEmailValidator._wha.a540(var0);
+    CommonUI._wha.a540(var0);
   }
 
   private static void a077wo(final int var0, final String[] var2, final String var3) {
     CommonUI._fjs = Enum1.C2;
     if (var0 == 255) {
-      UsernameValidator._ija = ScrollPane.a705(_jmt < 13);
+      UsernameValidator._ija = ScrollPane.a705(CreateAccountForm.ageFieldNum < 13);
       a786jp(null);
     } else if (var0 >= 100 && var0 <= 105) {
       a786jp(var2);
@@ -739,7 +734,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
   private static void a453va(final String[] var0, final int var1, final String var2) {
     CommonUI._eel = Enum1.C2;
     if (var1 == 255) {
-      _tplc = ScrollPane.a705(_jmt < 13);
+      _tplc = ScrollPane.a705(CreateAccountForm.ageFieldNum < 13);
     } else if (var1 >= 100 && var1 <= 105) {
       _tplc = a612tc(var0);
     } else {
@@ -748,16 +743,16 @@ public abstract class JagexApplet extends JagexBaseApplet {
   }
 
   private static e_ j083bp() {
-    return new e_(a983of(), !ConfirmEmailValidator._wha.b154());
+    return new e_(a983of(), !CommonUI._wha.b154());
   }
 
   private static String a983of() {
     if (CommonUI._eel == Enum1.C3) {
-      return _aeg;
-    } else if (ConfirmEmailValidator._wha.b154()) {
-      return CommonUI._fjs == Enum1.C3 ? ConfirmEmailValidator._wha.a738() : CommonUI.enteredUsername;
+      return CreateAccountForm.emailFieldText;
+    } else if (CommonUI._wha.b154()) {
+      return CommonUI._fjs == Enum1.C3 ? CommonUI._wha.getLabel() : CommonUI.enteredUsername;
     } else {
-      return ConfirmEmailValidator._wha.a738();
+      return CommonUI._wha.getLabel();
     }
   }
 
@@ -1826,10 +1821,10 @@ public abstract class JagexApplet extends JagexBaseApplet {
     }
   }
 
-  private int a968sr(final String var0, final int var1, final int var3, final String var4, final String var5, final boolean var6) {
-    final e_ var7 = new e_(var0);
+  private int a968sr(final String usernameOrEmail, final int affId, final int var3, final String password, final String var5, final boolean var6) {
+    final e_ var7 = new e_(usernameOrEmail);
     final e_ var8 = new e_(var5);
-    return this.a425si(var1, var3, var8, var7, var4, var6);
+    return this.a425si(affId, var3, var8, var7, password, var6);
   }
 
   private int a031wi(final e_ var0, final e_ var1) {
@@ -2035,7 +2030,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
           }
 
           _kej = false;
-          return CommonUI.LoginResult.R3;
+          return CommonUI.LoginResult.CONNECTION_LOST;
         }
 
         final int tmp = this.gamePort1Primary;
@@ -2122,7 +2117,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
     }
 
     if (action == CommonUI.TickResult.R2) {
-      final int var5 = this.a968sr(getUsernameOrEmail(), this.affId, _jmt, CommonUI.getPassword(), a983of(), _npm);
+      final int var5 = this.a968sr(getUsernameOrEmail(), this.affId, CreateAccountForm.ageFieldNum, CommonUI.getPassword(), a983of(), CreateAccountForm.optInCheckboxActive);
       if (var5 != -1) {
         a453va(_aee, var5, _nlc);
         _aee = null;
@@ -2357,11 +2352,11 @@ public abstract class JagexApplet extends JagexBaseApplet {
       } else if (connectionState >= ConnectionState.CONNECTED) {
         CommonUI.handleServerDisconnect();
         switch (_qjg) {
-          case ERROR_SERVER_CODE_51 -> CommonUI.handleLoginFailed(CommonUI.LoginResult.R256, StringConstants.ERROR_JS5CONNECT_FULL);
-          case ERROR_RESOURCE_INTEGRITY_CHECK -> CommonUI.handleLoginFailed(CommonUI.LoginResult.R256, StringConstants.ERROR_JS5CRC);
-          case ERROR_PAGE_SOURCE_PROTOCOL -> CommonUI.handleLoginFailed(CommonUI.LoginResult.R256, StringConstants.COMM_IO_ERROR);
-          case ERROR_SERVER_CODE_50 -> CommonUI.handleLoginFailed(CommonUI.LoginResult.R5, StringConstants.LOGIN_GAME_UPDATED);
-          default -> CommonUI.handleLoginFailed(CommonUI.LoginResult.R256, StringConstants.ERROR_JS5_CONNECT);
+          case ERROR_SERVER_CODE_51 -> CommonUI.handleLoginFailed(CommonUI.LoginResult.PROTOCOL_ERROR, StringConstants.ERROR_JS5CONNECT_FULL);
+          case ERROR_RESOURCE_INTEGRITY_CHECK -> CommonUI.handleLoginFailed(CommonUI.LoginResult.PROTOCOL_ERROR, StringConstants.ERROR_JS5CRC);
+          case ERROR_PAGE_SOURCE_PROTOCOL -> CommonUI.handleLoginFailed(CommonUI.LoginResult.PROTOCOL_ERROR, StringConstants.COMM_IO_ERROR);
+          case ERROR_SERVER_CODE_50 -> CommonUI.handleLoginFailed(CommonUI.LoginResult.GAME_UPDATED, StringConstants.LOGIN_GAME_UPDATED);
+          default -> CommonUI.handleLoginFailed(CommonUI.LoginResult.PROTOCOL_ERROR, StringConstants.ERROR_JS5_CONNECT);
         }
 
         _mdB = true;

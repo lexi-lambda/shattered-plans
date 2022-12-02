@@ -4,12 +4,12 @@ import funorb.graphics.Drawing;
 import funorb.graphics.Sprite;
 
 public abstract class FramedNavigationPage extends NavigationPage {
-  private int _L;
-  private int _K;
-  private int _T;
-  private int _R;
-  private int _P = 0;
-  private int _Q = 0;
+  private int startWidth;
+  private int endHeight;
+  private int endWidth;
+  private int startHeight;
+  private int endTick = 0;
+  private int currentTick = 0;
 
   protected FramedNavigationPage(final NavigationRoot root, final int width, final int height) {
     super(root, width, height);
@@ -32,16 +32,16 @@ public abstract class FramedNavigationPage extends NavigationPage {
     }
   }
 
-  protected final void b115(final int var2, final int var3, final int var4) {
-    if (var2 <= 0) {
-      this.b599(var4, var3);
+  protected final void animateBounds(final int ticks, final int width, final int height) {
+    if (ticks <= 0) {
+      this.setBoundsCentered(width, height);
     } else {
-      this._L = this.width;
-      this._R = this.height;
-      this._T = var3;
-      this._Q = 0;
-      this._K = var4;
-      this._P = var2;
+      this.startWidth = this.width;
+      this.startHeight = this.height;
+      this.endWidth = width;
+      this.endHeight = height;
+      this.currentTick = 0;
+      this.endTick = ticks;
     }
   }
 
@@ -52,11 +52,9 @@ public abstract class FramedNavigationPage extends NavigationPage {
     final short var5 = 211;
     int var7 = 0;
 
-    int var8;
-    int var9;
-    for (var8 = y; var7 < var4; ++var8) {
+    for (int var8 = y; var7 < var4; ++var8) {
       if (Drawing.top <= var8 && var8 < Drawing.bottom) {
-        var9 = var5 + var7 * (-17) / var4;
+        int var9 = var5 + var7 * (-17) / var4;
         int var10 = 0;
         int var11 = this.width;
         int var12;
@@ -111,8 +109,8 @@ public abstract class FramedNavigationPage extends NavigationPage {
     final short i1 = 194;
     int i2 = 0;
 
-    for (var8 = y + 35; i2 < b; ++var8) {
-      var9 = i1 + (-25) * i2 / b;
+    for (int var8 = y + 35; i2 < b; ++var8) {
+      int var9 = i1 + (-25) * i2 / b;
       var9 |= var9 << 8 | var9 << 16;
       Drawing.horizontalLine(x, var8, 6, var9);
       Drawing.horizontalLine(this.width + x - 6, var8, 6, var9);
@@ -126,50 +124,46 @@ public abstract class FramedNavigationPage extends NavigationPage {
     final int var16 = this.height - 79;
     int i4 = 0;
 
-    for (var8 = y + 57; i4 < var16; ++var8) {
-      var9 = i3 + i4 * (-42) / var16;
+    for (int var8 = y + 57; i4 < var16; ++var8) {
+      int var9 = i3 + i4 * (-42) / var16;
       var9 |= var9 << 16 | var9 << 8;
       Drawing.horizontalLine(x, var8, 6, var9);
       Drawing.horizontalLine(x + this.width - 6, var8, 6, var9);
       ++i4;
     }
-
   }
 
-  protected void g423() {
+  protected void animateBoundsFinished() {
   }
 
   @Override
-  public boolean k154() {
-    this.n150();
-    return super.k154();
+  public boolean canBeRemoved() {
+    this.skipAnimations();
+    return super.canBeRemoved();
   }
 
-  protected void n150() {
-    if (this._P > 0) {
-      this.b599(this._K, this._T);
-      this._P = 0;
-      this.g423();
+  protected void skipAnimations() {
+    if (this.endTick > 0) {
+      this.setBoundsCentered(this.endWidth, this.endHeight);
+      this.endTick = 0;
+      this.animateBoundsFinished();
     }
   }
 
   @Override
   public void tick2() {
-    int var2;
-    if (this._P > 0) {
-      var2 = this._T;
-      int var3 = this._K;
-      if (++this._Q >= this._P) {
-        this._P = 0;
-        this.g423();
+    if (this.endTick > 0) {
+      if (++this.currentTick >= this.endTick) {
+        this.endTick = 0;
+        this.animateBoundsFinished();
+        this.setBoundsCentered(this.endWidth, this.endHeight);
       } else {
-        final int var4 = (-this._Q + 2 * this._P) * this._Q;
-        final int var5 = this._P * this._P;
-        var3 = var4 * (-this._R + this._K) / var5 + this._R;
-        var2 = (this._T - this._L) * var4 / var5 + this._L;
+        final int fac = this.currentTick * ((this.endTick * 2) - this.currentTick);
+        final int endTickSq = this.endTick * this.endTick;
+        final int width  = ((this.endWidth - this.startWidth) * fac / endTickSq) + this.startWidth;
+        final int height = ((this.endHeight - this.startHeight) * fac / endTickSq) + this.startHeight;
+        this.setBoundsCentered(width, height);
       }
-
-      this.b599(var3, var2);
     }
 
     super.tick2();

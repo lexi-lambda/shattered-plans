@@ -20,9 +20,9 @@ import funorb.graphics.Font;
 import funorb.shatteredplans.StringConstants;
 
 public final class LoginForm extends ListContainer implements TextFieldListener, ButtonListener {
-  public static LoginForm _noe;
+  public static LoginForm instance;
 
-  private final boolean _L;
+  private final boolean wasConnected;
   private final String _J;
   private final Button cancelButton;
   private final AbstractTextField usernameField;
@@ -31,16 +31,16 @@ public final class LoginForm extends ListContainer implements TextFieldListener,
   private final Button logInButton;
   private Button _Q;
 
-  public LoginForm(final String var1, final boolean var3, final boolean canCreateAccount, final boolean isInitialLogin) {
+  public LoginForm(final String username, final boolean wasConnected, final boolean canCreateAccount, final boolean isInitialLogin) {
     super(0, 0, 310, 190);
     this._J = null;
     this.isInitialLogin = isInitialLogin;
-    this._L = var3;
+    this.wasConnected = wasConnected;
     final ButtonRenderer var6 = new ButtonRenderer();
-    if (!this._L || (!canCreateAccount && !this.isInitialLogin)) {
-      this.usernameField = new TextField(var1, this, 100);
+    if (!this.wasConnected || (!canCreateAccount && !this.isInitialLogin)) {
+      this.usernameField = new TextField(username, this, 100);
       this.passwordField = new TextField("", new PasswordFieldRenderer(), this, 20);
-      if (this._L) {
+      if (this.wasConnected) {
         this.logInButton = new Button(StringConstants.RETRY, var6, null);
         this.cancelButton = new Button(StringConstants.QUIT_TO_WEBSITE, var6, null);
         this.usernameField.enabled = false;
@@ -58,7 +58,7 @@ public final class LoginForm extends ListContainer implements TextFieldListener,
         this._Q.tooltip = StringConstants.LOGIN_CREATE_TOOLTIP;
       }
 
-      if (this._L) {
+      if (this.wasConnected) {
         this.cancelButton.tooltip = StringConstants.WARNING_IF_YOU_QUIT;
       } else {
         if (this.isInitialLogin) {
@@ -97,7 +97,7 @@ public final class LoginForm extends ListContainer implements TextFieldListener,
         this.y += 35;
       }
 
-      if (this._L || this.isInitialLogin) {
+      if (this.wasConnected || this.isInitialLogin) {
         this.cancelButton.setBounds(8, this.y, this.width - 10 - 6, 30);
         this.y += 35;
       } else {
@@ -118,12 +118,12 @@ public final class LoginForm extends ListContainer implements TextFieldListener,
     }
   }
 
-  public static void a667ce(final String var0) {
+  public static void a667ce(final String username) {
     if (CommonUI._jiG != null) {
       CommonUI._jiG.i423();
     }
-    _noe = new LoginForm(var0, false, true, true);
-    CommonUI._aef.b952(_noe);
+    instance = new LoginForm(username, false, true, true);
+    CommonUI._aef.setNextContent(instance);
   }
 
   public static void a487la() {
@@ -136,13 +136,13 @@ public final class LoginForm extends ListContainer implements TextFieldListener,
   }
 
   @Override
-  public boolean a686(final int keyCode, final char keyChar, final Component var4) {
-    if (super.a686(keyCode, keyChar, var4)) {
+  public boolean keyTyped(final int keyCode, final char keyChar, final Component focusRoot) {
+    if (super.keyTyped(keyCode, keyChar, focusRoot)) {
       return true;
     } else if (keyCode == KeyState.Code.UP) {
-      return this.a611(var4);
+      return this.a611(focusRoot);
     } else {
-      return keyCode == KeyState.Code.DOWN && this.a948(var4);
+      return keyCode == KeyState.Code.DOWN && this.a948(focusRoot);
     }
   }
 
@@ -151,7 +151,7 @@ public final class LoginForm extends ListContainer implements TextFieldListener,
   }
 
   private void submit() {
-    if (CommonUI._nlb || (this.usernameField.text.length() > 0 && this.passwordField.text.length() > 0)) {
+    if (CommonUI.wasConnected || (this.usernameField.text.length() > 0 && this.passwordField.text.length() > 0)) {
       CreateAccountPage.a584ai(this.usernameField.text, this.passwordField.text, false);
     }
   }
@@ -186,12 +186,12 @@ public final class LoginForm extends ListContainer implements TextFieldListener,
     } else if (this._Q == button) {
       CreateAccountForm.a423tl();
     } else if (this.cancelButton == button) {
-      if (this._L) {
-        CommonUI._crb = CommonUI.TickResult.QUIT_TO_WEBSITE;
+      if (this.wasConnected) {
+        CommonUI.nextTickResult = CommonUI.TickResult.QUIT_TO_WEBSITE;
       } else if (this.isInitialLogin) {
         CommonUI.b423ol();
       } else {
-        CommonUI._crb = CommonUI.TickResult.R4;
+        CommonUI.nextTickResult = CommonUI.TickResult.R4;
       }
     }
   }

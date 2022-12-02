@@ -65,7 +65,7 @@ public class Component {
 
   public final void tickRoot(final int x, final int y, final boolean var2) {
     this.tick(x, y, this);
-    final boolean var5 = this.isFocused();
+    final boolean var5 = this.hasFocus();
     if (var2) {
       if (JagexApplet.mouseWheelRotation != 0 && var5) {
         this.a931(JagexApplet.mouseY, JagexApplet.mouseX, this, y, x, JagexApplet.mouseWheelRotation);
@@ -92,10 +92,10 @@ public class Component {
   }
 
   /**
-   * @param previouslyFocused the component that previously had focus
+   * @param focusRoot the component to unfocus before transferring focus
    * @return {@code true} if focus was successfully transferred, {@code false} otherwise
    */
-  public boolean focus(final Component previouslyFocused) {
+  public boolean focus(final Component focusRoot) {
     return false;
   }
 
@@ -107,7 +107,7 @@ public class Component {
   }
 
   public final void keyTyped(final int keyCode, final char keyChar) {
-    if (!this.isFocused() || !this.a686(keyCode, keyChar, this)) {
+    if (!(this.hasFocus() && this.keyTyped(keyCode, keyChar, this))) {
       if (keyCode == KeyState.Code.TAB) {
         this.focus(this);
       }
@@ -161,11 +161,11 @@ public class Component {
     return this.isMouseOver ? this.tooltip : null;
   }
 
-  public boolean isFocused() {
+  public boolean hasFocus() {
     return false;
   }
 
-  public boolean a686(@MagicConstant(valuesFromClass = KeyState.Code.class) final int keyCode, final char keyChar, final Component var4) {
+  public boolean keyTyped(@MagicConstant(valuesFromClass = KeyState.Code.class) final int keyCode, final char keyChar, final Component focusRoot) {
     return false;
   }
 
@@ -204,7 +204,7 @@ public class Component {
       builder.append(" mouseover");
     }
 
-    if (this.isFocused()) {
+    if (this.hasFocus()) {
       builder.append(" focused");
     }
 

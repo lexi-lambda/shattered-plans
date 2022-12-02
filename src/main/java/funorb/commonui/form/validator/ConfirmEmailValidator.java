@@ -1,11 +1,11 @@
 package funorb.commonui.form.validator;
 
 import funorb.commonui.AbstractTextField;
+import funorb.commonui.CommonUI;
 import funorb.commonui.ks_;
 import funorb.shatteredplans.StringConstants;
 
 public final class ConfirmEmailValidator extends StringValidator {
-  public static ks_ _wha;
   private final ConfirmPasswordValidator _s;
   private boolean _n = false;
   private String _t = "";
@@ -13,13 +13,6 @@ public final class ConfirmEmailValidator extends StringValidator {
   public ConfirmEmailValidator(final AbstractTextField var1, final AbstractTextField var2) {
     super(var1);
     this._s = new ConfirmPasswordValidator(var1, var2);
-  }
-
-  private static ks_ a661os(final String var1) {
-    if (_wha.b154() && !var1.equals(_wha.a738())) {
-      _wha = new ks_(var1);
-    }
-    return _wha;
   }
 
   @Override
@@ -37,7 +30,7 @@ public final class ConfirmEmailValidator extends StringValidator {
       return ValidationState.INVALID;
     } else {
       if (!var2.equals(this._t)) {
-        final ks_ var3 = a661os(var2);
+        final ks_ var3 = CommonUI.a661os(var2);
         if (!var3.b154()) {
           return ValidationState.CHECKING_1;
         }

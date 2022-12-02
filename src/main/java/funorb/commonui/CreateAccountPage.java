@@ -24,7 +24,7 @@ public final class CreateAccountPage extends AccountPage {
   }
 
   public static void b150rm() {
-    a584ai(JagexApplet._aeg, CreateAccountForm._G, true);
+    a584ai(CreateAccountForm.emailFieldText, CreateAccountForm.passwordFieldText, true);
     CommonUI._nsbD = true;
   }
 
@@ -92,29 +92,29 @@ public final class CreateAccountPage extends AccountPage {
     final cf_ var5 = new cf_(this, Resources.AREZZO_14_BOLD, var4);
     if (var3._h) {
       if (var3._b) {
-        this.b952(new pe_(this));
+        this.setNextContent(new pe_(this));
         return;
       }
 
-      var5.a700(this, StringConstants.CONT);
+      var5.addButton(StringConstants.CONT, this);
     } else {
       if (this._Eb) {
-        var5.a700(this, StringConstants.CONT);
+        var5.addButton(StringConstants.CONT, this);
       } else if (var3._c == 5) {
-        var5.a966(StringConstants.RELOAD_GAME, CommonUI.TickResult.RELOAD);
-        var5.a966(StringConstants.QUIT_TO_WEBSITE, CommonUI.TickResult.QUIT_TO_WEBSITE);
+        var5.addActionButton(StringConstants.RELOAD_GAME, CommonUI.TickResult.RELOAD);
+        var5.addActionButton(StringConstants.QUIT_TO_WEBSITE, CommonUI.TickResult.QUIT_TO_WEBSITE);
       } else {
-        var5.a966(StringConstants.BACK, null);
+        var5.addActionButton(StringConstants.BACK, null);
       }
 
       if (var3._c == 3) {
-        var5.a966(StringConstants.TO_SERVER_LIST, CommonUI.TickResult.TO_SERVER_LIST);
+        var5.addActionButton(StringConstants.TO_SERVER_LIST, CommonUI.TickResult.TO_SERVER_LIST);
       } else if (var3._c == 6) {
-        var5.a966(StringConstants.TO_CUSTOMER_SUPPORT, CommonUI.TickResult.TO_CUSTOMER_SUPPORT);
+        var5.addActionButton(StringConstants.TO_CUSTOMER_SUPPORT, CommonUI.TickResult.TO_CUSTOMER_SUPPORT);
       }
     }
 
-    this.b952(var5);
+    this.setNextContent(var5);
   }
 
   public void f487() {

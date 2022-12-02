@@ -157,7 +157,7 @@ public class AbstractTextField extends Button {
   }
 
   @Override
-  public final boolean a686(@MagicConstant(valuesFromClass = KeyState.Code.class) final int keyCode, final char keyChar, final Component var4) {
+  public final boolean keyTyped(@MagicConstant(valuesFromClass = KeyState.Code.class) final int keyCode, final char keyChar, final Component focusRoot) {
 
     this._Q = PseudoMonotonicClock.currentTimeMillis();
     if (keyChar == '<' || keyChar == '>') {

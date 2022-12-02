@@ -125,9 +125,9 @@ public class Button extends Component {
   }
 
   @Override
-  public boolean focus(final Component previouslyFocused) {
+  public boolean focus(final Component focusRoot) {
     if (this.enabled && this._B) {
-      previouslyFocused.unfocus();
+      focusRoot.unfocus();
       this.focused = true;
       return true;
     } else {
@@ -136,7 +136,7 @@ public class Button extends Component {
   }
 
   @Override
-  public final boolean isFocused() {
+  public final boolean hasFocus() {
     return this.focused;
   }
 
@@ -173,8 +173,8 @@ public class Button extends Component {
   }
 
   @Override
-  public boolean a686(@MagicConstant(valuesFromClass = KeyState.Code.class) final int keyCode, final char keyChar, final Component var4) {
-    if (!this.isFocused() || keyCode != KeyState.Code.ENTER && keyCode != KeyState.Code.SPACE) {
+  public boolean keyTyped(@MagicConstant(valuesFromClass = KeyState.Code.class) final int keyCode, final char keyChar, final Component focusRoot) {
+    if (!this.hasFocus() || keyCode != KeyState.Code.ENTER && keyCode != KeyState.Code.SPACE) {
       return false;
     } else {
       this.handleClicked(1, -1, -1);
