@@ -8,7 +8,7 @@ public abstract class AbstractInputValidator implements InputValidator {
   protected abstract ValidationState a083();
 
   @Override
-  public final String a983() {
+  public final String getTooltip() {
     if (this.a154()) {
       return null;
     } else {

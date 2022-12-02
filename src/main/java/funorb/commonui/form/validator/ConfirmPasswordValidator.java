@@ -21,7 +21,7 @@ public final class ConfirmPasswordValidator extends StringValidator {
           return StringConstants.CREATE_ALERT_MISMATCH;
         }
 
-        return var3.a983();
+        return var3.getTooltip();
       }
     }
 

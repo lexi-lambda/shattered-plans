@@ -45,7 +45,7 @@ public final class ValidationLabel extends Label {
     if (var6 == ValidationState.CHECKING_2 || var6 == ValidationState.CHECKING_1) {
       var5 = StringConstants.CHECKING;
     } else {
-      var5 = this.validator.a983();
+      var5 = this.validator.getTooltip();
       if (var5 == null) {
         var5 = this.initialText;
       }

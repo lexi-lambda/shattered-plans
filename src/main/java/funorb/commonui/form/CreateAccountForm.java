@@ -21,7 +21,7 @@ import funorb.commonui.form.validator.InputValidator;
 import funorb.commonui.form.validator.PasswordValidator;
 import funorb.commonui.form.validator.UsernameValidator;
 import funorb.commonui.form.validator.ValidationState;
-import funorb.commonui.hl_;
+import funorb.commonui.ValidationStatusIcon;
 import funorb.commonui.listener.ButtonListener;
 import funorb.commonui.frame.CreateAccountFrame;
 import funorb.commonui.listener.LinkedTextListener;
@@ -211,7 +211,7 @@ public final class CreateAccountForm extends ListContainer implements LinkedText
   private int a840(final String var1, final Component var2, final int var3) {
     final pg_ var6 = new pg_(20, var3, 290, var2, false, 120, 3, Resources.AREZZO_14, Drawing.WHITE, var1);
     this.addChild(var6);
-    final hl_ var7 = new hl_(((InputField) var2).getValidator());
+    final ValidationStatusIcon var7 = new ValidationStatusIcon(((InputField) var2).getValidator());
     this.addChild(var7);
     var7.setBounds(var6.width + var6.x + 3, var6.y + (var6.height - 15 >> 1), 15, 15);
     return var6.height;

@@ -1,7 +1,7 @@
 package funorb.commonui.form.validator;
 
 public interface InputValidator {
-  String a983();
+  String getTooltip();
 
   boolean a154();
 
