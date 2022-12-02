@@ -9,27 +9,27 @@ import funorb.graphics.Font;
 import funorb.graphics.Sprite;
 import funorb.shatteredplans.StringConstants;
 
-public final class ah_ extends LinkedText {
-  private static TextRenderer _qqo;
-  private final InputValidator _M;
-  private final String _W;
+public final class ValidationLabel extends LinkedText {
+  private static TextRenderer globalRenderer;
+
+  private static TextRenderer getTextRenderer() {
+    if (globalRenderer == null) {
+      globalRenderer = new TextRenderer(Resources.AREZZO_12, 20, 0, 0, 0, 0xb0b0b0, Font.HorizontalAlignment.LEFT, Font.VerticalAlignment.TOP, Resources.AREZZO_12.ascent, true);
+    }
+    return globalRenderer;
+  }
+
+  private final InputValidator validator;
+  private final String initialText;
   private Sprite _V;
   private int _N;
 
   @SuppressWarnings("SameParameterValue")
-  public ah_(final InputValidator var1, final String var2, final int x, final int y, final int width, final int height) {
-    super(var2, b040ea());
-    this._M = var1;
-    this._W = var2;
+  public ValidationLabel(final InputValidator validator, final String text, final int x, final int y, final int width, final int height) {
+    super(text, getTextRenderer());
+    this.validator = validator;
+    this.initialText = text;
     this.setBounds(x, y, width, height);
-  }
-
-  private static TextRenderer b040ea() {
-    if (_qqo == null) {
-      _qqo = new TextRenderer(Resources.AREZZO_12, 20, 0, 0, 0, 0xb0b0b0, Font.HorizontalAlignment.LEFT, Font.VerticalAlignment.TOP, Resources.AREZZO_12.ascent, true);
-    }
-
-    return _qqo;
   }
 
   @Override
@@ -40,14 +40,14 @@ public final class ah_ extends LinkedText {
 
   @Override
   public void draw(final int x, final int y) {
-    final ValidationState var6 = this._M.validate();
+    final ValidationState var6 = this.validator.validate();
     String var5;
     if (var6 == ValidationState.CHECKING_2 || var6 == ValidationState.CHECKING_1) {
       var5 = StringConstants.CHECKING;
     } else {
-      var5 = this._M.a983();
+      var5 = this.validator.a983();
       if (var5 == null) {
-        var5 = this._W;
+        var5 = this.initialText;
       }
     }
 
@@ -57,7 +57,7 @@ public final class ah_ extends LinkedText {
     }
 
     super.draw(x, y);
-    final ValidationState c226 = this._M.validate();
+    final ValidationState c226 = this.validator.validate();
     final ITextRenderer var8 = (ITextRenderer) this.renderer;
     final int var9 = this.x + x;
     final int var10 = var8.a754(y, this) + (var8.updateLayout(this).b137() >> 1);

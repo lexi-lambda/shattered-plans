@@ -5,7 +5,7 @@ import funorb.commonui.Button;
 import funorb.commonui.CommonUI;
 import funorb.commonui.Component;
 import funorb.commonui.Resources;
-import funorb.commonui.ah_;
+import funorb.commonui.ValidationLabel;
 import funorb.commonui.container.ListContainer;
 import funorb.commonui.form.field.InputField;
 import funorb.commonui.form.field.TextField;
@@ -59,7 +59,7 @@ public final class CreateDisplayNameForm extends ListContainer implements Create
 
     final pg_ var8 = new pg_(20, var2, 290, var4, false, 120, 3, Resources.AREZZO_14, Drawing.WHITE, var6);
     this.addChild(var8);
-    final ah_ var9 = new ah_(((InputField) var4).getValidator(), var5, 126, var8.height + var2, 195, 35);
+    final ValidationLabel var9 = new ValidationLabel(((InputField) var4).getValidator(), var5, 126, var8.height + var2, 195, 35);
     var9.listener = this;
     this.addChild(var9);
     return var9.height + var8.height;

@@ -10,7 +10,7 @@ import funorb.commonui.Component;
 import funorb.commonui.Enum1;
 import funorb.commonui.container.ListContainer;
 import funorb.commonui.Resources;
-import funorb.commonui.ah_;
+import funorb.commonui.ValidationLabel;
 import funorb.commonui.form.field.InputField;
 import funorb.commonui.form.field.TextField;
 import funorb.commonui.form.validator.AgeValidator;
@@ -146,7 +146,7 @@ public final class CreateAccountForm extends ListContainer implements LinkedText
   private int a986(final int var3, final Component var4, final String var5, final String var6, final int var7) {
     final pg_ var8 = new pg_(20, var3, 290, var4, false, 120, 3, Resources.AREZZO_14, Drawing.WHITE, var6);
     this.addChild(var8);
-    final ah_ var9 = new ah_(((InputField) var4).getValidator(), var5, 126, var3 + var8.height, 220, var7);
+    final ValidationLabel var9 = new ValidationLabel(((InputField) var4).getValidator(), var5, 126, var3 + var8.height, 220, var7);
     var9.listener = this;
     this.addChild(var9);
     return var9.height + var8.height;
