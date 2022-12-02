@@ -12,12 +12,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class LinkedText extends Button {
+public class Label extends Button {
   private final List<Hotspot> hotspots = new ArrayList<>();
   private @Nullable Hotspot hoveredHotspot = null;
   private @Nullable String[] hotspotTooltips;
 
-  public LinkedText(final String text, final ComponentRenderer renderer) {
+  public Label(final String text, final ComponentRenderer renderer) {
     super(text, renderer, null);
   }
 

@@ -29,7 +29,7 @@ import funorb.commonui.pg_;
 import funorb.commonui.renderer.LinkRenderer;
 import funorb.commonui.renderer.PasswordFieldRenderer;
 import funorb.commonui.renderer.TextRenderer;
-import funorb.commonui.LinkedText;
+import funorb.commonui.Label;
 import funorb.graphics.Drawing;
 import funorb.graphics.Font;
 import funorb.shatteredplans.StringConstants;
@@ -87,7 +87,7 @@ public final class CreateAccountForm extends ListContainer implements LinkedText
     this.addChild(var4);
     var8 += var4.height;
     final TextRenderer var5 = new TextRenderer(Resources.AREZZO_14, 0, 0, 0, 0, Drawing.WHITE, Font.HorizontalAlignment.LEFT, Font.VerticalAlignment.TOP, Resources.AREZZO_14.ascent, true);
-    final LinkedText _I = new LinkedText(var2, var5);
+    final Label _I = new Label(var2, var5);
     _I.tooltip = "";
     _I.setHotspotTooltip(0, StringConstants.OPEN_IN_POPUP_WINDOW);
     _I.setHotspotTooltip(1, StringConstants.OPEN_IN_POPUP_WINDOW);

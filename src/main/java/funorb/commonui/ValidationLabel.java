@@ -9,7 +9,7 @@ import funorb.graphics.Font;
 import funorb.graphics.Sprite;
 import funorb.shatteredplans.StringConstants;
 
-public final class ValidationLabel extends LinkedText {
+public final class ValidationLabel extends Label {
   private static TextRenderer globalRenderer;
 
   private static TextRenderer getTextRenderer() {

@@ -23,7 +23,7 @@ public final class pe_ extends ListContainer implements LinkedTextListener, Butt
     final String var2 = Strings.format(StringConstants.CREATE_U13_TERMS, "<u=2164A2><col=2164A2>", "</col></u>");
     final byte var3 = 20;
     final TextRenderer var4 = new TextRenderer(Resources.AREZZO_14, 0, 0, 0, 0, Drawing.WHITE, Font.HorizontalAlignment.JUSTIFY, Font.VerticalAlignment.TOP, Resources.AREZZO_14.ascent, true);
-    final LinkedText _G = new LinkedText(var2, var4);
+    final Label _G = new Label(var2, var4);
     _G.tooltip = "";
     _G.setHotspotTooltip(0, StringConstants.OPEN_IN_POPUP_WINDOW);
     _G.setHotspotTooltip(1, StringConstants.OPEN_IN_POPUP_WINDOW);
