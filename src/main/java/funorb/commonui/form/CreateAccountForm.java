@@ -25,7 +25,7 @@ import funorb.commonui.ValidationStatusIcon;
 import funorb.commonui.listener.ButtonListener;
 import funorb.commonui.frame.CreateAccountFrame;
 import funorb.commonui.listener.LinkedTextListener;
-import funorb.commonui.pg_;
+import funorb.commonui.LabeledField;
 import funorb.commonui.renderer.LinkRenderer;
 import funorb.commonui.renderer.PasswordFieldRenderer;
 import funorb.commonui.renderer.TextRenderer;
@@ -83,7 +83,7 @@ public final class CreateAccountForm extends ListContainer implements LinkedText
     var8 += 5 + this.a244(StringConstants.CREATE_PASSWORD_HINT, var8, (byte) -127, this.confirmPasswordField, StringConstants.CREATE_PASSWORD_CONFIRM);
     var8 += this.a244(StringConstants.CREATE_DIPLAY_NAME_HINT, var8, (byte) -128, this.usernameField, StringConstants.CREATE_DISPLAY_NAME) + 5;
     var8 += this.a840(StringConstants.CREATE_AGE, this.ageField, var8);
-    final pg_ var4 = new pg_(46, var8, this.width - 90, this.optInCheckbox, true, this.width - 120, 5, Resources.AREZZO_12, 11579568, StringConstants.CREATE_OPT_IN_NEWS);
+    final LabeledField var4 = new LabeledField(46, var8, this.width - 90, this.optInCheckbox, true, this.width - 120, 5, Resources.AREZZO_12, 11579568, StringConstants.CREATE_OPT_IN_NEWS);
     this.addChild(var4);
     var8 += var4.height;
     final TextRenderer var5 = new TextRenderer(Resources.AREZZO_14, 0, 0, 0, 0, Drawing.WHITE, Font.HorizontalAlignment.LEFT, Font.VerticalAlignment.TOP, Resources.AREZZO_14.ascent, true);
@@ -144,7 +144,7 @@ public final class CreateAccountForm extends ListContainer implements LinkedText
   }
 
   private int a986(final int var3, final Component var4, final String var5, final String var6, final int var7) {
-    final pg_ var8 = new pg_(20, var3, 290, var4, false, 120, 3, Resources.AREZZO_14, Drawing.WHITE, var6);
+    final LabeledField var8 = new LabeledField(20, var3, 290, var4, false, 120, 3, Resources.AREZZO_14, Drawing.WHITE, var6);
     this.addChild(var8);
     final ValidationLabel var9 = new ValidationLabel(((InputField) var4).getValidator(), var5, 126, var3 + var8.height, 220, var7);
     var9.listener = this;
@@ -170,7 +170,7 @@ public final class CreateAccountForm extends ListContainer implements LinkedText
   }
 
   private int a187(final String var1, final Component var3, final int var4) {
-    final pg_ var6 = new pg_(20, var4, 290, var3, false, 120, 3, Resources.AREZZO_14, Drawing.WHITE, var1);
+    final LabeledField var6 = new LabeledField(20, var4, 290, var3, false, 120, 3, Resources.AREZZO_14, Drawing.WHITE, var1);
 
     this.addChild(var6);
     return var6.height;
@@ -209,7 +209,7 @@ public final class CreateAccountForm extends ListContainer implements LinkedText
   }
 
   private int a840(final String var1, final Component var2, final int var3) {
-    final pg_ var6 = new pg_(20, var3, 290, var2, false, 120, 3, Resources.AREZZO_14, Drawing.WHITE, var1);
+    final LabeledField var6 = new LabeledField(20, var3, 290, var2, false, 120, 3, Resources.AREZZO_14, Drawing.WHITE, var1);
     this.addChild(var6);
     final ValidationStatusIcon var7 = new ValidationStatusIcon(((InputField) var2).getValidator());
     this.addChild(var7);

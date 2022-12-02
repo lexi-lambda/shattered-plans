@@ -13,7 +13,7 @@ import funorb.commonui.form.validator.InputValidator;
 import funorb.commonui.form.validator.UsernameValidator;
 import funorb.commonui.form.validator.ValidationState;
 import funorb.commonui.listener.ButtonListener;
-import funorb.commonui.pg_;
+import funorb.commonui.LabeledField;
 import funorb.commonui.renderer.LinkRenderer;
 import funorb.commonui.renderer.TextRenderer;
 import funorb.graphics.Drawing;
@@ -57,7 +57,7 @@ public final class CreateDisplayNameForm extends ListContainer implements Create
 
   private int a649(final int var2, final Component var4, final String var5, final String var6) {
 
-    final pg_ var8 = new pg_(20, var2, 290, var4, false, 120, 3, Resources.AREZZO_14, Drawing.WHITE, var6);
+    final LabeledField var8 = new LabeledField(20, var2, 290, var4, false, 120, 3, Resources.AREZZO_14, Drawing.WHITE, var6);
     this.addChild(var8);
     final ValidationLabel var9 = new ValidationLabel(((InputField) var4).getValidator(), var5, 126, var8.height + var2, 195, 35);
     var9.listener = this;

@@ -10,7 +10,7 @@ import funorb.commonui.Resources;
 import funorb.commonui.form.field.TextField;
 import funorb.commonui.listener.ButtonListener;
 import funorb.commonui.listener.TextFieldListener;
-import funorb.commonui.pg_;
+import funorb.commonui.LabeledField;
 import funorb.commonui.renderer.ButtonRenderer;
 import funorb.commonui.renderer.LinkRenderer;
 import funorb.commonui.renderer.PasswordFieldRenderer;
@@ -71,10 +71,10 @@ public final class LoginForm extends ListContainer implements TextFieldListener,
 
       final String var8 = StringConstants.LOGIN_USERNAME_EMAIL;
 
-      pg_ var10;
-      this.addChild(var10 = new pg_(10, this.y, this.width - 20, this.usernameField, false, 80, 3, var7, Drawing.WHITE, var8));
+      LabeledField var10;
+      this.addChild(var10 = new LabeledField(10, this.y, this.width - 20, this.usernameField, false, 80, 3, var7, Drawing.WHITE, var8));
       this.y += var10.height + 5;
-      this.addChild(var10 = new pg_(10, this.y, this.width - 20, this.passwordField, false, 80, 3, var7, Drawing.WHITE, StringConstants.CREATE_PASSWORD));
+      this.addChild(var10 = new LabeledField(10, this.y, this.width - 20, this.passwordField, false, 80, 3, var7, Drawing.WHITE, StringConstants.CREATE_PASSWORD));
       this.y += var10.height + 5;
       this.logInButton.listener = this;
       if (this._Q != null) {
