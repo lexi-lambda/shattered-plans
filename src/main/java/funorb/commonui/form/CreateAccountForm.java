@@ -24,12 +24,12 @@ import funorb.commonui.form.validator.ValidationState;
 import funorb.commonui.hl_;
 import funorb.commonui.listener.ButtonListener;
 import funorb.commonui.frame.CreateAccountFrame;
-import funorb.commonui.op_;
+import funorb.commonui.listener.LinkedTextListener;
 import funorb.commonui.pg_;
 import funorb.commonui.renderer.LinkRenderer;
 import funorb.commonui.renderer.PasswordFieldRenderer;
 import funorb.commonui.renderer.TextRenderer;
-import funorb.commonui.ts_;
+import funorb.commonui.LinkedText;
 import funorb.graphics.Drawing;
 import funorb.graphics.Font;
 import funorb.shatteredplans.StringConstants;
@@ -37,7 +37,7 @@ import funorb.shatteredplans.client.JagexApplet;
 
 import java.applet.Applet;
 
-public final class CreateAccountForm extends ListContainer implements op_, ButtonListener, CreateForm {
+public final class CreateAccountForm extends ListContainer implements LinkedTextListener, ButtonListener, CreateForm {
   public static String passwordFieldText;
   public static String _cgF = null;
   public static CreateAccountForm _anb;
@@ -87,12 +87,12 @@ public final class CreateAccountForm extends ListContainer implements op_, Butto
     this.addChild(var4);
     var8 += var4.height;
     final TextRenderer var5 = new TextRenderer(Resources.AREZZO_14, 0, 0, 0, 0, Drawing.WHITE, Font.HorizontalAlignment.LEFT, Font.VerticalAlignment.TOP, Resources.AREZZO_14.ascent, true);
-    final ts_ _I = new ts_(var2, var5);
+    final LinkedText _I = new LinkedText(var2, var5);
     _I.tooltip = "";
-    _I.a096(0, StringConstants.OPEN_IN_POPUP_WINDOW);
-    _I.a096(1, StringConstants.OPEN_IN_POPUP_WINDOW);
+    _I.setHotspotTooltip(0, StringConstants.OPEN_IN_POPUP_WINDOW);
+    _I.setHotspotTooltip(1, StringConstants.OPEN_IN_POPUP_WINDOW);
     _I.listener = this;
-    _I.a652(46, var8, this.width - 90);
+    _I.setBounds(46, var8, this.width - 90);
     _I.pack();
     var8 += 15 + _I.height;
     this.addChild(_I);
@@ -133,12 +133,12 @@ public final class CreateAccountForm extends ListContainer implements op_, Butto
   }
 
   @Override
-  public void a746(final int var2) {
-    if (var2 == 0) {
+  public void handleLinkClicked(final int hotspotIndex) {
+    if (hotspotIndex == 0) {
       a984gm("terms.ws");
-    } else if (var2 == 1) {
+    } else if (hotspotIndex == 1) {
       a984gm("privacy.ws");
-    } else if (var2 == 2) {
+    } else if (hotspotIndex == 2) {
       a984gm("conduct.ws");
     }
   }
@@ -223,7 +223,7 @@ public final class CreateAccountForm extends ListContainer implements op_, Butto
 
   @Override
   public void handleButtonClicked(final Button button) {
-    if (this.backButton == button) {
+    if (button == this.backButton) {
       CommonUI.b423ol();
     } else if (button == this.createButton) {
       if (this.m154()) {

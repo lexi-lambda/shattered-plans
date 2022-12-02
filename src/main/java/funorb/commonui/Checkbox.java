@@ -16,8 +16,8 @@ public final class Checkbox extends Button {
   }
 
   @Override
-  public void handleClicked(final int var1, final int var2, final int var3) {
+  public void handleClicked(final int button, final int x, final int y) {
     this.active = !this.active;
-    super.handleClicked(var1, var2, var3);
+    super.handleClicked(button, x, y);
   }
 }

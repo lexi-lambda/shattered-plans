@@ -6,12 +6,13 @@ import funorb.commonui.container.ListContainer;
 import funorb.commonui.form.CreateAccountForm;
 import funorb.commonui.frame.CreateAccountFrame;
 import funorb.commonui.listener.ButtonListener;
+import funorb.commonui.listener.LinkedTextListener;
 import funorb.commonui.renderer.TextRenderer;
 import funorb.graphics.Drawing;
 import funorb.graphics.Font;
 import funorb.shatteredplans.StringConstants;
 
-public final class pe_ extends ListContainer implements op_, ButtonListener {
+public final class pe_ extends ListContainer implements LinkedTextListener, ButtonListener {
   private final Button _H;
   private final CreateAccountFrame _I;
 
@@ -22,13 +23,13 @@ public final class pe_ extends ListContainer implements op_, ButtonListener {
     final String var2 = Strings.format(StringConstants.CREATE_U13_TERMS, "<u=2164A2><col=2164A2>", "</col></u>");
     final byte var3 = 20;
     final TextRenderer var4 = new TextRenderer(Resources.AREZZO_14, 0, 0, 0, 0, Drawing.WHITE, Font.HorizontalAlignment.JUSTIFY, Font.VerticalAlignment.TOP, Resources.AREZZO_14.ascent, true);
-    final ts_ _G = new ts_(var2, var4);
+    final LinkedText _G = new LinkedText(var2, var4);
     _G.tooltip = "";
-    _G.a096(0, StringConstants.OPEN_IN_POPUP_WINDOW);
-    _G.a096(1, StringConstants.OPEN_IN_POPUP_WINDOW);
+    _G.setHotspotTooltip(0, StringConstants.OPEN_IN_POPUP_WINDOW);
+    _G.setHotspotTooltip(1, StringConstants.OPEN_IN_POPUP_WINDOW);
     _G.listener = this;
     _G.width = this.width - 40;
-    _G.a652(26, var3, this.width - 40);
+    _G.setBounds(26, var3, this.width - 40);
     final int var7 = var3 + _G.height + 15;
     this.addChild(_G);
     final byte var5 = 4;
@@ -40,12 +41,12 @@ public final class pe_ extends ListContainer implements op_, ButtonListener {
   }
 
   @Override
-  public void a746(final int var2) {
-    if (var2 == 0) {
+  public void handleLinkClicked(final int hotspotIndex) {
+    if (hotspotIndex == 0) {
       CreateAccountForm.a984gm("terms.ws");
-    } else if (var2 == 1) {
+    } else if (hotspotIndex == 1) {
       CreateAccountForm.a984gm("privacy.ws");
-    } else if (var2 == 2) {
+    } else if (hotspotIndex == 2) {
       CreateAccountForm.a984gm("conduct.ws");
     }
   }

@@ -1,6 +1,7 @@
 package funorb.commonui;
 
 import funorb.awt.KeyState;
+import funorb.awt.MouseState;
 import funorb.commonui.listener.ComponentListener;
 import funorb.commonui.listener.TextFieldListener;
 import funorb.commonui.renderer.ComponentRenderer;
@@ -102,12 +103,12 @@ public class AbstractTextField extends Button {
         final AbstractTextLayout var3 = var2.updateLayout(this);
         final int var4 = var3.getWidth();
         final int var5 = var2.getAvailableWidth(this);
-        final int var6 = var2.a474() >> 1;
+        final int var6 = var2.getLineHeight() >> 1;
         if (var4 < -var6 + var5) {
           this._l = 0;
           this._h = 0;
         } else {
-          final int var7 = this._h + var3.a527(this._H);
+          final int var7 = this._h + var3.getCharacterX(this._H);
           if (-var6 + var5 >= var7) {
             if (var6 > var7) {
               this._h += -var7 + var6;
@@ -273,7 +274,7 @@ public class AbstractTextField extends Button {
   public void tick(final int x, final int y, final Component root) {
     super.tick(x, y, root);
     this.j423();
-    if (this._o == 1) {
+    if (this.mouseButtonClicked == MouseState.Button.LEFT) {
       if (this.renderer instanceof ITextRenderer var5) {
         int var6 = var5.a242(x, JagexApplet.mouseX, y, this, JagexApplet.mouseY);
         if (var6 != -1) {

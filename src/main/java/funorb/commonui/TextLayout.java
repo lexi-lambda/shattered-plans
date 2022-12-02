@@ -26,8 +26,8 @@ public final class TextLayout extends AbstractTextLayout {
       this.text = text;
       this.horizontalAlignment = Font.HorizontalAlignment.LEFT;
       final TextLineMetrics var6 = this.initializeSingleLineLayout(font, text, baseline);
-      var6._b[0] = 0;
-      var6._b[text.length()] = font.measureLineWidth(text);
+      var6.charXs[0] = 0;
+      var6.charXs[text.length()] = font.measureLineWidth(text);
       var6.a137ta(font, text, 0);
     }
     this.needsRelayout = false;
@@ -41,8 +41,8 @@ public final class TextLayout extends AbstractTextLayout {
       this.horizontalAlignment = Font.HorizontalAlignment.RIGHT;
       this.text = text;
       final TextLineMetrics var6 = this.initializeSingleLineLayout(font, text, var2);
-      var6._b[0] = var5 - font.measureLineWidth(text);
-      var6._b[text.length()] = var5;
+      var6.charXs[0] = var5 - font.measureLineWidth(text);
+      var6.charXs[text.length()] = var5;
       var6.a137ta(font, text, 0);
     }
     this.needsRelayout = false;
@@ -56,8 +56,8 @@ public final class TextLayout extends AbstractTextLayout {
       this.font = font;
       final TextLineMetrics var6 = this.initializeSingleLineLayout(font, text, var1);
       final int var7 = font.measureLineWidth(text);
-      var6._b[0] = var5 - (var7 / 2);
-      var6._b[text.length()] = var5 + (var7 >> 1);
+      var6.charXs[0] = var5 - (var7 / 2);
+      var6.charXs[text.length()] = var5 + (var7 >> 1);
       var6.a137ta(font, text, 0);
     }
     this.needsRelayout = false;
@@ -123,9 +123,9 @@ public final class TextLayout extends AbstractTextLayout {
       for (int i = 0; i < lineCount; ++i) {
         final String var13 = lines[i];
         final TextLineMetrics var14 = new TextLineMetrics(baseline - font.ascent, baseline + font.descent, var13 == null ? 0 : var13.length());
-        var14._b[0] = 0;
+        var14.charXs[0] = 0;
         if (var13 != null) {
-          var14._b[var13.length()] = font.measureLineWidth(var13);
+          var14.charXs[var13.length()] = font.measureLineWidth(var13);
           var14.a137ta(font, var13, horizontalAlignment != Font.HorizontalAlignment.JUSTIFY ? 0 : this.a947(availableWidth, font.measureLineWidth(var13), var13));
         }
 

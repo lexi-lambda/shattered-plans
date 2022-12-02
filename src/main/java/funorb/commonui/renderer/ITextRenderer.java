@@ -12,7 +12,7 @@ public interface ITextRenderer extends ComponentRenderer {
 
   int getAvailableWidth(Component component);
 
-  int a474();
+  int getLineHeight();
 
   void a132(int var1, int var2, int var3, int var4, Component var6);
 

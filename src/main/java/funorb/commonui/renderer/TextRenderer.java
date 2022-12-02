@@ -58,9 +58,9 @@ public class TextRenderer implements ITextRenderer {
   public final void a403(final int var1, final int var2, final int var4, final Component var5) {
     if (var5.hasFocus()) {
       final AbstractTextLayout var6 = this.updateLayout(var5);
-      final int var7 = var6.a543(var1);
+      final int var7 = var6.getCharacterLine(var1);
       final TextLineMetrics var8 = var6.lineMetrics[var7];
-      final int var9 = var6.a527(var1);
+      final int var9 = var6.getCharacterX(var1);
       final int var10 = this.b896(var5, var9, var2);
       final int var11 = this.a754(var4, var5) + Math.max(0, var8.top);
       final int var12 = this.a754(var4, var5) + Math.min(this.getAvailableHeight(var5), Math.min(var8.bottom, var6.lineMetrics.length > 1 + var7 ? var6.lineMetrics[1 + var7].top : var8.bottom));
@@ -116,15 +116,15 @@ public class TextRenderer implements ITextRenderer {
           var9 = var4;
         }
 
-        final int var10 = var7.a543(var8);
-        final int var11 = var7.a543(var9);
+        final int var10 = var7.getCharacterLine(var8);
+        final int var11 = var7.getCharacterLine(var9);
         Drawing.withLocalContext(() -> {
           Drawing.expandBoundsToInclude(var3 + var6.x, var2 + var6.y, var3 + var6.x + var6.width, var2 + var6.y + var6.height);
           for (int var12 = var10; var11 >= var12; ++var12) {
             final TextLineMetrics var13 = var7.lineMetrics[var12];
             assert var13 != null;
-            final int var14 = var12 == var10 ? var7.a527(var8) : var13._b[0];
-            final int var15 = var12 != var11 ? var13._b[var13.getCharCount()] : var7.a527(var9);
+            final int var14 = var12 == var10 ? var7.getCharacterX(var8) : var13.charXs[0];
+            final int var15 = var12 != var11 ? var13.charXs[var13.getCharCount()] : var7.getCharacterX(var9);
             Drawing.fillRect(this.b896(var6, var14, var3), var13.top + var2 + var6.y + this._b + var6._l, var15 - var14, var13.bottom, this._e, this._e >>> 24);
           }
         });
@@ -217,8 +217,7 @@ public class TextRenderer implements ITextRenderer {
   }
 
   @Override
-  public final int a474() {
-
+  public final int getLineHeight() {
     return this.font.descent + this.font.ascent;
   }
 

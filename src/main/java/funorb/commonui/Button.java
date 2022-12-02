@@ -18,7 +18,7 @@ public class Button extends Component {
   public boolean enabled;
   private boolean focused;
 
-  public Button(final String text,  final ComponentListener listener) {
+  public Button(final String text, final ComponentListener listener) {
     this(text, new ButtonRenderer(), listener);
   }
 
@@ -144,7 +144,7 @@ public class Button extends Component {
   public boolean a446(final int var1, final int var2, final int var4, final int var5, final int var6, final Component var7) {
     if (this.enabled && this.a046(var2, var4, var6, var5)) {
       this.focus(var7);
-      this._o = var1;
+      this.mouseButtonClicked = var1;
 
       return true;
     } else {
@@ -162,14 +162,12 @@ public class Button extends Component {
   @Override
   public void tick(final int x, final int y, final Component root) {
     super.tick(x, y, root);
-    if (this._o != 0 && JagexApplet.mouseButtonDown != this._o) {
+    if (this.mouseButtonClicked != MouseState.Button.NONE && this.mouseButtonClicked != JagexApplet.mouseButtonDown) {
       if (this.a046(JagexApplet.mouseX, JagexApplet.mouseY, y, x) && JagexApplet.mouseButtonDown == MouseState.Button.NONE) {
-        this.handleClicked(this._o, JagexApplet.mouseX - x, -y + JagexApplet.mouseY);
+        this.handleClicked(this.mouseButtonClicked, JagexApplet.mouseX - x, -y + JagexApplet.mouseY);
       }
-
       this.a132(JagexApplet.mouseX, y, x, JagexApplet.mouseY, root);
     }
-
   }
 
   @Override
@@ -177,12 +175,12 @@ public class Button extends Component {
     if (!this.hasFocus() || keyCode != KeyState.Code.ENTER && keyCode != KeyState.Code.SPACE) {
       return false;
     } else {
-      this.handleClicked(1, -1, -1);
+      this.handleClicked(MouseState.Button.LEFT, -1, -1);
       return true;
     }
   }
 
-  protected void handleClicked(final int var1, final int var2, final int var3) {
+  protected void handleClicked(@MagicConstant(valuesFromClass = MouseState.Button.class) final int button, final int x, final int y) {
     if (this.listener != null && this.listener instanceof ButtonListener) {
       ((ButtonListener) this.listener).handleButtonClicked(this);
     }
@@ -190,6 +188,6 @@ public class Button extends Component {
 
   @Override
   public final void a132(final int var1, final int var2, final int var3, final int var4, final Component var6) {
-    this._o = 0;
+    this.mouseButtonClicked = MouseState.Button.NONE;
   }
 }

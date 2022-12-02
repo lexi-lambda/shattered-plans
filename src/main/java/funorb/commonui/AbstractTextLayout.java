@@ -6,17 +6,17 @@ import java.util.Objects;
 public abstract class AbstractTextLayout {
   public TextLineMetrics[] lineMetrics;
 
-  public final int a543(int var2) {
-    int var3 = 0;
-
-    while (this.lineMetrics.length > var3) {
-      final TextLineMetrics var4 = this.lineMetrics[var3];
-      if (var4._b.length > var2) {
-        return var3;
+  /**
+   * @param charIndex the index of the character in the original text
+   * @return the index of the line in which the character appears
+   */
+  public final int getCharacterLine(int charIndex) {
+    for (int i = 0; i < this.lineMetrics.length; ++i) {
+      final TextLineMetrics metrics = this.lineMetrics[i];
+      if (charIndex < metrics.charXs.length) {
+        return i;
       }
-
-      var2 -= var4.getCharCount();
-      ++var3;
+      charIndex -= metrics.getCharCount();
     }
 
     return this.lineMetrics.length;
@@ -90,20 +90,13 @@ public abstract class AbstractTextLayout {
     }
   }
 
-  public final int a527(int var2) {
-    final TextLineMetrics[] var3 = this.lineMetrics;
-    int var4 = 0;
-
-    while (var3.length > var4) {
-      final TextLineMetrics var5 = var3[var4];
-      if (var5._b.length > var2) {
-        return var5._b[var2];
+  public final int getCharacterX(int charIndex) {
+    for (final TextLineMetrics metrics : this.lineMetrics) {
+      if (charIndex < metrics.charXs.length) {
+        return metrics.charXs[charIndex];
       }
-
-      var2 -= var5.getCharCount();
-      ++var4;
+      charIndex -= metrics.getCharCount();
     }
-
     return 0;
   }
 }

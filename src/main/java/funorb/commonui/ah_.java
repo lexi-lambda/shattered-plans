@@ -9,7 +9,7 @@ import funorb.graphics.Font;
 import funorb.graphics.Sprite;
 import funorb.shatteredplans.StringConstants;
 
-public final class ah_ extends ts_ {
+public final class ah_ extends LinkedText {
   private static TextRenderer _qqo;
   private final InputValidator _M;
   private final String _W;
@@ -53,7 +53,7 @@ public final class ah_ extends ts_ {
 
     if (!var5.equals(this.text)) {
       this.text = var5;
-      this.e487();
+      this.recalculateHotspots();
     }
 
     super.draw(x, y);

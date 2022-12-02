@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 public class Component {
+  @MagicConstant(valuesFromClass = MouseState.Button.class)
   private static int mouseButtonDown = 0;
 
   public TextLayout textLayout;
@@ -23,7 +24,8 @@ public class Component {
   public int x;
   public int y;
   public ComponentRenderer renderer;
-  protected int _o;
+  @MagicConstant(valuesFromClass = MouseState.Button.class)
+  protected int mouseButtonClicked;
   public String text;
   public int _l = 0;
   public int _h = 0;
@@ -77,7 +79,7 @@ public class Component {
         }
       }
 
-      if (JagexApplet.mouseButtonDown == MouseState.Button.NONE && mouseButtonDown != 0) {
+      if (JagexApplet.mouseButtonDown == MouseState.Button.NONE && mouseButtonDown != MouseState.Button.NONE) {
         this.a132(JagexApplet.mouseX, y, x, JagexApplet.mouseY, this);
       }
     } else if (var5 && JagexApplet.mouseButtonJustClicked != MouseState.Button.NONE) {
@@ -100,7 +102,7 @@ public class Component {
   }
 
   public void a132(final int var1, final int var2, final int var3, final int var4, final Component var6) {
-    this._o = 0;
+    this.mouseButtonClicked = MouseState.Button.NONE;
   }
 
   public void unfocus() {
@@ -122,7 +124,7 @@ public class Component {
 
   public boolean a446(final int var1, final int var2, final int var4, final int var5, final int var6, final Component var7) {
     if (this.a046(var2, var4, var6, var5)) {
-      this._o = var1;
+      this.mouseButtonClicked = var1;
     }
     return false;
   }
