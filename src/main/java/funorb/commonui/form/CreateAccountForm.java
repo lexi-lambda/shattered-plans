@@ -234,7 +234,7 @@ public final class CreateAccountForm extends ListContainer implements op_, Butto
 
         if (CommonUI._eel == Enum1.C1) {
           final CreateAccountPage var6 = new CreateAccountPage(CommonUI.root, this);
-          CommonUI.root.pushChild(var6);
+          CommonUI.root.pushActive(var6);
           if (a591js(JagexBaseApplet.getInstance())) {
             var6.f487();
           } else {

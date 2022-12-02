@@ -3,7 +3,7 @@ package funorb.commonui;
 import funorb.awt.KeyState;
 import org.jetbrains.annotations.NotNull;
 
-public class FormNavigationPage extends FramedNavigationPage {
+public class FormFrame extends Frame {
   private static final int PADDING = 6;
   private static final int PADDING_2 = PADDING * 2;
 
@@ -12,10 +12,10 @@ public class FormNavigationPage extends FramedNavigationPage {
   private final int animateBoundsTicks;
   private Component nextContent;
   private TransparentContainer transparentContent;
-  private @NotNull FormNavigationPage.AnimationState animationState = AnimationState.NONE;
+  private @NotNull FormFrame.AnimationState animationState = AnimationState.NONE;
   private int currentTick;
 
-  protected FormNavigationPage(final NavigationRoot root, final Component content, final int paddingTop, final int ticksPerState, final int animateBoundsTicks) {
+  protected FormFrame(final RootFrame root, final Component content, final int paddingTop, final int ticksPerState, final int animateBoundsTicks) {
     super(root, content.width + PADDING_2, content.height + paddingTop + PADDING_2);
     this.paddingTop = paddingTop;
     this.ticksPerState = ticksPerState;
@@ -55,7 +55,7 @@ public class FormNavigationPage extends FramedNavigationPage {
   }
 
   @Override
-  protected final void animateBoundsFinished() {
+  protected final void onAnimateBoundsComplete() {
     if (this.animationState != AnimationState.FADE_OUT) {
       this.currentTick = 0;
       this.animationState = AnimationState.FADE_IN;
@@ -66,7 +66,7 @@ public class FormNavigationPage extends FramedNavigationPage {
   }
 
   @Override
-  public void tick2() {
+  public void tickAnimations() {
     if (this.animationState == AnimationState.FADE_OUT) {
       if (++this.currentTick == this.ticksPerState) {
         this.animationState = AnimationState.BOUNDS;
@@ -85,7 +85,7 @@ public class FormNavigationPage extends FramedNavigationPage {
       }
     }
 
-    super.tick2();
+    super.tickAnimations();
   }
 
   public final void setNextContent(final Component content) {
@@ -112,12 +112,6 @@ public class FormNavigationPage extends FramedNavigationPage {
     }
 
     super.skipAnimations();
-  }
-
-  @Override
-  public final boolean canBeRemoved() {
-    this.skipAnimations();
-    return super.canBeRemoved();
   }
 
   private enum AnimationState {

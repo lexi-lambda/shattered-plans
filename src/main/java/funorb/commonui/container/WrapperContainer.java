@@ -67,7 +67,7 @@ public abstract class WrapperContainer extends Component implements Container {
 
   @Override
   public final boolean hasFocus() {
-    return this.a274() != null;
+    return this.getFocusedChild() != null;
   }
 
   @Override
@@ -105,7 +105,7 @@ public abstract class WrapperContainer extends Component implements Container {
     return this.child != null && this.child.a446(var1, var2, var4, var5 + this.x, this.y + var6, var7);
   }
 
-  protected Component a274() {
+  protected Component getFocusedChild() {
     return this.child != null && this.child.hasFocus() ? this.child : null;
   }
 

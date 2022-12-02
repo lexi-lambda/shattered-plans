@@ -10,7 +10,7 @@ import funorb.client.JagexBaseApplet;
 import funorb.shatteredplans.StringConstants;
 import org.intellij.lang.annotations.MagicConstant;
 
-public class AccountPage extends FormNavigationPage implements ButtonListener {
+public class AccountPage extends FormFrame implements ButtonListener {
   private final boolean isLoginPage;
   private final ProgressBar progressBar;
   private final boolean canRetryOnFailure;
@@ -18,7 +18,7 @@ public class AccountPage extends FormNavigationPage implements ButtonListener {
   private boolean wasProtocolError = false;
   private boolean hasFailed = false;
 
-  public AccountPage(final NavigationRoot var1, final Font var2, final String var3, final boolean var4, final boolean var5) {
+  public AccountPage(final RootFrame var1, final Font var2, final String var3, final boolean var4, final boolean var5) {
     super(var1, new cf_(null, var2, var3), 77, 10, 10);
     this.canRetryOnFailure = var4;
     this.isLoginPage = var5;
@@ -39,7 +39,7 @@ public class AccountPage extends FormNavigationPage implements ButtonListener {
 
     final String var1 = l738w();
     LoginForm.instance = new LoginForm(var1, true, false, false);
-    CommonUI.root.pushChild(CommonUI._aef);
+    CommonUI.root.pushActive(CommonUI._aef);
     CommonUI._aef.setNextContent(LoginForm.instance);
     CommonUI._aef.skipAnimations();
   }
@@ -73,8 +73,8 @@ public class AccountPage extends FormNavigationPage implements ButtonListener {
   }
 
   public final void i423() {
-    if (this.isAlive) {
-      this.isAlive = false;
+    if (this.isActive) {
+      this.isActive = false;
       if (this.canRetryOnFailure) {
         a150nb();
       } else if (this.isLoginPage) {

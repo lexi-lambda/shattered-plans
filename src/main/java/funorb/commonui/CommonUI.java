@@ -13,9 +13,9 @@ import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.Nullable;
 
 public final class CommonUI {
-  public static NavigationRoot root;
+  public static RootFrame root;
   public static AccountPage _jiG;
-  public static FormNavigationPage _aef;
+  public static FormFrame _aef;
   public static ks_ _wha;
   private static LoadingBar loadingBar;
 
@@ -45,7 +45,7 @@ public final class CommonUI {
     _wha.a540(false);
     Resources.load(spritesLoader, fontsLoader, dataLoader);
     TooltipManager.initialize(Resources.AREZZO_14);
-    root = new NavigationRoot();
+    root = new RootFrame();
     switchToLogin(true, true);
     _eel = Enum1.C1;
     _fjs = Enum1.C1;
@@ -53,7 +53,7 @@ public final class CommonUI {
 
   public static TickResult tick() {
     root.tickRoot(0, 0, true);
-    root.tick2();
+    root.tickAnimations();
 
     while (JagexApplet.nextTypedKey()) {
       root.keyTyped(JagexApplet.lastTypedKeyCode, JagexApplet.lastTypedKeyChar);
@@ -80,7 +80,7 @@ public final class CommonUI {
 
   public static void switchToLoadingScreen() {
     if (root != null) {
-      root.switchToLoadingScreen();
+      root.expediteRemoval();
     }
     if (loadingBar != null) {
       loadingBar.disableAnimation();
@@ -92,24 +92,24 @@ public final class CommonUI {
 
   public static void switchToLogin(final boolean canCreateAccount, final boolean isInitialLogin) {
     f150fe();
-    root.startTransitioningOut();
+    root.popAll();
     LoginForm.instance = new LoginForm(enteredUsername, wasConnected, canCreateAccount, isInitialLogin);
-    _aef = new FormNavigationPage(root, LoginForm.instance, 33, 20, 30);
-    root.pushChild(_aef);
+    _aef = new FormFrame(root, LoginForm.instance, 33, 20, 30);
+    root.pushActive(_aef);
   }
 
   public static void setStateLoggingIn(final String message, final boolean var2) {
     _nsbD = var2;
     loggingIn = true;
     _jiG = new AccountPage(root, Resources.AREZZO_14_BOLD, message, wasConnected, _nsbD);
-    root.pushChild(_jiG);
+    root.pushActive(_jiG);
   }
 
   public static void handleServerDisconnect() {
     if (JagexApplet.connectionState == JagexApplet.ConnectionState.CONNECTED) {
       f150fe();
       wasConnected = true;
-      root.startTransitioningOut();
+      root.popAll();
       setStateLoggingIn(StringConstants.CONNECTION_LOST_RECONNECTING, false);
       JagexApplet.connectionState = JagexApplet.ConnectionState.RECONNECTING;
     }
@@ -148,7 +148,7 @@ public final class CommonUI {
 
   public static void handleLoginFailed(@MagicConstant(valuesFromClass = LoginResult.class) int var0, String var1) {
     loggingIn = false;
-    if (_jiG != null && _jiG.isAlive) {
+    if (_jiG != null && _jiG.isActive) {
       if (var0 == LoginResult.R8) {
         var0 = LoginResult.R2;
         if (wasConnected) {
@@ -228,11 +228,11 @@ public final class CommonUI {
   }
 
   private static void switchToLoading() {
-    root.startTransitioningOut();
+    root.popAll();
     if (loadingBar == null) {
       loadingBar = new LoadingBar(root, loadingNotificationMessage);
     }
-    root.pushChild(loadingBar);
+    root.pushActive(loadingBar);
   }
 
   public static void draw() {
@@ -242,7 +242,7 @@ public final class CommonUI {
   public static void drawLoading() {
     if (loadingBar == null) {
       loadingBar = new LoadingBar(root, loadingNotificationMessage);
-      root.pushChild(loadingBar);
+      root.pushActive(loadingBar);
     }
     loadingBar.update(loadingMessage, loadingPercent, loadingFailed);
     Drawing.clear();

@@ -3,14 +3,14 @@ package funorb.commonui;
 import funorb.graphics.Drawing;
 import funorb.graphics.Font;
 
-public final class LoadingBar extends FramedNavigationPage {
+public final class LoadingBar extends Frame {
   private String progressMessage;
   private final String notificationMessage;
   private final ProgressBar progressBar;
   private boolean failed;
   private boolean animationDisabled;
 
-  public LoadingBar(final NavigationRoot root, final String notificationMessage) {
+  public LoadingBar(final RootFrame root, final String notificationMessage) {
     super(root, 300, 120);
     this.notificationMessage = notificationMessage;
     if (this.notificationMessage != null) {

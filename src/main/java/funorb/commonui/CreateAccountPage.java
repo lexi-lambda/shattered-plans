@@ -11,7 +11,7 @@ public final class CreateAccountPage extends AccountPage {
   private boolean _Eb;
   private boolean _Hb;
 
-  public CreateAccountPage(final NavigationRoot var1, final CreateAccountForm var2) {
+  public CreateAccountPage(final RootFrame var1, final CreateAccountForm var2) {
     super(var1, Resources.AREZZO_14_BOLD, StringConstants.CREATING_YOUR_ACCOUNT, false, false);
     this._Db = var2;
   }
@@ -56,15 +56,15 @@ public final class CreateAccountPage extends AccountPage {
   }
 
   @Override
-  public void tick2() {
-    if (this.isAlive && !this._Hb) {
+  public void tickAnimations() {
+    if (this.isActive && !this._Hb) {
       final kj_ var2 = a752br();
       if (var2 != null) {
         this.a122(false, var2);
       }
     }
 
-    super.tick2();
+    super.tickAnimations();
   }
 
   private void a122(final boolean var2, final kj_ var3) {
