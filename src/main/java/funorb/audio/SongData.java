@@ -262,7 +262,7 @@ public final class SongData {
                 midi.writeByte(0xb0 + midiChannel); // control change
               }
 
-              controller += input.data[posControlDeltas++] & 127;
+              controller = controller + input.data[posControlDeltas++] & 127;
               midi.writeByte(controller);
               final byte valueDelta;
               if (controller == 0 || controller == 32) { // bank switch msb/lsb

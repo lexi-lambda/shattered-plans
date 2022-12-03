@@ -264,7 +264,7 @@ public final class fd_ {
     return var2;
   }
 
-  public kk_ a582() {
+  public AudioSampleData_idk a582() {
     if (this._N == null) {
       this._M = 0;
       this._n = new float[_r];
@@ -299,7 +299,7 @@ public final class fd_ {
     this._n = null;
     final byte[] var7 = this._N;
     this._N = null;
-    return new kk_(this._B, var7, this._H, this._G, this._I);
+    return new AudioSampleData_idk(this._B, var7, this._H, this._G, this._I);
   }
 
   private float[] e875(final int var1) {
