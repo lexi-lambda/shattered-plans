@@ -5,10 +5,10 @@ import funorb.audio.PlayingSound;
 import funorb.audio.SampledAudioChannel;
 import funorb.audio.SoundEffect;
 import funorb.audio.SoundLoader;
-import funorb.audio.al_;
+import funorb.audio.AudioSamplePlayback_idk;
 import funorb.audio.h_;
-import funorb.audio.kk_;
-import funorb.audio.vk_;
+import funorb.audio.AudioSampleData_idk;
+import funorb.audio.AudioSourceSum_idk;
 import funorb.cache.ResourceLoader;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public final class Sounds {
   public static int musicVolume = 256;
 
   public static final List<PlayingSound> playingSounds = new ArrayList<>();
-  public static vk_ soundsTn;
+  public static AudioSourceSum_idk soundsTn;
   public static h_ musicTn;
   static SampledAudioChannel soundsChannel;
   static SampledAudioChannel musicChannel;
@@ -59,24 +59,24 @@ public final class Sounds {
     MUSIC_LOSE = SongData.load(loader1, "shattered_plans_lose");
 
     ShatteredPlansClient.currentTrack = MUSIC_IN_GAME_2;
-    musicTn._u.a350(SoundLoader.globalLoader, loader2, MUSIC_INTRO);
-    musicTn._u.a350(SoundLoader.globalLoader, loader2, MUSIC_IN_GAME_1);
-    musicTn._u.a350(SoundLoader.globalLoader, loader2, MUSIC_IN_GAME_2);
-    musicTn._u.f150();
+    musicTn.midiPlayer2.a350(SoundLoader.globalLoader, loader2, MUSIC_INTRO);
+    musicTn.midiPlayer2.a350(SoundLoader.globalLoader, loader2, MUSIC_IN_GAME_1);
+    musicTn.midiPlayer2.a350(SoundLoader.globalLoader, loader2, MUSIC_IN_GAME_2);
+    musicTn.midiPlayer2.f150();
 
     SoundLoader.globalLoader = null;
   }
 
   public static void play(final SoundEffect effect) {
-    play(effect._f, effect.volume);
+    play(effect.sample, effect.volume);
   }
 
   public static PlayingSound play(final SoundEffect effect, final int volume) {
-    return play(effect._f, effect.volume * volume / 96);
+    return play(effect.sample, effect.volume * volume / 96);
   }
 
-  private static PlayingSound play(final kk_ var1, final int volume) {
-    final al_ var01 = al_.a638(var1, volume);
+  private static PlayingSound play(final AudioSampleData_idk var1, final int volume) {
+    final AudioSamplePlayback_idk var01 = AudioSamplePlayback_idk.a638(var1, volume);
     assert var01 != null;
     final PlayingSound sound = new PlayingSound(var01);
     playingSounds.add(sound);

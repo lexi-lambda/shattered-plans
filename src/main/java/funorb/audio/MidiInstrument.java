@@ -2,21 +2,21 @@ package funorb.audio;
 
 import funorb.io.Buffer;
 
-public final class br_ {
-  public final kk_[] _h = new kk_[128];
-  public final kc_[] _j = new kc_[128];
-  public final byte[] _t = new byte[128];
-  public final int _q;
-  public final short[] _k = new short[128];
-  public final byte[] _r = new byte[128];
-  public final byte[] _s = new byte[128];
-  private int[] _n = new int[128];
+public final class MidiInstrument {
+  public final AudioSampleData_idk[] noteSample = new AudioSampleData_idk[128];
+  public final KeyParams_idk[] keyParams_idk = new KeyParams_idk[128];
+  public final byte[] notePan_idk = new byte[128];
+  public final int mainVolume_idk;
+  public final short[] noteTuning_idk = new short[128];
+  public final byte[] noteOffNote_idk = new byte[128];
+  public final byte[] noteVolume_idk = new byte[128];
+  private int[] noteSampleIds_idk = new int[128];
 
-  public br_(final byte[] var1) {
-    final Buffer var2 = new Buffer(var1);
+  public MidiInstrument(final byte[] instrumentData) {
+    final Buffer buf = new Buffer(instrumentData);
 
     int var3 = 0;
-    while (var2.data[var3 + var2.pos] != 0) {
+    while (buf.data[var3 + buf.pos] != 0) {
       ++var3;
     }
 
@@ -24,16 +24,16 @@ public final class br_ {
 
     int var5;
     for (var5 = 0; var5 < var3; ++var5) {
-      var4[var5] = var2.readByte();
+      var4[var5] = buf.readByte();
     }
 
     ++var3;
-    ++var2.pos;
-    var5 = var2.pos;
-    var2.pos += var3;
+    ++buf.pos;
+    var5 = buf.pos;
+    buf.pos += var3;
 
     int var6 = 0;
-    while (var2.data[var6 + var2.pos] != 0) {
+    while (buf.data[var6 + buf.pos] != 0) {
       ++var6;
     }
 
@@ -41,27 +41,27 @@ public final class br_ {
 
     int var8;
     for (var8 = 0; var8 < var6; ++var8) {
-      var7[var8] = var2.readByte();
+      var7[var8] = buf.readByte();
     }
 
-    ++var2.pos;
+    ++buf.pos;
     ++var6;
-    var8 = var2.pos;
-    var2.pos += var6;
+    var8 = buf.pos;
+    buf.pos += var6;
 
     int var9 = 0;
-    while (var2.data[var9 + var2.pos] != 0) {
+    while (buf.data[var9 + buf.pos] != 0) {
       ++var9;
     }
 
     final byte[] var10 = new byte[var9];
 
     for (int var11 = 0; var11 < var9; ++var11) {
-      var10[var11] = var2.readByte();
+      var10[var11] = buf.readByte();
     }
 
     ++var9;
-    ++var2.pos;
+    ++buf.pos;
     final byte[] var36 = new byte[var9];
     int var12;
     int var14;
@@ -73,7 +73,7 @@ public final class br_ {
       int var13 = 1;
 
       for (var14 = 2; var9 > var14; ++var14) {
-        int var15 = var2.readUByte();
+        int var15 = buf.readUByte();
         if (var15 == 0) {
           var13 = var12++;
         } else {
@@ -88,30 +88,30 @@ public final class br_ {
       }
     }
 
-    final kc_[] var37 = new kc_[var12];
+    final KeyParams_idk[] var37 = new KeyParams_idk[var12];
 
-    kc_ var38;
+    KeyParams_idk var38;
     for (var14 = 0; var14 < var37.length; ++var14) {
-      var38 = var37[var14] = new kc_();
-      final int var16 = var2.readUByte();
+      var38 = var37[var14] = new KeyParams_idk();
+      final int var16 = buf.readUByte();
       if (var16 > 0) {
         var38._n = new byte[var16 * 2];
       }
 
-      final int j137 = var2.readUByte();
+      final int j137 = buf.readUByte();
       if (j137 > 0) {
         var38._e = new byte[2 * j137 + 2];
         var38._e[1] = 64;
       }
     }
 
-    var14 = var2.readUByte();
+    var14 = buf.readUByte();
     final byte[] var39 = var14 > 0 ? new byte[2 * var14] : null;
-    var14 = var2.readUByte();
+    var14 = buf.readUByte();
     final byte[] var40 = var14 <= 0 ? null : new byte[var14 * 2];
 
     int var17 = 0;
-    while (var2.data[var2.pos + var17] != 0) {
+    while (buf.data[buf.pos + var17] != 0) {
       ++var17;
     }
 
@@ -119,24 +119,24 @@ public final class br_ {
 
     int var19;
     for (var19 = 0; var19 < var17; ++var19) {
-      var18[var19] = var2.readByte();
+      var18[var19] = buf.readByte();
     }
 
     ++var17;
-    ++var2.pos;
+    ++buf.pos;
     var19 = 0;
 
     int var20;
     for (var20 = 0; var20 < 128; ++var20) {
-      var19 += var2.readUByte();
-      this._k[var20] = (short) var19;
+      var19 += buf.readUByte();
+      this.noteTuning_idk[var20] = (short) var19;
     }
 
     var19 = 0;
 
     for (var20 = 0; var20 < 128; ++var20) {
-      var19 += var2.readUByte();
-      this._k[var20] = (short) (this._k[var20] + (var19 << 8));
+      var19 += buf.readUByte();
+      this.noteTuning_idk[var20] = (short) (this.noteTuning_idk[var20] + (var19 << 8));
     }
 
     var20 = 0;
@@ -152,12 +152,12 @@ public final class br_ {
           var20 = var18[var21++];
         }
 
-        var22 = var2.readVariableInt();
+        var22 = buf.readVariableInt();
       }
 
-      this._k[var23] = (short) (this._k[var23] + ((var22 - 1 & 2) << 14));
+      this.noteTuning_idk[var23] = (short) (this.noteTuning_idk[var23] + ((var22 - 1 & 2) << 14));
       --var20;
-      this._n[var23] = var22;
+      this.noteSampleIds_idk[var23] = var22;
     }
 
     int i = 0;
@@ -166,7 +166,7 @@ public final class br_ {
 
     int var24;
     for (var24 = 0; var24 < 128; ++var24) {
-      if (this._n[var24] != 0) {
+      if (this.noteSampleIds_idk[var24] != 0) {
         if (var20 == 0) {
           if (i < var4.length) {
             var20 = var4[i++];
@@ -174,11 +174,11 @@ public final class br_ {
             var20 = -1;
           }
 
-          var23 = var2.data[var5++] - 1;
+          var23 = buf.data[var5++] - 1;
         }
 
         --var20;
-        this._r[var24] = (byte) var23;
+        this.noteOffNote_idk[var24] = (byte) var23;
       }
     }
 
@@ -187,7 +187,7 @@ public final class br_ {
     var24 = 0;
 
     for (int var25 = 0; var25 < 128; ++var25) {
-      if (this._n[var25] != 0) {
+      if (this.noteSampleIds_idk[var25] != 0) {
         if (var20 == 0) {
           if (i1 >= var7.length) {
             var20 = -1;
@@ -195,21 +195,21 @@ public final class br_ {
             var20 = var7[i1++];
           }
 
-          var24 = 16 + var2.data[var8++] << 2;
+          var24 = 16 + buf.data[var8++] << 2;
         }
 
         --var20;
-        this._t[var25] = (byte) var24;
+        this.notePan_idk[var25] = (byte) var24;
       }
     }
 
     int i2 = 0;
     var20 = 0;
-    kc_ var42 = null;
+    KeyParams_idk var42 = null;
 
     int var26;
     for (var26 = 0; var26 < 128; ++var26) {
-      if (this._n[var26] != 0) {
+      if (this.noteSampleIds_idk[var26] != 0) {
         if (var20 == 0) {
           var42 = var37[var36[i2]];
           if (var10.length <= i2) {
@@ -220,7 +220,7 @@ public final class br_ {
         }
 
         --var20;
-        this._j[var26] = var42;
+        this.keyParams_idk[var26] = var42;
       }
     }
 
@@ -237,43 +237,43 @@ public final class br_ {
           var20 = -1;
         }
 
-        if (this._n[var27] > 0) {
-          var26 = var2.readUByte() + 1;
+        if (this.noteSampleIds_idk[var27] > 0) {
+          var26 = buf.readUByte() + 1;
         }
       }
 
       --var20;
-      this._s[var27] = (byte) var26;
+      this.noteVolume_idk[var27] = (byte) var26;
     }
 
-    this._q = var2.readUByte() + 1;
+    this.mainVolume_idk = buf.readUByte() + 1;
 
-    kc_ var28;
+    KeyParams_idk var28;
     int var29;
     for (var27 = 0; var27 < var12; ++var27) {
       var28 = var37[var27];
       if (var28._n != null) {
         for (var29 = 1; var29 < var28._n.length; var29 += 2) {
-          var28._n[var29] = var2.readByte();
+          var28._n[var29] = buf.readByte();
         }
       }
 
       if (var28._e != null) {
         for (var29 = 3; var28._e.length - 2 > var29; var29 += 2) {
-          var28._e[var29] = var2.readByte();
+          var28._e[var29] = buf.readByte();
         }
       }
     }
 
     if (var39 != null) {
       for (var27 = 1; var39.length > var27; var27 += 2) {
-        var39[var27] = var2.readByte();
+        var39[var27] = buf.readByte();
       }
     }
 
     if (var40 != null) {
       for (var27 = 1; var27 < var40.length; var27 += 2) {
-        var40[var27] = var2.readByte();
+        var40[var27] = buf.readByte();
       }
     }
 
@@ -283,7 +283,7 @@ public final class br_ {
         var19 = 0;
 
         for (var29 = 2; var29 < var28._e.length; var29 += 2) {
-          var19 = var2.readUByte() + var19 + 1;
+          var19 = buf.readUByte() + var19 + 1;
           var28._e[var29] = (byte) var19;
         }
       }
@@ -295,7 +295,7 @@ public final class br_ {
         var19 = 0;
 
         for (var29 = 2; var29 < var28._n.length; var29 += 2) {
-          var19 = var2.readUByte() + var19 + 1;
+          var19 = buf.readUByte() + var19 + 1;
           var28._n[var29] = (byte) var19;
         }
       }
@@ -308,11 +308,11 @@ public final class br_ {
     int var45;
     byte var47;
     if (var39 != null) {
-      var19 = var2.readUByte();
+      var19 = buf.readUByte();
       var39[0] = (byte) var19;
 
       for (var27 = 2; var27 < var39.length; var27 += 2) {
-        var19 = var2.readUByte() + var19 + 1;
+        var19 = buf.readUByte() + var19 + 1;
         var39[var27] = (byte) var19;
       }
 
@@ -320,7 +320,7 @@ public final class br_ {
       byte var43 = var39[1];
 
       for (var29 = 0; var29 < var47; ++var29) {
-        this._s[var29] = (byte) (32 + this._s[var29] * var43 >> 6);
+        this.noteVolume_idk[var29] = (byte) (32 + this.noteVolume_idk[var29] * var43 >> 6);
       }
 
       for (var29 = 2; var29 < var39.length; var47 = var30) {
@@ -330,7 +330,7 @@ public final class br_ {
 
         for (var33 = var47; var30 > var33; ++var33) {
           var34 = a666ql(var32, var30 - var47);
-          this._s[var33] = (byte) (32 + this._s[var33] * var34 >> 6);
+          this.noteVolume_idk[var33] = (byte) (32 + this.noteVolume_idk[var33] * var34 >> 6);
           var32 += -var43 + var31;
         }
 
@@ -339,16 +339,16 @@ public final class br_ {
       }
 
       for (var45 = var47; var45 < 128; ++var45) {
-        this._s[var45] = (byte) (32 + this._s[var45] * var43 >> 6);
+        this.noteVolume_idk[var45] = (byte) (32 + this.noteVolume_idk[var45] * var43 >> 6);
       }
     }
 
     if (var40 != null) {
-      var19 = var2.readUByte();
+      var19 = buf.readUByte();
       var40[0] = (byte) var19;
 
       for (var27 = 2; var40.length > var27; var27 += 2) {
-        var19 = 1 + var19 + var2.readUByte();
+        var19 = 1 + var19 + buf.readUByte();
         var40[var27] = (byte) var19;
       }
 
@@ -356,7 +356,7 @@ public final class br_ {
       int var44 = var40[1] << 1;
 
       for (var29 = 0; var29 < var47; ++var29) {
-        var45 = (this._t[var29] & 255) + var44;
+        var45 = (this.notePan_idk[var29] & 255) + var44;
         if (var45 < 0) {
           var45 = 0;
         }
@@ -365,7 +365,7 @@ public final class br_ {
           var45 = 128;
         }
 
-        this._t[var29] = (byte) var45;
+        this.notePan_idk[var29] = (byte) var45;
       }
 
       int var46;
@@ -376,7 +376,7 @@ public final class br_ {
 
         for (var33 = var47; var33 < var30; ++var33) {
           var34 = a666ql(var32, -var47 + var30);
-          int var35 = var34 + (255 & this._t[var33]);
+          int var35 = var34 + (255 & this.notePan_idk[var33]);
           if (var35 < 0) {
             var35 = 0;
           }
@@ -385,7 +385,7 @@ public final class br_ {
             var35 = 128;
           }
 
-          this._t[var33] = (byte) var35;
+          this.notePan_idk[var33] = (byte) var35;
           var32 += -var44 + var46;
         }
 
@@ -394,7 +394,7 @@ public final class br_ {
       }
 
       for (var45 = var47; var45 < 128; ++var45) {
-        var46 = var44 + (this._t[var45] & 255);
+        var46 = var44 + (this.notePan_idk[var45] & 255);
         if (var46 < 0) {
           var46 = 0;
         }
@@ -403,44 +403,44 @@ public final class br_ {
           var46 = 128;
         }
 
-        this._t[var45] = (byte) var46;
+        this.notePan_idk[var45] = (byte) var46;
       }
     }
 
     for (var27 = 0; var12 > var27; ++var27) {
-      var37[var27]._h = var2.readUByte();
+      var37[var27]._h = buf.readUByte();
     }
 
     for (var27 = 0; var12 > var27; ++var27) {
       var28 = var37[var27];
       if (var28._n != null) {
-        var28._k = var2.readUByte();
+        var28._k = buf.readUByte();
       }
 
       if (var28._e != null) {
-        var28._c = var2.readUByte();
+        var28._c = buf.readUByte();
       }
 
       if (var28._h > 0) {
-        var28._a = var2.readUByte();
+        var28._a = buf.readUByte();
       }
     }
 
     for (var27 = 0; var27 < var12; ++var27) {
-      var37[var27]._o = var2.readUByte();
+      var37[var27].vibratoPhaseSpeed_idk = buf.readUByte();
     }
 
     for (var27 = 0; var12 > var27; ++var27) {
       var28 = var37[var27];
-      if (var28._o > 0) {
-        var28._f = var2.readUByte();
+      if (var28.vibratoPhaseSpeed_idk > 0) {
+        var28._f = buf.readUByte();
       }
     }
 
     for (var27 = 0; var12 > var27; ++var27) {
       var28 = var37[var27];
       if (var28._f > 0) {
-        var28._j = var2.readUByte();
+        var28._j = buf.readUByte();
       }
     }
 
@@ -451,40 +451,40 @@ public final class br_ {
     return -var2 + (var0 + var2) / var1;
   }
 
-  public boolean a972(final SoundLoader var1, final byte[] var2) {
-    boolean var5 = true;
+  public boolean loadNoteSamples(final SoundLoader loader, final byte[] restrictNotes) {
+    boolean success = true;
     int var6 = 0;
-    kk_ var7 = null;
+    AudioSampleData_idk sampleData = null;
 
-    for (int var8 = 0; var8 < 128; ++var8) {
-      if (var2 == null || var2[var8] != 0) {
-        int var9 = this._n[var8];
-        if (var9 != 0) {
-          if (var9 != var6) {
-            var6 = var9--;
-            if ((1 & var9) == 0) {
-              var7 = var1.loadSingleton1(var9 >> 2);
+    for (int noteNumber = 0; noteNumber < 128; ++noteNumber) {
+      if (restrictNotes == null || restrictNotes[noteNumber] != 0) {
+        int sampleId = this.noteSampleIds_idk[noteNumber];
+        if (sampleId != 0) {
+          if (sampleId != var6) {
+            var6 = sampleId--;
+            if ((1 & sampleId) == 0) {
+              sampleData = loader.loadSingleton1(sampleId >> 2);
             } else {
-              var7 = var1.loadSingleton2(var9 >> 2);
+              sampleData = loader.loadSingleton2(sampleId >> 2);
             }
 
-            if (var7 == null) {
-              var5 = false;
+            if (sampleData == null) {
+              success = false;
             }
           }
 
-          if (var7 != null) {
-            this._h[var8] = var7;
-            this._n[var8] = 0;
+          if (sampleData != null) {
+            this.noteSample[noteNumber] = sampleData;
+            this.noteSampleIds_idk[noteNumber] = 0;
           }
         }
       }
     }
 
-    return var5;
+    return success;
   }
 
   public void e150() {
-    this._n = null;
+    this.noteSampleIds_idk = null;
   }
 }

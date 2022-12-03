@@ -18,8 +18,8 @@ public final class SampledAudioChannel implements Closeable {
 
   private final AudioFormat format = new AudioFormat(SAMPLES_PER_SECOND, 16, 2, true, false);
   private final byte[] buffer = new byte[1024];
-  private final MixerInterface_idk[] _o = new MixerInterface_idk[8];
-  private final MixerInterface_idk[] _s = new MixerInterface_idk[8];
+  private final AudioSource_idk[] _o = new AudioSource_idk[8];
+  private final AudioSource_idk[] _s = new AudioSource_idk[8];
   public int[] data;
   public int _g;
   public int _b;
@@ -27,7 +27,7 @@ public final class SampledAudioChannel implements Closeable {
   private int lineBufferSizeInInts;
   private boolean isShutdown = false;
   private long _m = PseudoMonotonicClock.currentTimeMillis();
-  private MixerInterface_idk source;
+  private AudioSource_idk source;
   private int _r = 0;
   private int _l = 0;
   private boolean _n = true;
@@ -46,10 +46,10 @@ public final class SampledAudioChannel implements Closeable {
     return var6 & 255;
   }
 
-  private static void b446(final MixerInterface_idk var0) {
-    var0.useGenerateAudio1_idk = false;
-    if (var0._k != null) {
-      var0._k._h = 0;
+  private static void b446(final AudioSource_idk var0) {
+    var0.enabled = false;
+    if (var0.sampleData != null) {
+      var0.sampleData._h = 0;
     }
     var0.forEach(SampledAudioChannel::b446);
   }
@@ -96,7 +96,7 @@ public final class SampledAudioChannel implements Closeable {
     }
   }
 
-  private void a704(final int[] data) {
+  private void fillAudioBuffer(final int[] data) {
     Arrays.fill(data, 0, BYTES_PER_CHANNEL_PER_WRITE, 0);
     this._a -= 256;
     if (this.source != null && this._a <= 0) {
@@ -106,7 +106,7 @@ public final class SampledAudioChannel implements Closeable {
       int var4 = 0;
       int var5 = 255;
 
-      MixerInterface_idk var10;
+      AudioSource_idk var10;
       label106:
       for (int var6 = 7; var5 != 0; --var6) {
         int var7;
@@ -123,7 +123,7 @@ public final class SampledAudioChannel implements Closeable {
           if ((var9 & 1) != 0) {
             var5 &= ~(1 << var7);
             var10 = null;
-            MixerInterface_idk var11 = this._o[var7];
+            AudioSource_idk var11 = this._o[var7];
 
             label100:
             while (true) {
@@ -132,13 +132,13 @@ public final class SampledAudioChannel implements Closeable {
                   break label100;
                 }
 
-                final kk_ var12 = var11._k;
+                final AudioSampleData_idk var12 = var11.sampleData;
                 if (var12 != null && var12._h > var8) {
                   var5 |= 1 << var7;
                   var10 = var11;
                   var11 = var11._h;
                 } else {
-                  var11.useGenerateAudio1_idk = true;
+                  var11.enabled = true;
                   final int var13 = var11.a784();
                   var4 += var13;
                   if (var12 != null) {
@@ -152,7 +152,7 @@ public final class SampledAudioChannel implements Closeable {
                   final int var15 = var11._i;
                   var11.forEach(var14 -> this.a607(var14, var15 * var14.c784() >> 8));
 
-                  final MixerInterface_idk var18 = var11._h;
+                  final AudioSource_idk var18 = var11._h;
                   var11._h = null;
                   if (var10 == null) {
                     this._o[var7] = var18;
@@ -176,7 +176,7 @@ public final class SampledAudioChannel implements Closeable {
       }
 
       for (int var6 = 0; var6 < 8; ++var6) {
-        MixerInterface_idk var16 = this._o[var6];
+        AudioSource_idk var16 = this._o[var6];
         this._s[var6] = null;
 
         for (this._o[var6] = null; var16 != null; var16 = var10) {
@@ -191,7 +191,7 @@ public final class SampledAudioChannel implements Closeable {
     }
 
     if (this.source != null) {
-      this.source.generateAudio1_idk(data, 0, 256);
+      this.source.processAndWrite(data, 0, 256);
     }
 
     this._m = PseudoMonotonicClock.currentTimeMillis();
@@ -203,13 +203,13 @@ public final class SampledAudioChannel implements Closeable {
       this._a = 0;
     }
     if (this.source != null) {
-      this.source.generateAudio2_idk(256);
+      this.source.processAndDiscard(256);
     }
   }
 
-  private void a607(final MixerInterface_idk var1, final int var2) {
+  private void a607(final AudioSource_idk var1, final int var2) {
     final int i = var2 >> 5;
-    final MixerInterface_idk var4 = this._s[i];
+    final AudioSource_idk var4 = this._s[i];
     if (var4 == null) {
       this._o[i] = var1;
     } else {
@@ -277,7 +277,7 @@ public final class SampledAudioChannel implements Closeable {
           }
 
           while (var3 < var4) {
-            this.a704(this.data);
+            this.fillAudioBuffer(this.data);
             this.performWrite();
             var3 += 256;
           }
@@ -309,7 +309,7 @@ public final class SampledAudioChannel implements Closeable {
     }
   }
 
-  public synchronized void setSource(final MixerInterface_idk source) {
+  public synchronized void setSource(final AudioSource_idk source) {
     this.source = source;
   }
 

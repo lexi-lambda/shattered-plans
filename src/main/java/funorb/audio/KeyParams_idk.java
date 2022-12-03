@@ -1,6 +1,6 @@
 package funorb.audio;
 
-public final class kc_ {
+public final class KeyParams_idk {
   public int _j;
   public int _c;
   public int _a;
@@ -9,5 +9,5 @@ public final class kc_ {
   public int _k;
   public byte[] _n;
   public int _f;
-  public int _o;
+  public int vibratoPhaseSpeed_idk;
 }

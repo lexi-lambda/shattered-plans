@@ -3,10 +3,10 @@ package funorb.audio;
 import funorb.shatteredplans.client.Sounds;
 
 public final class PlayingSound {
-  public final al_ _p;
+  public final AudioSamplePlayback_idk _p;
   public int volume;
 
-  public PlayingSound(final al_ var1) {
+  public PlayingSound(final AudioSamplePlayback_idk var1) {
     this._p = var1;
     this.volume = var1.getVolume();
     this._p.setVolume((128 + (this.volume * Sounds.soundVolume)) >> 8);

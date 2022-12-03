@@ -5,7 +5,7 @@ import funorb.audio.AudioThread;
 import funorb.audio.SongData;
 import funorb.audio.SampledAudioChannel;
 import funorb.audio.h_;
-import funorb.audio.vk_;
+import funorb.audio.AudioSourceSum_idk;
 import funorb.awt.FullScreenCanvas;
 import funorb.awt.KeyState;
 import funorb.awt.MouseState;
@@ -4263,15 +4263,15 @@ public final class ShatteredPlansClient extends JagexApplet {
     super.initialize();
 
     final h_ musicTn = new h_();
-    musicTn._u.initialize();
-    musicTn._r.initialize();
-    musicTn._u.setVolume(Sounds.MAX_VOLUME);
-    musicTn._r.setVolume(Sounds.MAX_VOLUME);
+    musicTn.midiPlayer2.initialize();
+    musicTn.midiPlayer1.initialize();
+    musicTn.midiPlayer2.setVolume(Sounds.MAX_VOLUME);
+    musicTn.midiPlayer1.setVolume(Sounds.MAX_VOLUME);
 
     Sounds.musicChannel = createAudioChannel(0, SampledAudioChannel.SAMPLES_PER_SECOND);
     Sounds.soundsChannel = createAudioChannel(1, 1102);
 
-    Sounds.soundsTn = new vk_();
+    Sounds.soundsTn = new AudioSourceSum_idk();
     Sounds.soundsChannel.setSource(Sounds.soundsTn);
     Sounds.musicTn = musicTn;
     Sounds.musicTn.setVolume(Sounds.musicVolume);
