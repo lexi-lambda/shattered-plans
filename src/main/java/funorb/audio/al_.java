@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.Iterator;
 
-public final class al_ extends tn_ {
+public final class al_ extends MixerInterface_idk {
   private final int _u;
   private final boolean _o;
   private final int _r;
@@ -579,7 +579,7 @@ public final class al_ extends tn_ {
   }
 
   @Override
-  public synchronized void a150(int len) {
+  public synchronized void generateAudio2_idk(int len) {
     if (this._v > 0) {
       if (len >= this._v) {
         if (this.volume == Integer.MIN_VALUE) {
@@ -766,7 +766,7 @@ public final class al_ extends tn_ {
   }
 
   @Override
-  public @NotNull Iterator<tn_> iterator() {
+  public @NotNull Iterator<MixerInterface_idk> iterator() {
     return Collections.emptyIterator();
   }
 
@@ -785,9 +785,9 @@ public final class al_ extends tn_ {
   }
 
   @Override
-  public synchronized void b397(final int[] dest, final int offset, final int len) {
+  public synchronized void generateAudio1_idk(final int[] dest, final int offset, final int len) {
     if (this.volume == 0 && this._v == 0) {
-      this.a150(len);
+      this.generateAudio2_idk(len);
       return;
     }
 

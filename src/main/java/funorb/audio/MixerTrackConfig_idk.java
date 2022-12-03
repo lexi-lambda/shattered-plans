@@ -2,7 +2,7 @@ package funorb.audio;
 
 import funorb.data.NodeList;
 
-public final class qq_ extends NodeList.Node {
+public final class MixerTrackConfig_idk extends NodeList.Node {
   public int _E;
   public int _G;
   public int _v;

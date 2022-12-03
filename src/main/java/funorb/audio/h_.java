@@ -6,32 +6,32 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 
-public final class h_ extends tn_ {
-  public final ga_ _r;
-  public final ga_ _u;
+public final class h_ extends MixerInterface_idk {
+  public final MidiPlayer_idk _r;
+  public final MidiPlayer_idk _u;
   private int[] _D;
-  private MusicTrack _E;
+  private SongData _E;
   private int _l;
   private int _n = 0x100000;
-  private MusicTrack _z;
+  private SongData _z;
   private int[] _p;
   private int volume = 256;
   private boolean _C;
 
   public h_() {
-    final ga_ var1 = new ga_();
+    final MidiPlayer_idk var1 = new MidiPlayer_idk();
     this._u = var1;
-    this._r = new ga_(var1);
+    this._r = new MidiPlayer_idk(var1);
   }
 
-  public boolean a419(final MusicTrack var1) {
+  public boolean a419(final SongData var1) {
     return var1 == this._z || var1 == this._E;
   }
 
   @Override
-  public void b397(final int[] dest, final int offset, final int len) {
+  public void generateAudio1_idk(final int[] dest, final int offset, final int len) {
     if (this.volume <= 0) {
-      this.a150(len);
+      this.generateAudio2_idk(len);
     } else {
       if (this._C) {
         if (this._l > 0 && !this._u.h154()) {
@@ -77,9 +77,9 @@ public final class h_ extends tn_ {
       int var8;
       if (this._z != null || this._E != null) {
         if (var4 == 256) {
-          this._u.b397(dest, offset, len);
+          this._u.generateAudio1_idk(dest, offset, len);
         } else if (var5 == 256) {
-          this._r.b397(dest, offset, len);
+          this._r.generateAudio1_idk(dest, offset, len);
         } else {
           if (this._D != null && this._D.length >= var6) {
             Arrays.fill(this._D, 0, var6, 0);
@@ -89,8 +89,8 @@ public final class h_ extends tn_ {
             this._D = new int[var6];
           }
 
-          this._u.b397(this._D, 0, len);
-          this._r.b397(this._p, 0, len);
+          this._u.generateAudio1_idk(this._D, 0, len);
+          this._r.generateAudio1_idk(this._p, 0, len);
           var7 = offset << 1;
 
           for (var8 = 0; var6 > var8; ++var8) {
@@ -103,13 +103,13 @@ public final class h_ extends tn_ {
   }
 
   @Override
-  public synchronized void a150(final int len) {
+  public synchronized void generateAudio2_idk(final int len) {
     if (this._n > 0 && this._z != null) {
-      this._u.a150(len);
+      this._u.generateAudio2_idk(len);
     }
 
     if (this._n < 1048576 && this._E != null) {
-      this._r.a150(len);
+      this._r.generateAudio2_idk(len);
     }
 
     if (this._C) {
@@ -151,7 +151,7 @@ public final class h_ extends tn_ {
 
   }
 
-  private void a633(final ga_ var3) {
+  private void a633(final MidiPlayer_idk var3) {
     var3.a679();
     var3.c430();
   }
@@ -166,11 +166,11 @@ public final class h_ extends tn_ {
   }
 
   @Override
-  public @NotNull Iterator<tn_> iterator() {
+  public @NotNull Iterator<MixerInterface_idk> iterator() {
     return Collections.emptyIterator();
   }
 
-  public synchronized void a180(final MusicTrack track, final int var5, final boolean var4) {
+  public synchronized void a180(final SongData track, final int var5, final boolean var4) {
     if (this._C && var4) {
       if (this._l > 0) {
         if (this._z != null) {

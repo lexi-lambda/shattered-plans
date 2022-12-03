@@ -6,18 +6,18 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.Objects;
 
-public final class rc_ extends tn_ {
-  public final NodeList<qq_> _n = new NodeList<>();
+public final class rc_ extends MixerInterface_idk {
+  public final NodeList<MixerTrackConfig_idk> _n = new NodeList<>();
   public final vk_ _o = new vk_();
-  private final ga_ _m;
+  private final MidiPlayer_idk _m;
 
-  public rc_(final ga_ var1) {
+  public rc_(final MidiPlayer_idk var1) {
     this._m = var1;
   }
 
   @Override
-  public @NotNull Iterator<tn_> iterator() {
-    return this._n.stream().<tn_>map(var1 -> var1._K).filter(Objects::nonNull).iterator();
+  public @NotNull Iterator<MixerInterface_idk> iterator() {
+    return this._n.stream().<MixerInterface_idk>map(var1 -> var1._K).filter(Objects::nonNull).iterator();
   }
 
   @Override
@@ -26,10 +26,10 @@ public final class rc_ extends tn_ {
   }
 
   @Override
-  public void a150(final int len) {
-    this._o.a150(len);
+  public void generateAudio2_idk(final int len) {
+    this._o.generateAudio2_idk(len);
 
-    for (final qq_ var3 : this._n) {
+    for (final MixerTrackConfig_idk var3 : this._n) {
       if (!this._m.a258(var3)) {
         int var2 = len;
 
@@ -49,10 +49,10 @@ public final class rc_ extends tn_ {
   }
 
   @Override
-  public void b397(final int[] dest, final int offset, final int len) {
-    this._o.b397(dest, offset, len);
+  public void generateAudio1_idk(final int[] dest, final int offset, final int len) {
+    this._o.generateAudio1_idk(dest, offset, len);
 
-    for (final qq_ var6 : this._n) {
+    for (final MixerTrackConfig_idk var6 : this._n) {
       if (!this._m.a258(var6)) {
         int var4 = offset;
         int var5 = len;
@@ -73,7 +73,7 @@ public final class rc_ extends tn_ {
 
   }
 
-  private void a222(final qq_ var2, int var3) {
+  private void a222(final MixerTrackConfig_idk var2, int var3) {
     if ((4 & this._m._F[var2._y]) != 0 && var2._E < 0) {
       final int var4 = this._m._u[var2._y] / SampledAudioChannel.SAMPLES_PER_SECOND;
       final int var5 = (1048575 + var4 - var2._j) / var4;
@@ -96,10 +96,10 @@ public final class rc_ extends tn_ {
     }
 
     assert var2._K != null;
-    var2._K.a150(var3);
+    var2._K.generateAudio2_idk(var3);
   }
 
-  private void a829(final int[] var1, int var2, final qq_ var3, int var4, final int var6) {
+  private void a829(final int[] var1, int var2, final MixerTrackConfig_idk var3, int var4, final int var6) {
     if ((4 & this._m._F[var3._y]) != 0 && var3._E < 0) {
       final int var7 = this._m._u[var3._y] / SampledAudioChannel.SAMPLES_PER_SECOND;
 
@@ -110,7 +110,7 @@ public final class rc_ extends tn_ {
           break;
         }
 
-        var3._K.b397(var1, var2, var8);
+        var3._K.generateAudio1_idk(var1, var2, var8);
         var3._j += var8 * var7 - 1048576;
         var2 += var8;
         var4 -= var8;
@@ -135,13 +135,13 @@ public final class rc_ extends tn_ {
         }
 
         var11.g150(var9);
-        var11.b397(var1, var2, var6 - var2);
+        var11.generateAudio1_idk(var1, var2, var6 - var2);
         if (var11.e801()) {
           this._o.addFirst(var11);
         }
       }
     }
 
-    var3._K.b397(var1, var2, var4);
+    var3._K.generateAudio1_idk(var1, var2, var4);
   }
 }
