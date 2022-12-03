@@ -8,18 +8,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public final class ga_ extends tn_ {
+public final class MidiPlayer_idk extends MixerInterface_idk {
   public final int[] _t = new int[16];
   public final int[] _F = new int[16];
   private final int[] _p = new int[16];
   private final int[] _y = new int[16];
   private final int[] _q = new int[16];
-  private final qq_[][] _N = new qq_[16][128];
+  private final MixerTrackConfig_idk[][] _N = new MixerTrackConfig_idk[16][128];
   private final int[] _r = new int[16];
   private final int[] _m = new int[16];
   private final Map<Integer, br_> _Q;
   private final int[] _G = new int[16];
-  private final pi_ _x = new pi_();
+  private final MidiReader midiReader = new MidiReader();
   private final int[] _I = new int[16];
   private final int[] _P = new int[16];
   private final int[] _E = new int[16];
@@ -29,24 +29,24 @@ public final class ga_ extends tn_ {
   private final rc_ _l = new rc_(this);
   public final int[] _u = new int[16];
   private int volume = 256;
-  private final qq_[][] _K = new qq_[16][128];
+  private final MixerTrackConfig_idk[][] _K = new MixerTrackConfig_idk[16][128];
   private int _M = 1000000;
   private final int[] _s = new int[16];
-  private int _C;
+  private int trackWithSoonestEvent;
   private long _O;
-  private int _D;
-  private long _n;
+  private int nextEventTicks;
+  private long currentPlayTime;
   private boolean _v;
-  private MusicTrack _z;
+  private SongData _z;
 
-  public ga_() {
+  public MidiPlayer_idk() {
     this._Q = new HashMap<>();
     this.a679();
     this.a430(true);
   }
 
   @SuppressWarnings("CopyConstructorMissesField")
-  public ga_(final ga_ var1) {
+  public MidiPlayer_idk(final MidiPlayer_idk var1) {
     this._Q = var1._Q;
     this.a679();
     this.a430(true);
@@ -66,8 +66,8 @@ public final class ga_ extends tn_ {
   }
 
   @Override
-  public @NotNull Iterator<tn_> iterator() {
-    return Collections.<tn_>singletonList(this._l).iterator();
+  public @NotNull Iterator<MixerInterface_idk> iterator() {
+    return Collections.<MixerInterface_idk>singletonList(this._l).iterator();
   }
 
   private void a326(final int var2, final int var3) {
@@ -75,7 +75,7 @@ public final class ga_ extends tn_ {
     this._u[var3] = (int) (0.5D + 2097152.0D * Math.pow(2.0D, 5.4931640625E-4D * (double) var2));
   }
 
-  private int b237(final qq_ var1) {
+  private int b237(final MixerTrackConfig_idk var1) {
     int var3 = (var1._r * var1._G >> 12) + var1._J;
     var3 += this._r[var1._y] * (this._T[var1._y] - 8192) >> 12;
     final kc_ var4 = var1._u;
@@ -103,7 +103,7 @@ public final class ga_ extends tn_ {
   }
 
   private void a093(final int var1) {
-    for (final qq_ var3 : this._l._n) {
+    for (final MixerTrackConfig_idk var3 : this._l._n) {
       if ((var1 < 0 || var3._y == var1) && var3._E < 0) {
         this._N[var3._y][var3._H] = null;
         var3._E = 0;
@@ -112,7 +112,7 @@ public final class ga_ extends tn_ {
   }
 
   private void a172(final int var3, final int var4) {
-    final qq_ var5 = this._N[var3][var4];
+    final MixerTrackConfig_idk var5 = this._N[var3][var4];
     if (var5 != null) {
       this._N[var3][var4] = null;
       if ((2 & this._F[var3]) == 0) {
@@ -133,12 +133,12 @@ public final class ga_ extends tn_ {
     }
   }
 
-  public synchronized void a350(final SoundLoader soundLoader, final ResourceLoader loader, final MusicTrack track) {
-    track.a797();
+  public synchronized void a350(final SoundLoader soundLoader, final ResourceLoader loader, final SongData track) {
+    track.analyzeNotesUsedPerProgram();
 
     boolean var6 = true;
 
-    for (final Map.Entry<Integer, byte[]> var8 : track._i.entrySet()) {
+    for (final Map.Entry<Integer, byte[]> var8 : track.notesUsedPerProgram.entrySet()) {
       final int var9 = var8.getKey();
       br_ var10 = this._Q.get(var9);
       if (var10 == null) {
@@ -157,31 +157,55 @@ public final class ga_ extends tn_ {
     }
 
     if (var6) {
-      track.b797();
+      track.resetNotesUsedPerProgram();
     }
   }
 
   @Override
-  public synchronized void a150(int len) {
-    if (this._x.f801()) {
-      final int var2 = this._x._e * this._M / SampledAudioChannel.SAMPLES_PER_SECOND;
+  public synchronized void generateAudio1_idk(final int[] dest, int offset, int len) {
+    if (this.midiReader.isLoaded()) {
+      final int var4 = this.midiReader.ticksPerQuarterNote * this._M / SampledAudioChannel.SAMPLES_PER_SECOND;
+
+      do {
+        final long var5 = this._O + (long) len * (long) var4;
+        if (this.currentPlayTime - var5 >= 0L) {
+          this._O = var5;
+          break;
+        }
+
+        final int var7 = (int) ((-this._O + (this.currentPlayTime - (-((long) var4) + 1L))) / (long) var4);
+        this._O += (long) var7 * (long) var4;
+        this._l.generateAudio1_idk(dest, offset, var7);
+        offset += var7;
+        len -= var7;
+        this.a423();
+      } while (this.midiReader.isLoaded());
+    }
+
+    this._l.generateAudio1_idk(dest, offset, len);
+  }
+
+  @Override
+  public synchronized void generateAudio2_idk(int len) {
+    if (this.midiReader.isLoaded()) {
+      final int var2 = this.midiReader.ticksPerQuarterNote * this._M / SampledAudioChannel.SAMPLES_PER_SECOND;
 
       do {
         final long var3 = (long) len * (long) var2 + this._O;
-        if (this._n - var3 >= 0L) {
+        if (this.currentPlayTime - var3 >= 0L) {
           this._O = var3;
           break;
         }
 
-        final int var5 = (int) ((-1L - this._O + this._n + (long) var2) / (long) var2);
+        final int var5 = (int) ((-1L - this._O + this.currentPlayTime + (long) var2) / (long) var2);
         this._O += (long) var5 * (long) var2;
-        this._l.a150(var5);
+        this._l.generateAudio2_idk(var5);
         len -= var5;
         this.a423();
-      } while (this._x.f801());
+      } while (this.midiReader.isLoaded());
     }
 
-    this._l.a150(len);
+    this._l.generateAudio2_idk(len);
   }
 
   @SuppressWarnings("SameParameterValue")
@@ -190,13 +214,13 @@ public final class ga_ extends tn_ {
   }
 
   private synchronized void b430(final boolean var2) {
-    this._x.d797();
+    this.midiReader.unload();
     this._z = null;
     this.a430(var2);
   }
 
   private void b366(final int var1) {
-    for (final qq_ var3 : this._l._n) {
+    for (final MixerTrackConfig_idk var3 : this._l._n) {
       if (var1 < 0 || var1 == var3._y) {
         if (var3._K != null) {
           var3._K.g150(SampledAudioChannel.SAMPLES_PER_SECOND / 100);
@@ -218,7 +242,7 @@ public final class ga_ extends tn_ {
 
   private void a540(final int var2) {
     if ((2 & this._F[var2]) != 0) {
-      for (final qq_ var3 : this._l._n) {
+      for (final MixerTrackConfig_idk var3 : this._l._n) {
         if (var3._y == var2 && this._N[var2][var3._H] == null && var3._E < 0) {
           var3._E = 0;
         }
@@ -226,32 +250,8 @@ public final class ga_ extends tn_ {
     }
   }
 
-  public synchronized void a077(final MusicTrack var1, final boolean var3) {
+  public synchronized void a077(final SongData var1, final boolean var3) {
     this.a918(var3, var1, true);
-  }
-
-  @Override
-  public synchronized void b397(final int[] dest, int offset, int len) {
-    if (this._x.f801()) {
-      final int var4 = this._x._e * this._M / SampledAudioChannel.SAMPLES_PER_SECOND;
-
-      do {
-        final long var5 = this._O + (long) len * (long) var4;
-        if (this._n - var5 >= 0L) {
-          this._O = var5;
-          break;
-        }
-
-        final int var7 = (int) ((-this._O + (this._n - (-((long) var4) + 1L))) / (long) var4);
-        this._O += (long) var7 * (long) var4;
-        this._l.b397(dest, offset, var7);
-        offset += var7;
-        len -= var7;
-        this.a423();
-      } while (this._x.f801());
-    }
-
-    this._l.b397(dest, offset, len);
   }
 
   private void a556(int var2) {
@@ -298,7 +298,7 @@ public final class ga_ extends tn_ {
   }
 
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  public boolean a258(final qq_ var2) {
+  public boolean a258(final MixerTrackConfig_idk var2) {
     if (var2._K == null) {
       if (var2._E >= 0) {
         var2.unlink();
@@ -498,27 +498,27 @@ public final class ga_ extends tn_ {
     return 0;
   }
 
-  private synchronized void a918(final boolean var1, final MusicTrack var2, final boolean var4) {
+  private synchronized void a918(final boolean var1, final SongData songData, final boolean var4) {
     this.b430(var4);
-    this._x.a604(var2._h);
+    this.midiReader.load(songData.midiData);
     this._v = var1;
     this._O = 0L;
-    final int var5 = this._x.c784();
+    final int numTracks = this.midiReader.numTracks();
 
-    for (int var6 = 0; var5 > var6; ++var6) {
-      this._x.b150(var6);
-      this._x.d150(var6);
-      this._x.e150(var6);
+    for (int track = 0; track < numTracks; ++track) {
+      this.midiReader.setCursorToTrackPlaybackPos(track);
+      this.midiReader.advanceTrackTicks(track);
+      this.midiReader.setTrackPlaybackPosToCursor(track);
     }
 
-    this._C = this._x.g784();
-    this._D = this._x._b[this._C];
-    this._n = this._x.c138(this._D);
+    this.trackWithSoonestEvent = this.midiReader.trackWithSoonestNextTick();
+    this.nextEventTicks = this.midiReader.trackNextTick[this.trackWithSoonestEvent];
+    this.currentPlayTime = this.midiReader.getPlayTime(this.nextEventTicks);
   }
 
   private void d093(final int var2) {
     if ((4 & this._F[var2]) != 0) {
-      for (final qq_ var3 : this._l._n) {
+      for (final MixerTrackConfig_idk var3 : this._l._n) {
         if (var3._y == var2) {
           var3._j = 0;
         }
@@ -530,8 +530,8 @@ public final class ga_ extends tn_ {
   private void a842(final int var1, final int var2, final int var3) {
     this.a172(var2, var1);
     if ((this._F[var2] & 2) != 0) {
-      for (final Iterator<qq_> it = this._l._n.descendingIterator(); it.hasNext(); ) {
-        final qq_ var5 = it.next();
+      for (final Iterator<MixerTrackConfig_idk> it = this._l._n.descendingIterator(); it.hasNext(); ) {
+        final MixerTrackConfig_idk var5 = it.next();
         if (var5._y == var2 && var5._E < 0) {
           this._N[var2][var5._H] = null;
           this._N[var2][var1] = var5;
@@ -549,7 +549,7 @@ public final class ga_ extends tn_ {
     if (var10 != null) {
       final kk_ var11 = var10._h[var1];
       if (var11 != null) {
-        final qq_ var7 = new qq_();
+        final MixerTrackConfig_idk var7 = new MixerTrackConfig_idk();
         var7._y = var2;
         var7._A = var10;
         var7._M = var11;
@@ -565,7 +565,7 @@ public final class ga_ extends tn_ {
         var7._h = 0;
         var7._v = 0;
         if (this._t[var2] == 0) {
-          var7._K = al_.a771(var11, this.b237(var7), this.a510(var7), this.a237(var7));
+          var7._K = al_.a771(var11, this.b237(var7), this.generateSample(var7), this.a237(var7));
         } else {
           var7._K = al_.a771(var11, this.b237(var7), 0, this.a237(var7));
           this.a559(var7, var10._k[var1] < 0);
@@ -577,7 +577,7 @@ public final class ga_ extends tn_ {
         }
 
         if (var7._z >= 0) {
-          final qq_ var9 = this._K[var2][var7._z];
+          final MixerTrackConfig_idk var9 = this._K[var2][var7._z];
           if (var9 != null && var9._E < 0) {
             this._N[var2][var9._H] = null;
             var9._E = 0;
@@ -593,7 +593,7 @@ public final class ga_ extends tn_ {
   }
 
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  public boolean a543(final int var1, final int[] var2, final qq_ var4, final int var5) {
+  public boolean a543(final int var1, final int[] var2, final MixerTrackConfig_idk var4, final int var5) {
     var4._p = SampledAudioChannel.SAMPLES_PER_SECOND / 100;
     if (var4._E < 0 || var4._K != null && !var4._K.g801()) {
       int var6 = var4._G;
@@ -659,9 +659,9 @@ public final class ga_ extends tn_ {
       if (var8) {
         var4._K.g150(var4._p);
         if (var2 == null) {
-          var4._K.a150(var5);
+          var4._K.generateAudio2_idk(var5);
         } else {
-          var4._K.b397(var2, var1, var5);
+          var4._K.generateAudio1_idk(var2, var1, var5);
         }
 
         if (var4._K.e801()) {
@@ -679,7 +679,7 @@ public final class ga_ extends tn_ {
         return true;
       } else {
 
-        var4._K.a326(var4._p, this.a510(var4), this.a237(var4));
+        var4._K.a326(var4._p, this.generateSample(var4), this.a237(var4));
         return false;
       }
     } else {
@@ -702,70 +702,72 @@ public final class ga_ extends tn_ {
     }
   }
 
-  private int a237(final qq_ var1) {
+  private int a237(final MixerTrackConfig_idk var1) {
     final int var3 = this._G[var1._y];
     return var3 >= 8192 ? -(32 + (128 - var1._q) * (-var3 + 16384) >> 6) + 16384 : 32 + var1._q * var3 >> 6;
   }
 
   private void a423() {
-    int var2 = this._C;
-    int var3 = this._D;
-    long var4 = this._n;
-    if (this._z != null && var3 == 0) {
+    int track = this.trackWithSoonestEvent;
+    int ticks = this.nextEventTicks;
+    long var4 = this.currentPlayTime;
+
+    if (this._z != null && ticks == 0) {
       this.a918(this._v, this._z, false);
       this.a423();
     } else {
-      while (var3 == this._D) {
-        while (this._x._b[var2] == var3) {
-          this._x.b150(var2);
-          final int var7 = this._x.a137(var2);
-          if (var7 == 1) {
-            this._x.e797();
-            this._x.e150(var2);
-            if (this._x.a801()) {
+      while (ticks == this.nextEventTicks) {
+        while (this.midiReader.trackNextTick[track] == ticks) {
+          this.midiReader.setCursorToTrackPlaybackPos(track);
+          final int event = this.midiReader.readNextTrackEvent(track);
+
+          if (event == MidiReader.EVENT_TRACK_END) {
+            this.midiReader.resetCursor();
+            this.midiReader.setTrackPlaybackPosToCursor(track);
+            if (this.midiReader.allTracksStopped()) {
               if (this._z != null) {
                 this.a077(this._z, this._v);
                 this.a423();
                 return;
               }
 
-              if (!this._v || var3 == 0) {
+              if (!this._v || ticks == 0) {
                 this.a430(true);
-                this._x.d797();
+                this.midiReader.unload();
                 return;
               }
 
-              this._x.a111(var4);
+              this.midiReader.resetPlayback(var4);
             }
             break;
           }
 
-          if ((var7 & 128) != 0) {
-            this.a366(var7);
+          if ((event & 128) != 0) {
+            this.a366(event);
           }
 
-          this._x.d150(var2);
-          this._x.e150(var2);
+          this.midiReader.advanceTrackTicks(track);
+          this.midiReader.setTrackPlaybackPosToCursor(track);
         }
 
-        var2 = this._x.g784();
-        var3 = this._x._b[var2];
-        var4 = this._x.c138(var3);
+        track = this.midiReader.trackWithSoonestNextTick();
+        ticks = this.midiReader.trackNextTick[track];
+        var4 = this.midiReader.getPlayTime(ticks);
       }
 
-      this._C = var2;
-      this._D = var3;
-      this._n = var4;
-      if (this._z != null && var3 > 0) {
-        this._C = -1;
-        this._D = 0;
-        this._n = this._x.c138(this._D);
+      this.trackWithSoonestEvent = track;
+      this.nextEventTicks = ticks;
+      this.currentPlayTime = var4;
+      if (this._z != null && ticks > 0) {
+        this.trackWithSoonestEvent = -1;
+        this.nextEventTicks = 0;
+        this.currentPlayTime = this.midiReader.getPlayTime(this.nextEventTicks);
       }
 
     }
   }
 
-  public void a559(final qq_ var2, final boolean var3) {
+  public void a559(final MixerTrackConfig_idk var2, final boolean var3) {
 
     int var4 = var2._M.data.length;
     int var5;
@@ -784,50 +786,50 @@ public final class ga_ extends tn_ {
     var2._K.h150(var5);
   }
 
-  private int a510(final qq_ var1) {
+  private int generateSample(final MixerTrackConfig_idk var1) {
     if (this._A[var1._y] == 0) {
       return 0;
-    } else {
-      final kc_ var3 = var1._u;
-      int var4 = this._y[var1._y] * this._s[var1._y] + 4096 >> 13;
-      var4 = var4 * var4 + 16384 >> 15;
-      var4 = var1._k * var4 + 16384 >> 15;
-      var4 = 128 + this.volume * var4 >> 8;
-      var4 = this._A[var1._y] * var4 + 128 >> 8;
-      if (var3._h > 0) {
-        var4 = (int) (0.5D + (double) var4 * Math.pow(0.5D, (double) var1._h * 1.953125E-5D * (double) var3._h));
-      }
-
-      int var5;
-      int var6;
-      int var7;
-      int var8;
-      if (var3._n != null) {
-        var5 = var1._F;
-        var6 = var3._n[1 + var1._B];
-        if (var1._B < var3._n.length - 2) {
-          var7 = var3._n[var1._B] << 8 & '\uff00';
-          var8 = (255 & var3._n[2 + var1._B]) << 8;
-          var6 += (-var6 + var3._n[var1._B + 3]) * (-var7 + var5) / (-var7 + var8);
-        }
-
-        var4 = var6 * var4 + 32 >> 6;
-      }
-
-      if (var1._E > 0 && var3._e != null) {
-        var5 = var1._E;
-        var6 = var3._e[1 + var1._v];
-        if (var3._e.length - 2 > var1._v) {
-          var7 = (255 & var3._e[var1._v]) << 8;
-          var8 = var3._e[2 + var1._v] << 8 & '\uff00';
-          var6 += (var3._e[var1._v + 3] - var6) * (-var7 + var5) / (-var7 + var8);
-        }
-
-        var4 = 32 + var4 * var6 >> 6;
-      }
-
-      return var4;
     }
+
+    final kc_ var3 = var1._u;
+    int x = this._y[var1._y] * this._s[var1._y] + 4096 >> 13;
+    x = x * x + 16384 >> 15;
+    x = var1._k * x + 16384 >> 15;
+    x = 128 + this.volume * x >> 8;
+    x = this._A[var1._y] * x + 128 >> 8;
+    if (var3._h > 0) {
+      x = (int) (0.5D + (double) x * Math.pow(0.5D, (double) var1._h * 1.953125E-5D * (double) var3._h));
+    }
+
+    int var5;
+    int var6;
+    int var7;
+    int var8;
+    if (var3._n != null) {
+      var5 = var1._F;
+      var6 = var3._n[1 + var1._B];
+      if (var1._B < var3._n.length - 2) {
+        var7 = var3._n[var1._B] << 8 & '\uff00';
+        var8 = (255 & var3._n[2 + var1._B]) << 8;
+        var6 += (-var6 + var3._n[var1._B + 3]) * (-var7 + var5) / (-var7 + var8);
+      }
+
+      x = var6 * x + 32 >> 6;
+    }
+
+    if (var1._E > 0 && var3._e != null) {
+      var5 = var1._E;
+      var6 = var3._e[1 + var1._v];
+      if (var3._e.length - 2 > var1._v) {
+        var7 = (255 & var3._e[var1._v]) << 8;
+        var8 = var3._e[2 + var1._v] << 8 & '\uff00';
+        var6 += (var3._e[var1._v + 3] - var6) * (-var7 + var5) / (-var7 + var8);
+      }
+
+      x = 32 + x * var6 >> 6;
+    }
+
+    return x;
   }
 
   public synchronized void initialize() {
@@ -838,6 +840,6 @@ public final class ga_ extends tn_ {
 
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public synchronized boolean h154() {
-    return this._x.f801();
+    return this.midiReader.isLoaded();
   }
 }

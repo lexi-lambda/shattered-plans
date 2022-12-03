@@ -103,11 +103,11 @@ public class Buffer implements ReadableBuffer, WritableBuffer {
     }
   }
 
-  public final void c093(final int var1) {
-    this.data[-var1 + this.pos - 4] = (byte) (var1 >> 24);
-    this.data[-3 + this.pos - var1] = (byte) (var1 >> 16);
-    this.data[-var1 + this.pos - 2] = (byte) (var1 >> 8);
-    this.data[this.pos + (-var1 - 1)] = (byte) var1;
+  public final void writeSizePrefixBackwards(final int length) {
+    this.data[this.pos - length - 4] = (byte) (length >> 24);
+    this.data[this.pos - length - 3] = (byte) (length >> 16);
+    this.data[this.pos - length - 2] = (byte) (length >> 8);
+    this.data[this.pos - length - 1] = (byte) length;
   }
 
   @Override
@@ -152,6 +152,22 @@ public class Buffer implements ReadableBuffer, WritableBuffer {
     if (val >= (1 << 14)) this.data[this.pos++] = (byte) (((val >>> 14) & 0x7f) | 0x80);
     if (val >= (1 <<  7)) this.data[this.pos++] = (byte) (((val >>>  7) & 0x7f) | 0x80);
     this.data[this.pos++] = (byte) (val & 0x7f);
+  }
+
+  public final void writeVariableInt_v2(final int val) {
+    if ((val & 0xffffff80) != 0) {
+      if ((val & 0xffffc000) != 0) {
+        if ((0xffe00000 & val) != 0) {
+          if ((0xf0000000 & val) != 0) {
+            this.writeByte(val >>> 28 | 0x80);
+          }
+          this.writeByte(val >>> 21 | 0x80);
+        }
+        this.writeByte(val >>> 14 | 0x80);
+      }
+      this.writeByte(val >>> 7 | 0x80);
+    }
+    this.writeByte(0x7f & val);
   }
 
   @Override
@@ -337,26 +353,6 @@ public class Buffer implements ReadableBuffer, WritableBuffer {
     } else {
       return this.readNullTerminatedString();
     }
-  }
-
-  public final void a556(final int var2) {
-    if ((var2 & -128) != 0) {
-      if ((var2 & -16384) != 0) {
-        if ((-2097152 & var2) != 0) {
-          if ((-268435456 & var2) != 0) {
-            this.writeByte(var2 >>> 28 | 128);
-          }
-
-          this.writeByte(var2 >>> 21 | 128);
-        }
-
-        this.writeByte((2107852 | var2) >>> 14);
-      }
-
-      this.writeByte(var2 >>> 7 | 128);
-    }
-
-    this.writeByte(127 & var2);
   }
 
   @Override

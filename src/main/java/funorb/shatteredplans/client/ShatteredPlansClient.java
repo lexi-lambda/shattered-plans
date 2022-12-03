@@ -2,7 +2,7 @@ package funorb.shatteredplans.client;
 
 import funorb.Strings;
 import funorb.audio.AudioThread;
-import funorb.audio.MusicTrack;
+import funorb.audio.SongData;
 import funorb.audio.SampledAudioChannel;
 import funorb.audio.h_;
 import funorb.audio.vk_;
@@ -182,7 +182,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   public static int thirdPreviousS2cPacketType = -1;
   private static boolean _sbh;
   public static boolean _isa;
-  public static MusicTrack currentTrack;
+  public static SongData currentTrack;
   public static String MUSIC_OPT_NEW;
   public static String MUSIC_OPT_OLD;
   public static boolean accountCreationDisabled;
@@ -3754,7 +3754,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     }
   }
 
-  public static void a827jo(final MusicTrack track, final int var3, final boolean var2) {
+  public static void a827jo(final SongData track, final int var3, final boolean var2) {
     Sounds.musicTn.a180(track, var3, !var2);
   }
 

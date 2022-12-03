@@ -5,11 +5,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
-public final class vk_ extends tn_ {
-  private final NodeList<tn_> _l = new NodeList<>();
+public final class vk_ extends MixerInterface_idk {
+  private final NodeList<MixerInterface_idk> _l = new NodeList<>();
 
   @Override
-  public @NotNull Iterator<tn_> iterator() {
+  public @NotNull Iterator<MixerInterface_idk> iterator() {
     return this._l.iterator();
   }
 
@@ -19,9 +19,9 @@ public final class vk_ extends tn_ {
   }
 
   @Override
-  public synchronized void a150(final int len) {
-    for (final tn_ var2 : this._l) {
-      var2.a150(len);
+  public synchronized void generateAudio2_idk(final int len) {
+    for (final MixerInterface_idk var2 : this._l) {
+      var2.generateAudio2_idk(len);
     }
   }
 
@@ -30,9 +30,9 @@ public final class vk_ extends tn_ {
   }
 
   @Override
-  public synchronized void b397(final int[] dest, final int offset, final int len) {
-    for (final tn_ var4 : this._l) {
-      var4.a397(dest, offset, len);
+  public synchronized void generateAudio1_idk(final int[] dest, final int offset, final int len) {
+    for (final MixerInterface_idk var4 : this._l) {
+      var4.generateAudio(dest, offset, len);
     }
   }
 }

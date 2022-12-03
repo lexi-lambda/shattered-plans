@@ -1,6 +1,6 @@
 package funorb.shatteredplans.client;
 
-import funorb.audio.MusicTrack;
+import funorb.audio.SongData;
 import funorb.audio.PlayingSound;
 import funorb.audio.SampledAudioChannel;
 import funorb.audio.SoundEffect;
@@ -24,11 +24,11 @@ public final class Sounds {
   public static SoundEffect SFX_EXPLOSION;
   public static SoundEffect SFX_NEXT_OPEN;
   public static SoundEffect SFX_NEXT_CLOSE;
-  public static MusicTrack MUSIC_INTRO;
-  public static MusicTrack MUSIC_IN_GAME_2;
-  public static MusicTrack MUSIC_IN_GAME_1;
-  public static MusicTrack MUSIC_WIN;
-  public static MusicTrack MUSIC_LOSE;
+  public static SongData MUSIC_INTRO;
+  public static SongData MUSIC_IN_GAME_2;
+  public static SongData MUSIC_IN_GAME_1;
+  public static SongData MUSIC_WIN;
+  public static SongData MUSIC_LOSE;
 
   public static int soundVolume = 256;
   public static int musicVolume = 256;
@@ -52,11 +52,11 @@ public final class Sounds {
   }
 
   public static void loadMusic(final ResourceLoader loader1, final ResourceLoader loader2) {
-    MUSIC_INTRO = MusicTrack.load(loader1, "shattered_plans_intro");
-    MUSIC_IN_GAME_1 = MusicTrack.load(loader1, "shattered_plans_ingame");
-    MUSIC_IN_GAME_2 = MusicTrack.load(loader1, "shattered_plans_ingame_two");
-    MUSIC_WIN = MusicTrack.load(loader1, "shattered_plans_win");
-    MUSIC_LOSE = MusicTrack.load(loader1, "shattered_plans_lose");
+    MUSIC_INTRO = SongData.load(loader1, "shattered_plans_intro");
+    MUSIC_IN_GAME_1 = SongData.load(loader1, "shattered_plans_ingame");
+    MUSIC_IN_GAME_2 = SongData.load(loader1, "shattered_plans_ingame_two");
+    MUSIC_WIN = SongData.load(loader1, "shattered_plans_win");
+    MUSIC_LOSE = SongData.load(loader1, "shattered_plans_lose");
 
     ShatteredPlansClient.currentTrack = MUSIC_IN_GAME_2;
     musicTn._u.a350(SoundLoader.globalLoader, loader2, MUSIC_INTRO);
