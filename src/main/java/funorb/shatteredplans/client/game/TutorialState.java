@@ -305,7 +305,7 @@ public final class TutorialState {
               }
 
               if (var6.equalsIgnoreCase("animationControls")) {
-                session.ui._K.visible = true;
+                session.ui.animationControlsPanel.visible = true;
                 session.ui.animationAutoPlayButton.activate();
               }
 

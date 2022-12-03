@@ -1193,7 +1193,7 @@ public final class ClientGameSession extends GameSession {
 
   public void handleKeyTyped() {
     if (this.isMultiplayer) {
-      if (this.localPlayerIndex >= 0 ? ShatteredPlansClient.isChatboxSelected : (JagexApplet.lastTypedKeyCode != KeyState.Code.ESCAPE && GameUI._gen)) {
+      if (this.localPlayerIndex >= 0 ? ShatteredPlansClient.isChatboxSelected : (JagexApplet.lastTypedKeyCode != KeyState.Code.ESCAPE && GameUI.isChatOpen)) {
         return;
       }
     }

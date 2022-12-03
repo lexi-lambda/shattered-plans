@@ -1,5 +1,6 @@
 package funorb.shatteredplans.client.game;
 
+import funorb.graphics.Drawing;
 import funorb.graphics.Point;
 import funorb.graphics.Rect;
 import funorb.graphics.Sprite;
@@ -361,6 +362,7 @@ public abstract class AbstractGameView {
   }
 
   final void drawBackground() {
+    Drawing.fillRect(0, 0, Drawing.width, Drawing.height, Drawing.BLACK);
     final int var2 = ShatteredPlansClient.STAR_FIELD.width - ShatteredPlansClient.SCREEN_WIDTH;
     final int var3 = ShatteredPlansClient.STAR_FIELD.height - ShatteredPlansClient.SCREEN_HEIGHT;
     final int var4 = -(((int) this.mapScrollPosnX) * (var2 << 4)) / (this.map.drawingWidth);

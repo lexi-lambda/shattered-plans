@@ -207,7 +207,6 @@ public final class ShatteredPlansClient extends JagexApplet {
   public static String[] MENU_ITEM_LABELS;
   public static boolean playingGame;
   public static @NotNull Channel currentChatChannel = Channel.LOBBY;
-  public static int _flh;
   private static Component<?> _cbl;
   private static boolean _K = true;
   private static boolean menuInitialized;
@@ -744,15 +743,15 @@ public final class ShatteredPlansClient extends JagexApplet {
     }
   }
 
-  private static void a877u(final boolean var0) {
+  private static void a877u(final boolean inGame) {
     if (Menu.currentMenu == Menu.Id.INTRODUCTION) {
       IntroAnimation.render();
     } else if (ClientGameSession.playSession != null) {
-      a430u(var0);
+      a430u(inGame);
     } else if (ClientGameSession.spectateSession == null) {
       f423fr();
     } else {
-      a430u(var0);
+      a430u(inGame);
     }
   }
 
@@ -2439,34 +2438,34 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   public static void f423fr() {
-    final int var0 = (int) (1600.0D * (1.0D + Math.cos((float) currentTick / 500.0F)));
-    final int var1 = (int) (1600.0D * (-Math.sin((float) currentTick / 500.0F) + 1.0D));
+    final int x = (int) (1600.0D * (1.0D + Math.cos((float) currentTick / 500.0F)));
+    final int y = (int) (1600.0D * (1.0D - Math.sin((float) currentTick / 500.0F)));
     if (renderQuality.antialiasStarfieldBackground) {
-      a034il(var0, var1, STAR_FIELD);
+      a034il(x, y, STAR_FIELD);
       Drawing.horizontalLine(0, 0, SCREEN_WIDTH, 0);
     } else {
-      STAR_FIELD.c093(-var0 >> 4, -var1 >> 4);
+      STAR_FIELD.c093(-x >> 4, -y >> 4);
     }
   }
 
-  private static void a034il(int var0, int var2, final Sprite var3) {
+  private static void a034il(int x, int y, final Sprite sprite) {
     if (_cfa == null || _cfa.length != Drawing.width) {
       _cfa = new int[Drawing.width];
     }
 
-    final int var4 = var2 & 15;
-    var2 >>= 4;
-    final int var5 = var0 & 15;
-    var0 >>= 4;
+    final int var4 = y & 15;
+    y >>= 4;
+    final int var5 = x & 15;
+    x >>= 4;
     int var12 = 0;
-    int var13 = var3.width * var2 + var0;
-    final int var14 = -Drawing.width + var3.width;
+    int var13 = sprite.width * y + x;
+    final int var14 = sprite.width - Drawing.width;
 
     for (int var15 = -Drawing.height; var15 < 0; var13 += var14) {
       int var16 = 0;
 
       for (int var17 = Drawing.width - 1; var17 >= 0; --var17) {
-        final int var6 = var3.pixels[var13];
+        final int var6 = sprite.pixels[var13];
         final int var8 = var6 & '\uff00';
         final int var7 = var6 & 16711935;
         final int var10 = 267390960 & var5 * var7;
@@ -2542,15 +2541,15 @@ public final class ShatteredPlansClient extends JagexApplet {
     });
   }
 
-  private static void a366fa(int var0) {
-    _flf = var0;
+  private static void a366fa(int chatPanelY) {
+    _flf = chatPanelY;
     if (_pgJ != 20) {
       final int var1 = 400;
       final int var2 = -(_pgJ * _pgJ) + var1;
-      var0 += (-var0 + _dmgm) * var2 / var1;
+      chatPanelY += (-chatPanelY + _dmgm) * var2 / var1;
     }
 
-    Component._tgc.setBounds(_tmh, var0, SCREEN_WIDTH, 120);
+    Component._tgc.setBounds(_tmh, chatPanelY, SCREEN_WIDTH, GameUI.CHAT_PANEL_HEIGHT);
     a370qc(_dmgm - 24, _tga, ClientLobbyRoom._qob);
   }
 
@@ -4274,7 +4273,7 @@ public final class ShatteredPlansClient extends JagexApplet {
 
     renderQuality = RenderQuality.high();
     Menu.gameOptions = GameOptions.STREAMLINED_GAME_OPTIONS;
-    _flh = 20;
+    GameUI.chatPanelOpenAmount = 20;
   }
 
   @Override
@@ -4403,7 +4402,7 @@ public final class ShatteredPlansClient extends JagexApplet {
         }
 
         Menu.switchTo(Menu.Id.GAME, 0, false);
-        GameUI._gen = false;
+        GameUI.isChatOpen = false;
         _tli = true;
         _isa = false;
       } else if (currentS2cPacketType == Type.LEAVE_GAME) {
@@ -4418,7 +4417,7 @@ public final class ShatteredPlansClient extends JagexApplet {
           Menu.nextMenu = Menu.Id.LOBBY;
           _tli = false;
           spectatingGame = false;
-          GameUI._gen = true;
+          GameUI.isChatOpen = true;
           b150nj();
         }
 
@@ -4446,7 +4445,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     }
 
     if (Menu.currentMenu == Menu.Id.LOBBY && Menu.nextMenu != Menu.Id.GAME) {
-      GameUI._gen = true;
+      GameUI.isChatOpen = true;
     }
 
     final boolean shouldForceDisconnection =
@@ -4778,18 +4777,15 @@ public final class ShatteredPlansClient extends JagexApplet {
         b150af();
       }
 
-      if (GameUI._gen) {
-        if (_flh < 20) {
-          ++_flh;
+      if (GameUI.isChatOpen) {
+        if (GameUI.chatPanelOpenAmount < 20) {
+          ++GameUI.chatPanelOpenAmount;
         }
-      } else if (_flh > 0) {
-        --_flh;
+      } else if (GameUI.chatPanelOpenAmount > 0) {
+        --GameUI.chatPanelOpenAmount;
       }
 
-      final int var5 = 400;
-      final int var6 = -(_flh * _flh) + var5;
-      final int var7 = 120 * var6 / var5 + 360;
-      a366fa(var7);
+      a366fa(GameUI.getChatPanelY());
       if (IntroAnimation._ucv > 0) {
         --IntroAnimation._ucv;
       }

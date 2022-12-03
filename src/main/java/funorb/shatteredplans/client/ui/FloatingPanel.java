@@ -189,27 +189,25 @@ public final class FloatingPanel<T extends PanelState> extends UIComponent<Objec
 
   @Override
   public void handleDrag(final int mouseX, final int mouseY, final int originX, final int originY) {
-    final int var4 = mouseX + originX;
-    final int var5 = mouseY + originY;
+    final int newX = mouseX + originX;
+    final int newY = mouseY + originY;
 
-    int var6 = -this.x + var4;
-    if (this.x + var6 < -this.width / 2) {
-      var6 = -this.x + -this.width / 2;
+    int dx = newX - this.x;
+    if (this.x + dx < -this.width / 2) {
+      dx = -this.x - (this.width / 2);
+    }
+    if (ShatteredPlansClient.SCREEN_WIDTH - (this.width / 2) < dx + this.x) {
+      dx = (ShatteredPlansClient.SCREEN_WIDTH - this.x) - (this.width / 2);
     }
 
-    int var7 = var5 - this.y;
-    if (-(this.width / 2) + ShatteredPlansClient.SCREEN_WIDTH < var6 + this.x) {
-      var6 = -(this.width / 2) + (ShatteredPlansClient.SCREEN_WIDTH - this.x);
+    int dy = newY - this.y;
+    if (this.y + dy < 0) {
+      dy = -this.y;
+    }
+    if (this.y + dy > ShatteredPlansClient.SCREEN_HEIGHT - 15) {
+      dy = 465 - this.y;
     }
 
-    if (this.y + var7 < 0) {
-      var7 = -this.y;
-    }
-
-    if (var7 + this.y > 465) {
-      var7 = 465 - this.y;
-    }
-
-    this.translate(var6, var7);
+    this.translate(dx, dy);
   }
 }

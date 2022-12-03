@@ -78,6 +78,11 @@ public final class GameUI {
   private static final int STATS_GRAPH_HEIGHT = 220;
   private static final int _rga = 56;
   private static final int ADD_CHAT_MESSAGE_TIMER_MAX = 18;
+  public static final int CHAT_PANEL_OPEN_AMOUNT_MAX = 20;
+  public static final int CHAT_PANEL_OPEN_AMOUNT_MAX_SQ = CHAT_PANEL_OPEN_AMOUNT_MAX * CHAT_PANEL_OPEN_AMOUNT_MAX;
+  public static final int CHAT_PANEL_HEIGHT = 120;
+  public static final int TOOLTIP_HEIGHT = 13;
+  public static int chatPanelOpenAmount;
 
   private static ArgbSprite _kbw;
   public static Font _ssb;
@@ -95,7 +100,7 @@ public final class GameUI {
   public static Sprite FACTION_RING_CENTER;
   private static ChatMessage[] recentChatMessages;
   private static int addChatMessageTimer;
-  public static boolean _gen = true;
+  public static boolean isChatOpen = true;
   public static Sprite[] PRODUCTION_ICONS;
   private static funorb.client.lobby.ChatMessage lastChatMessage;
   public static Sprite PRODUCTION_BUTTON_DOWN;
@@ -126,15 +131,15 @@ public final class GameUI {
   private final Button<StatsScreenTab> systemsTabButton;
   private final FixedPanel fleetsTabControl;
   private final FixedPanel overviewTabControl;
-  private final FixedPanel _V;
+  private final FixedPanel showChatButtonPanel;
   private final Button<StatsScreenTab> overviewTabButton;
   private final FixedPanel systemsTabControl;
   private final FixedPanel productionTabControl;
   private final int[] _p = new int[]{32, 0, 0, 0};
   private final List<UIComponent<?>> statsScreenTabs;
   private final int[] _ob = new int[]{82, 52, 52, 52};
-  public final FixedPanel _K;
-  private final Button<?> showChat;
+  public final FixedPanel animationControlsPanel;
+  private final Button<?> showChatButton;
   private final Button<StatsScreenTab> productionTabButton;
   private final List<UIComponent<?>> components = new ArrayList<>();
   private final Button<StatsScreenTab> fleetsTabButton;
@@ -164,14 +169,14 @@ public final class GameUI {
   private FixedPanel statusPanel;
   private String[] playerDiplomacyStatusMessage;
   private StatsScreenTab currentStatsScreenTab;
-  private ScrollPane<Component<?>> _E;
+  private ScrollPane<Component<?>> chatScrollPaneSinglePlayer;
   private int[][] _G;
   private int newTurnPanelOpenAmount;
   private int[][] _q;
   private boolean isStatsScreenOpen;
   private boolean _I = true;
   private FloatingPanel<DiplomacyPanelState> diplomacyPanel;
-  private Component<Component<?>> _O;
+  private Component<Component<?>> chatPanelSinglePlayer;
   private int _w;
   private FloatingPanel<?> fleetInfoPanel;
   private Sprite _T;
@@ -220,38 +225,42 @@ public final class GameUI {
       this.addComponent(this.victoryPanel);
     }
 
-    this.statusPanel = createStatusPanel();
-    this.addComponent(this.statusPanel);
+    final int readyButtonX = getReadyButtonX();
     if (this.gameSession.localPlayer != null) {
-      this.projectsButton = new Button<>(511, 25, HUD_ICON_3.width, HUD_ICON_3.height, HUD_ICON_3, null, 0, HUD_ICON_RED_3, null, 0);
-      this.projectsButton.tooltip = StringConstants.TOOLTIP_PROJECTS_BUTTON_SHOW;
-      this.addComponent(this.projectsButton);
-    }
-
-    this.diplomacyButton = new Button<>(HUD_ICON_3.width / 2 + 512, 5, HUD_ICON_1.width, HUD_ICON_1.height, HUD_ICON_1, null, 0, HUD_ICON_RED_1, null, 0);
-    this.diplomacyButton.tooltip = StringConstants.TOOLTIP_DIPLOMACY_BUTTON_SHOW;
-    this.addComponent(this.diplomacyButton);
-    this.fleetInfoButton = new Button<>(513 + HUD_ICON_3.width, 25, HUD_ICON_4.width, HUD_ICON_4.height, HUD_ICON_4, null, 0, HUD_ICON_RED_4, null, 0);
-    this.fleetInfoButton.tooltip = StringConstants.TOOLTIP_FLEET_INFO_BUTTON_SHOW;
-    this.addComponent(this.fleetInfoButton);
-    this.productionButton = new Button<>(HUD_ICON_1.width + 514 + HUD_ICON_3.width / 2, 5, HUD_ICON_2.width, HUD_ICON_2.height, HUD_ICON_2, null, 0, HUD_ICON_RED_2, null, 0);
-    this.productionButton.tooltip = StringConstants.TOOLTIP_PRODUCTION_BUTTON_SHOW;
-    this.addComponent(this.productionButton);
-    if (this.victoryPanel != null) {
-      this.victoryButton = new Button<>(HUD_ICON_4.width + HUD_ICON_3.width + 515, 25, HUD_ICON_5.width, HUD_ICON_5.height, HUD_ICON_5, null, 0, HUD_ICON_RED_5, null, 0);
-      this.victoryButton.tooltip = StringConstants.TOOLTIP_VICTORY_BUTTON_SHOW;
-      this.addComponent(this.victoryButton);
-    }
-
-    if (this.gameSession.localPlayer != null) {
-      this.endTurnButton = new Button<>(521 + HUD_ICON_3.width * 3, 20, READY_BUTTON.width, READY_BUTTON.height, READY_BUTTON, null, 0, READY_BUTTON_DOWN, null, 0);
+      this.endTurnButton = new Button<>(readyButtonX, 20, READY_BUTTON.width, READY_BUTTON.height, READY_BUTTON, null, 0, READY_BUTTON_DOWN, null, 0);
       this.endTurnButton.tooltip = StringConstants.TOOLTIP_END_TURN;
       this.addComponent(this.endTurnButton);
     }
 
-    this._K = new FixedPanel(590, ShatteredPlansClient.SCREEN_HEIGHT - Menu.SMALL_FONT.ascent, 60, 2 * Menu.SMALL_FONT.ascent);
-    this.addComponent(this._K, 0);
-    this.animationAutoPlayButton = new Button<>(595, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[3].height, ANIM_ICONS[3].width, ANIM_ICONS[3].height, ANIM_ICONS[3], null, 0, ANIM_ICONS[0], null, 0);
+    final int hudIconWidth = HUD_ICON_1.width;
+    final int victoryButtonX = readyButtonX - 6 - hudIconWidth;
+    if (this.victoryPanel != null) {
+      this.victoryButton = new Button<>(victoryButtonX, 25, HUD_ICON_5.width, HUD_ICON_5.height, HUD_ICON_5, null, 0, HUD_ICON_RED_5, null, 0);
+      this.victoryButton.tooltip = StringConstants.TOOLTIP_VICTORY_BUTTON_SHOW;
+      this.addComponent(this.victoryButton);
+    }
+    this.productionButton = new Button<>(readyButtonX - 6 - (hudIconWidth / 2) - hudIconWidth, 5, HUD_ICON_2.width, HUD_ICON_2.height, HUD_ICON_2, null, 0, HUD_ICON_RED_2, null, 0);
+    this.productionButton.tooltip = StringConstants.TOOLTIP_PRODUCTION_BUTTON_SHOW;
+    this.addComponent(this.productionButton);
+    this.fleetInfoButton = new Button<>(victoryButtonX - 2 - hudIconWidth, 25, HUD_ICON_4.width, HUD_ICON_4.height, HUD_ICON_4, null, 0, HUD_ICON_RED_4, null, 0);
+    this.fleetInfoButton.tooltip = StringConstants.TOOLTIP_FLEET_INFO_BUTTON_SHOW;
+    this.addComponent(this.fleetInfoButton);
+    this.diplomacyButton = new Button<>(this.productionButton.x - 2 - hudIconWidth, 5, HUD_ICON_1.width, HUD_ICON_1.height, HUD_ICON_1, null, 0, HUD_ICON_RED_1, null, 0);
+    this.diplomacyButton.tooltip = StringConstants.TOOLTIP_DIPLOMACY_BUTTON_SHOW;
+    this.addComponent(this.diplomacyButton);
+    final int projectsButtonX = this.fleetInfoButton.x - 2 - hudIconWidth;
+    if (this.gameSession.localPlayer != null) {
+      this.projectsButton = new Button<>(projectsButtonX, 25, HUD_ICON_3.width, HUD_ICON_3.height, HUD_ICON_3, null, 0, HUD_ICON_RED_3, null, 0);
+      this.projectsButton.tooltip = StringConstants.TOOLTIP_PROJECTS_BUTTON_SHOW;
+      this.addComponent(this.projectsButton);
+    }
+
+    this.statusPanel = createStatusPanel(projectsButtonX);
+    this.addComponent(this.statusPanel);
+
+    this.animationControlsPanel = new FixedPanel(ShatteredPlansClient.SCREEN_WIDTH - 50, ShatteredPlansClient.SCREEN_HEIGHT - Menu.SMALL_FONT.ascent, 60, 2 * Menu.SMALL_FONT.ascent);
+    this.addComponent(this.animationControlsPanel, 0);
+    this.animationAutoPlayButton = new Button<>(this.animationControlsPanel.x + 5, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[3].height, ANIM_ICONS[3].width, ANIM_ICONS[3].height, ANIM_ICONS[3], null, 0, ANIM_ICONS[0], null, 0);
     if ((currentSettings & 0b100000) == 0) {
       this.animationAutoPlayButton.tooltip = StringConstants.TOOLTIP_ANIM_AUTO_PLAY_IS_OFF;
     } else {
@@ -259,9 +268,9 @@ public final class GameUI {
       this.animationAutoPlayButton.tooltip = StringConstants.TOOLTIP_ANIM_AUTO_PLAY_IS_ON;
     }
 
-    this.animationPlayingButton = new Button<>(610, -ANIM_ICONS[1].height + ShatteredPlansClient.SCREEN_HEIGHT, ANIM_ICONS[1].width, ANIM_ICONS[1].height, ANIM_ICONS[1], null, 0, ANIM_ICONS[4], null, 0);
+    this.animationPlayingButton = new Button<>(this.animationControlsPanel.x + 20, -ANIM_ICONS[1].height + ShatteredPlansClient.SCREEN_HEIGHT, ANIM_ICONS[1].width, ANIM_ICONS[1].height, ANIM_ICONS[1], null, 0, ANIM_ICONS[4], null, 0);
     this.animationPlayingButton.tooltip = StringConstants.TOOLTIP_ANIM_CLICK_TO_PLAY;
-    this.animationSpeedDoubledButton = new Button<>(625, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[5].height, ANIM_ICONS[5].width, ANIM_ICONS[5].height, ANIM_ICONS[5], null, 0, ANIM_ICONS[2], null, 0);
+    this.animationSpeedDoubledButton = new Button<>(this.animationControlsPanel.x + 35, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[5].height, ANIM_ICONS[5].width, ANIM_ICONS[5].height, ANIM_ICONS[5], null, 0, ANIM_ICONS[2], null, 0);
     if ((currentSettings & 0b1000000) == 0) {
       this.animationSpeedDoubledButton.tooltip = StringConstants.TOOLTIP_ANIM_SPEED_IS_NORMAL;
     } else {
@@ -269,13 +278,13 @@ public final class GameUI {
       this.animationSpeedDoubledButton.tooltip = StringConstants.TOOLTIP_ANIM_SPEED_IS_DOUBLE;
     }
 
-    this._K.addChild(this.animationAutoPlayButton);
-    this._K.addChild(this.animationPlayingButton);
-    this._K.addChild(this.animationSpeedDoubledButton);
-    this._V = new FixedPanel(3, ShatteredPlansClient.SCREEN_HEIGHT, 10 + Menu.SMALL_FONT.measureLineWidth(StringConstants.TEXT_SHOW_CHAT), 2 * Menu.SMALL_FONT.ascent);
-    this.showChat = new Button<>(3, ShatteredPlansClient.SCREEN_HEIGHT, this._V.width, Menu.SMALL_FONT.ascent - 4, null, StringConstants.TEXT_SHOW_CHAT, Drawing.WHITE, null, StringConstants.TEXT_HIDE_CHAT, Drawing.WHITE);
-    this._V.addChild(this.showChat);
-    this.addComponent(this._V, 0);
+    this.animationControlsPanel.addChild(this.animationAutoPlayButton);
+    this.animationControlsPanel.addChild(this.animationPlayingButton);
+    this.animationControlsPanel.addChild(this.animationSpeedDoubledButton);
+    this.showChatButtonPanel = new FixedPanel(3, ShatteredPlansClient.SCREEN_HEIGHT, 10 + Menu.SMALL_FONT.measureLineWidth(StringConstants.TEXT_SHOW_CHAT), 2 * Menu.SMALL_FONT.ascent);
+    this.showChatButton = new Button<>(3, ShatteredPlansClient.SCREEN_HEIGHT, this.showChatButtonPanel.width, Menu.SMALL_FONT.ascent - 4, null, StringConstants.TEXT_SHOW_CHAT, Drawing.WHITE, null, StringConstants.TEXT_HIDE_CHAT, Drawing.WHITE);
+    this.showChatButtonPanel.addChild(this.showChatButton);
+    this.addComponent(this.showChatButtonPanel, 0);
 
     this.warningSprite = new ArgbSprite(GameView.WARNING.offsetX, GameView.WARNING.offsetY);
     this.warningSprite.withInstalledForDrawing(() -> {
@@ -292,16 +301,16 @@ public final class GameUI {
       ShatteredPlansClient.clearChatMessages();
       final Component<Component<?>> var6 = new Component<>(null);
       var6.children = new ArrayList<>();
-      this._E = new ScrollPane<>(var6, Component.LABEL_DARK_2, Component.SCROLL_BAR);
+      this.chatScrollPaneSinglePlayer = new ScrollPane<>(var6, Component.LABEL_DARK_2, Component.SCROLL_BAR);
       final Component<Component<?>> var4 = new Component<>(Component._mpa);
-      this._O = new Component<>(Component._cna);
-      this._O.setBounds(0, ShatteredPlansClient.SCREEN_HEIGHT, ShatteredPlansClient.SCREEN_WIDTH, 120);
-      var4.setBounds(3, 3, 634, this._O.height - 6);
-      this._O.addChild(var4);
-      var4.addChild(this._E);
+      this.chatPanelSinglePlayer = new Component<>(Component._cna);
+      this.chatPanelSinglePlayer.setBounds(0, ShatteredPlansClient.SCREEN_HEIGHT, ShatteredPlansClient.SCREEN_WIDTH, CHAT_PANEL_HEIGHT);
+      var4.setBounds(3, 3, ShatteredPlansClient.SCREEN_WIDTH - 6, this.chatPanelSinglePlayer.height - 6);
+      this.chatPanelSinglePlayer.addChild(var4);
+      var4.addChild(this.chatScrollPaneSinglePlayer);
       final int var5 = var4.height - 5;
-      this._E.setBounds(5, 5, 624, var5 - 5, 15);
-      _gen = false;
+      this.chatScrollPaneSinglePlayer.setBounds(5, 5, ShatteredPlansClient.SCREEN_WIDTH - 16, var5 - 5, 15);
+      isChatOpen = false;
     }
 
     a613cq(Menu.SMALL_FONT);
@@ -338,8 +347,8 @@ public final class GameUI {
       this.projectsButton.visible = false;
       this.victoryButton.visible = false;
       this.endTurnButton.visible = false;
-      this._K.visible = false;
-      this._V.visible = false;
+      this.animationControlsPanel.visible = false;
+      this.showChatButtonPanel.visible = false;
       TutorialState.a018jr("continue", StringConstants.TUTORIAL_CONTINUE);
       TutorialState.a018jr("continue2", StringConstants.TUTORIAL_CONTINUE_2);
       TutorialState.a018jr("continue3", StringConstants.TUTORIAL_CONTINUE_3);
@@ -357,6 +366,10 @@ public final class GameUI {
 
       TutorialState.a529lp(TutorialMessages.get("start"));
     }
+  }
+
+  private static int getReadyButtonX() {
+    return ShatteredPlansClient.SCREEN_WIDTH - 12 - READY_BUTTON.width;
   }
 
   private void addComponent(final UIComponent<?> component) {
@@ -589,8 +602,8 @@ public final class GameUI {
     return panel;
   }
 
-  private static FixedPanel createStatusPanel() {
-    final FixedPanel _goE = new FixedPanel(5, 5, 500, 45);
+  private static FixedPanel createStatusPanel(final int width) {
+    final FixedPanel _goE = new FixedPanel(5, 5, width - 10, 45);
     final StatusPanelState var1 = new StatusPanelState();
     _goE.state = var1;
     final Icon var2 = new Icon(15, 10, 36, 36, null);
@@ -1555,7 +1568,7 @@ public final class GameUI {
 
     Drawing.restoreBoundsFrom(bounds);
     if (this.currentStatDescriptionTooltip != null && this._jb > 60) {
-      this.a209(this.currentStatDescriptionTooltip);
+      this.drawTooltip(this.currentStatDescriptionTooltip);
     }
   }
 
@@ -1966,18 +1979,20 @@ public final class GameUI {
     }
 
     if (this.gameSession.isMultiplayer && !this.gameSession.gameState.hasEnded) {
-      Drawing.fillRoundedRect(HUD_ICON_3.width * 3 + 521, 4, READY_BUTTON.width, Menu.SMALL_FONT.ascent - 2, 2, 0, 128);
+      final int readyButtonX = getReadyButtonX();
+      Drawing.fillRoundedRect(readyButtonX, 4, READY_BUTTON.width, Menu.SMALL_FONT.ascent - 2, 2, 0, 128);
       final int var2 = (this.gameSession.turnTicksLeft + 49) / 50;
+      final int turnTimerX = readyButtonX + (READY_BUTTON.width / 2);
       if (this.gameSession.turnTicksLeft < 0) {
-        Menu.SMALL_FONT.drawCentered(this.a436(Math.abs(var2)), 521 + HUD_ICON_3.width * 3 + READY_BUTTON.width / 2, Menu.SMALL_FONT.ascent * 3 / 4 + 3, Drawing.RED);
+        Menu.SMALL_FONT.drawCentered(this.a436(Math.abs(var2)), turnTimerX, Menu.SMALL_FONT.ascent * 3 / 4 + 3, Drawing.RED);
       }
 
-      if (GameSession.TURN_DURATIONS[this.gameSession.gameState.turnLengthIndex] <= 3 * this.gameSession.turnTicksLeft) {
-        Menu.SMALL_FONT.drawCentered(this.a436(Math.abs(var2)), READY_BUTTON.width / 2 + 3 * HUD_ICON_3.width + 521, Menu.SMALL_FONT.ascent * 3 / 4 + 3, Drawing.WHITE);
+      if (this.gameSession.turnTicksLeft * 3 >= GameSession.TURN_DURATIONS[this.gameSession.gameState.turnLengthIndex]) {
+        Menu.SMALL_FONT.drawCentered(this.a436(Math.abs(var2)), turnTimerX, Menu.SMALL_FONT.ascent * 3 / 4 + 3, Drawing.WHITE);
       } else {
         final int var3 = this.gameSession.turnTicksLeft % 50;
         if (var3 >= 30 || var3 < 20 && var3 >= 10) {
-          Menu.SMALL_FONT.drawCentered(this.a436(Math.abs(var2)), HUD_ICON_3.width * 3 + 521 + READY_BUTTON.width / 2, 3 * Menu.SMALL_FONT.ascent / 4 + 3, 3974311);
+          Menu.SMALL_FONT.drawCentered(this.a436(Math.abs(var2)), turnTimerX, 3 * Menu.SMALL_FONT.ascent / 4 + 3, 0x3ca4a7);
         }
       }
     }
@@ -1994,8 +2009,8 @@ public final class GameUI {
     }
 
     d150vn();
-    if (this._O != null) {
-      this._O.b540(false);
+    if (this.chatPanelSinglePlayer != null) {
+      this.chatPanelSinglePlayer.b540(false);
     }
 
     if (this._U != -1) {
@@ -2103,9 +2118,8 @@ public final class GameUI {
     }
 
     if (this.hoveredComponent != null && this.hoveredComponent.tooltip != null) {
-      this.a209(this.hoveredComponent.tooltip);
+      this.drawTooltip(this.hoveredComponent.tooltip);
     }
-
   }
 
   private void a652(final int var1, final int var2, final int var4) {
@@ -2220,8 +2234,8 @@ public final class GameUI {
     }
 
     if (JagexApplet.lastTypedKeyCode == KeyState.Code.LETTER_C) {
-      _gen = !_gen;
-      this.showChat.toggle();
+      isChatOpen = !isChatOpen;
+      this.showChatButton.toggle();
     }
   }
 
@@ -2229,7 +2243,7 @@ public final class GameUI {
     if (this.gameSession.isTutorial) {
       return JagexApplet.gameHeight;
     } else {
-      return this.gameSession.isMultiplayer ? Component._tgc.y : this._O.y;
+      return this.gameSession.isMultiplayer ? Component._tgc.y : this.chatPanelSinglePlayer.y;
     }
   }
 
@@ -2445,7 +2459,7 @@ public final class GameUI {
   }
 
   private boolean processInputHud(final boolean var1) {
-    final boolean var3 = this.hoveredComponent != null || Component._tgc.y <= JagexApplet.mouseY || this._O != null && this._O.y <= JagexApplet.mouseY;
+    final boolean var3 = this.hoveredComponent != null || Component._tgc.y <= JagexApplet.mouseY || this.chatPanelSinglePlayer != null && this.chatPanelSinglePlayer.y <= JagexApplet.mouseY;
     this.processMouseInput(this.components);
     if (this.mouseDownComponent != null) {
       for (final UIComponent<?> var4 : this.components) {
@@ -2589,9 +2603,9 @@ public final class GameUI {
         return var3;
       }
 
-      if (this.clickedComponent == this.showChat) {
-        _gen = !_gen;
-        this.showChat.toggle();
+      if (this.clickedComponent == this.showChatButton) {
+        isChatOpen = !isChatOpen;
+        this.showChatButton.toggle();
         return var3;
       }
 
@@ -2695,22 +2709,22 @@ public final class GameUI {
     return var3;
   }
 
-  private void a209(final String var2) {
-    int var3 = JagexApplet.mouseX + 10;
-    int var4 = JagexApplet.mouseY + 20;
-    final int var5 = Menu.SMALL_FONT.measureLineWidth(var2);
-    if (13 + var4 > ShatteredPlansClient.SCREEN_HEIGHT) {
-      var3 = JagexApplet.mouseX;
-      var4 = JagexApplet.mouseY - 15;
+  private void drawTooltip(final String message) {
+    int x = JagexApplet.mouseX + 10;
+    int y = JagexApplet.mouseY + 20;
+    final int width = Menu.SMALL_FONT.measureLineWidth(message);
+    if (y + TOOLTIP_HEIGHT > ShatteredPlansClient.SCREEN_HEIGHT) {
+      x = JagexApplet.mouseX;
+      y = JagexApplet.mouseY - 15;
     }
 
-    if (10 + var5 + var3 > 639) {
-      var3 = -1 - var5 + 630;
+    if (x + width > ShatteredPlansClient.SCREEN_WIDTH - 11) {
+      x = ShatteredPlansClient.SCREEN_WIDTH - 11 - width;
     }
 
-    Drawing.fillRoundedRect(var3, var4, var5 + 10, 13, 5, 0, 192);
-    Drawing.f669(var3 - 1, var4 - 1, var5 + 12, 15, 6, 3974311);
-    Menu.SMALL_FONT.draw(var2, 6 + var3, 3 + var4 + Menu.SMALL_FONT.ascent / 2, Drawing.WHITE);
+    Drawing.fillRoundedRect(x, y, width + 10, TOOLTIP_HEIGHT, 5, 0, 192);
+    Drawing.f669(x - 1, y - 1, width + 12, 15, 6, 0x3ca4a7);
+    Menu.SMALL_FONT.draw(message, 6 + x, 3 + y + Menu.SMALL_FONT.ascent / 2, Drawing.WHITE);
   }
 
   private void initialize() {
@@ -2758,12 +2772,12 @@ public final class GameUI {
     }
 
     if (!this.gameSession.isMultiplayer && !this.gameSession.isTutorial) {
-      this.b150();
+      this.tickChatSinglePlayer();
     }
 
     tickChat();
-    this._V.setPosition(this._V.x, this.getHeight() - this._V.height / 2);
-    this._K.setPosition(this._K.x, this._V.y);
+    this.showChatButtonPanel.setPosition(this.showChatButtonPanel.x, this.getHeight() - this.showChatButtonPanel.height / 2);
+    this.animationControlsPanel.setPosition(this.animationControlsPanel.x, this.showChatButtonPanel.y);
     boolean var9 = false;
 
     for (int i = 0; i < this.gameSession.gameState.playerCount; ++i) {
@@ -2992,17 +3006,14 @@ public final class GameUI {
     this.overviewTabControl.setPosition((ShatteredPlansClient.SCREEN_WIDTH - var5) / 2 + 20 + (this.fleetsTabButton.width + 5) * 3, this.overviewTabButton.y);
   }
 
-  private void b150() {
-    final int var2 = 400;
-    final int var3 = var2 - ShatteredPlansClient._flh * ShatteredPlansClient._flh;
-    final int var4 = 360 + 120 * var3 / var2;
-    this._O.setBounds(0, var4, ShatteredPlansClient.SCREEN_WIDTH, 120);
-    this._E.content.children.clear();
+  private void tickChatSinglePlayer() {
+    final int chatPanelY = getChatPanelY();
+    this.chatPanelSinglePlayer.setBounds(0, chatPanelY, ShatteredPlansClient.SCREEN_WIDTH, CHAT_PANEL_HEIGHT);
+    this.chatScrollPaneSinglePlayer.content.children.clear();
     int var5 = 0;
     int var6 = 0;
 
-    int var7;
-    for (var7 = ShatteredPlansClient.chatMessageCount - 1; var7 >= 0; --var7) {
+    for (int var7 = ShatteredPlansClient.chatMessageCount - 1; var7 >= 0; --var7) {
       final funorb.client.lobby.ChatMessage var8 = ShatteredPlansClient.chatMessages[var7];
       final boolean var9 = ShatteredPlansClient._kpi > var5;
       if (var9) {
@@ -3022,34 +3033,38 @@ public final class GameUI {
       }
     }
 
-    var7 = 0;
+    int var7 = 0;
 
-    int var11;
-    for (var11 = 0; var11 < ShatteredPlansClient.chatMessageCount; ++var11) {
+    for (int var11 = 0; var11 < ShatteredPlansClient.chatMessageCount; ++var11) {
       final funorb.client.lobby.ChatMessage var12 = ShatteredPlansClient.chatMessages[var11];
       if (var12.component != null) {
-        this._E.content.addChild(var12.component);
+        this.chatScrollPaneSinglePlayer.content.addChild(var12.component);
         var12.component.setBounds(ShatteredPlansClient._tga, var7, var12.component.e474(), 15);
         var7 += 15;
       }
     }
 
-    var11 = -var7 + var6 + this._E.content._gb + this._E.content.height;
-    this._E.content.y += var11;
-    this._E.content.height = var7;
-    this._E.content._gb = 0;
-    final int var13 = this._E.viewport.height - this._E.content.height - this._E.content._gb;
+    final int var11 = -var7 + var6 + this.chatScrollPaneSinglePlayer.content._gb + this.chatScrollPaneSinglePlayer.content.height;
+    this.chatScrollPaneSinglePlayer.content.y += var11;
+    this.chatScrollPaneSinglePlayer.content.height = var7;
+    this.chatScrollPaneSinglePlayer.content._gb = 0;
+    final int var13 = this.chatScrollPaneSinglePlayer.viewport.height - this.chatScrollPaneSinglePlayer.content.height - this.chatScrollPaneSinglePlayer.content._gb;
     if (this._v) {
-      this._E.content._w = var13 - this._E.content.y;
+      this.chatScrollPaneSinglePlayer.content._w = var13 - this.chatScrollPaneSinglePlayer.content.y;
     }
 
-    this._E.a795(30 * JagexApplet.mouseWheelRotation, 15);
-    this._v = var13 == this._E.content.y + this._E.content._w;
-    this._O.rootProcessMouseEvents(true);
+    this.chatScrollPaneSinglePlayer.a795(30 * JagexApplet.mouseWheelRotation, 15);
+    this._v = var13 == this.chatScrollPaneSinglePlayer.content.y + this.chatScrollPaneSinglePlayer.content._w;
+    this.chatPanelSinglePlayer.rootProcessMouseEvents(true);
+  }
+
+  public static int getChatPanelY() {
+    final int chatPanelOpenFac = CHAT_PANEL_OPEN_AMOUNT_MAX_SQ - (chatPanelOpenAmount * chatPanelOpenAmount);
+    return (ShatteredPlansClient.SCREEN_HEIGHT - CHAT_PANEL_HEIGHT) + (CHAT_PANEL_HEIGHT * chatPanelOpenFac / CHAT_PANEL_OPEN_AMOUNT_MAX_SQ);
   }
 
   private void a690(final FloatingPanel<?> var2) {
-    assert this.components.indexOf(this._V) == 0 && this.components.indexOf(this._K) == 1;
+    assert this.components.indexOf(this.showChatButtonPanel) == 0 && this.components.indexOf(this.animationControlsPanel) == 1;
     this.components.remove(var2);
     this.addComponent(var2, 2);
   }
