@@ -2092,19 +2092,19 @@ public final class GameUI {
     }
 
     if (var8 != null) {
-      Menu.FONT.drawCentered(var8, 320, 240, var10, GameView.uiPulseCounter);
-      int var11 = Menu.SMALL_FONT.ascent + 245;
+      Menu.FONT.drawCentered(var8, ShatteredPlansClient.SCREEN_CENTER_X, ShatteredPlansClient.SCREEN_CENTER_Y, var10, GameView.uiPulseCounter);
+      int var11 = Menu.SMALL_FONT.ascent + ShatteredPlansClient.SCREEN_CENTER_Y + 5;
       //noinspection StringEquality
       if (var8 == StringConstants.TEXT_PEACE) {
         final String s = this.gameSession.gameState.anyPlayersDefeated() ? StringConstants.TEXT_PEACE_3 : StringConstants.TEXT_PEACE_2;
-        Menu.SMALL_FONT.drawCentered(s, 320, var11, var10, GameView.uiPulseCounter);
+        Menu.SMALL_FONT.drawCentered(s, ShatteredPlansClient.SCREEN_CENTER_X, var11, var10, GameView.uiPulseCounter);
         var11 += 3 + Menu.SMALL_FONT.ascent;
       }
 
-      Menu.SMALL_FONT.drawCentered(StringConstants.TEXT_TOGGLE_STATS, 320, var11, var10, GameView.uiPulseCounter);
+      Menu.SMALL_FONT.drawCentered(StringConstants.TEXT_TOGGLE_STATS, ShatteredPlansClient.SCREEN_CENTER_X, var11, var10, GameView.uiPulseCounter);
       if (var9) {
         var11 += Menu.SMALL_FONT.ascent + 3;
-        Menu.SMALL_FONT.drawCentered(StringConstants.TEXT_TOGGLE_STATS_2, 320, var11, var10, GameView.uiPulseCounter);
+        Menu.SMALL_FONT.drawCentered(StringConstants.TEXT_TOGGLE_STATS_2, ShatteredPlansClient.SCREEN_CENTER_X, var11, var10, GameView.uiPulseCounter);
       }
     }
 
