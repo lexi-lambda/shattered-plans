@@ -2241,7 +2241,7 @@ public final class GameUI {
 
   public int getHeight() {
     if (this.gameSession.isTutorial) {
-      return JagexApplet.gameHeight;
+      return ShatteredPlansClient.SCREEN_HEIGHT;
     } else {
       return this.gameSession.isMultiplayer ? Component._tgc.y : this.chatPanelSinglePlayer.y;
     }

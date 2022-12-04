@@ -792,13 +792,13 @@ public final class ShatteredPlansClient extends JagexApplet {
     chatMessageCount = 0;
   }
 
-  private static void a985no(final Canvas canvas) {
+  private static void drawLoading(final Canvas canvas) {
     if (JagexApplet.loadStage < LoadStage.REQUEST_GAME_STRINGS) {
       final boolean var3 = JagexBaseApplet._oqe;
       if (JagexBaseApplet._oqe) {
         JagexBaseApplet._oqe = false;
       }
-      drawLoadingScreen(loadingScreenMessage(), loadingScreenPercent(), var3);
+      drawLoadingScreen(loadingScreenPercent(), loadingScreenMessage(), var3);
     } else if (!JagexLogoIntroAnimation.isFinished()) {
       Drawing.clear();
       JagexLogoIntroAnimation.draw();
@@ -4870,7 +4870,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   protected void render() {
     final Canvas canvas = fullScreenCanvas == null ? JagexBaseApplet.canvas : fullScreenCanvas;
     if (!isConnectedAndLoaded()) {
-      a985no(canvas);
+      drawLoading(canvas);
     } else if (!isFullyLoaded) {
       CommonUI.drawLoading();
       JagexBaseApplet.paint(canvas);

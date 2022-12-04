@@ -7,7 +7,6 @@ import funorb.graphics.Sprite;
 import funorb.shatteredplans.StringConstants;
 import funorb.shatteredplans.client.CombatEngagementAnimationState;
 import funorb.shatteredplans.client.GameUI;
-import funorb.shatteredplans.client.JagexApplet;
 import funorb.shatteredplans.client.ShatteredPlansClient;
 import funorb.shatteredplans.game.ContiguousForce;
 import funorb.shatteredplans.game.GameState;
@@ -468,7 +467,7 @@ public abstract class AbstractGameView {
   }
 
   protected void a487() {
-    final int offsetX = JagexApplet.gameWidth / 2;
+    final int offsetX = ShatteredPlansClient.SCREEN_WIDTH / 2;
     final int offsetY = this.gameUI.getHeight() / 2;
 
     if (this.systemHexes == null || this.map.systems.length != this.systemHexes.length) {

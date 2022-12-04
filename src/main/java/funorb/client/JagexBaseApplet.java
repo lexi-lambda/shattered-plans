@@ -5,8 +5,8 @@ import funorb.awt.ImageProducerScreenBuffer;
 import funorb.awt.ScreenBuffer;
 import funorb.awt.ComponentCanvas;
 import funorb.shatteredplans.client.FrameClock;
-import funorb.shatteredplans.client.JagexApplet;
 import funorb.shatteredplans.client.MessagePumpThread;
+import funorb.shatteredplans.client.ShatteredPlansClient;
 import funorb.util.PseudoMonotonicClock;
 
 import java.applet.Applet;
@@ -72,6 +72,7 @@ public abstract class JagexBaseApplet extends Applet implements Runnable, FocusL
     }
   }
 
+  @SuppressWarnings("SameParameterValue")
   private static ScreenBuffer initializeScreenBuffer(final Component canvas, final int width, final int height) {
     try {
       final ScreenBuffer sb = new CanvasScreenBuffer();
@@ -85,12 +86,12 @@ public abstract class JagexBaseApplet extends Applet implements Runnable, FocusL
   }
 
   public static AffineTransform getTransform(final Component canvas) {
-    final double scaleX = (double) canvas.getWidth() / JagexApplet.gameWidth;
-    final double scaleY = (double) canvas.getHeight() / JagexApplet.gameHeight;
+    final double scaleX = (double) canvas.getWidth() / ShatteredPlansClient.SCREEN_WIDTH;
+    final double scaleY = (double) canvas.getHeight() / ShatteredPlansClient.SCREEN_HEIGHT;
     final double scale = Math.min(scaleX, scaleY);
 
-    final double offsetX = (canvas.getWidth() - (JagexApplet.gameWidth * scale)) / 2;
-    final double offsetY = (canvas.getHeight() - (JagexApplet.gameHeight * scale)) / 2;
+    final double offsetX = (canvas.getWidth() - (ShatteredPlansClient.SCREEN_WIDTH * scale)) / 2;
+    final double offsetY = (canvas.getHeight() - (ShatteredPlansClient.SCREEN_HEIGHT * scale)) / 2;
 
     final AffineTransform transform = new AffineTransform();
     transform.translate(offsetX, offsetY);
@@ -154,7 +155,7 @@ public abstract class JagexBaseApplet extends Applet implements Runnable, FocusL
     instance.setFocusCycleRoot(true);
 
     this.initializeCanvas();
-    screenBuffer = initializeScreenBuffer(canvas, JagexApplet.gameWidth, JagexApplet.gameHeight);
+    screenBuffer = initializeScreenBuffer(canvas, ShatteredPlansClient.SCREEN_WIDTH, ShatteredPlansClient.SCREEN_HEIGHT);
     this.initialize();
     frameClock = new FrameClock();
 
@@ -200,7 +201,7 @@ public abstract class JagexBaseApplet extends Applet implements Runnable, FocusL
       _oqe = true;
       if (PseudoMonotonicClock.currentTimeMillis() - _pvcm > 1000L) {
         final Rectangle var2 = var1.getClipBounds();
-        if (var2 == null || var2.width >= JagexApplet.gameWidth && var2.height >= JagexApplet.gameHeight) {
+        if (var2 == null || var2.width >= ShatteredPlansClient.SCREEN_WIDTH && var2.height >= ShatteredPlansClient.SCREEN_HEIGHT) {
           _ncc = true;
         }
       }

@@ -54,6 +54,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -137,8 +138,6 @@ public abstract class JagexApplet extends JagexBaseApplet {
   private static final String[] LOADING_TEXT = new String[]{"Loading text", "Lade Text", "Chargement du texte", "Carregando textos", "Tekst laden", "Cargando texto"};
   private static final String[] WAITING_FOR_TEXT = new String[]{"Waiting for text", "Warte auf Text", "En attente du texte", "Aguardando textos", "Op tekst wachten", "Esperando a texto"};
   private static final String[] _nla = new String[255];
-  public static int gameHeight;
-  public static int gameWidth;
   protected static String connectingToUpdateServerMessage;
   protected static String loadingTextMessage;
   protected static String waitingForTextMessage;
@@ -171,7 +170,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
   public static int connectionState;
   private static int[] _ajd;
   public static int mouseWheelRotation;
-  private static java.awt.Font _haa;
+  private static java.awt.Font loadingScreenFont;
   private int gamePort1Primary;
   private int gamePort1Secondary;
   private static MailboxMessage socketMessage1;
@@ -1515,16 +1514,18 @@ public abstract class JagexApplet extends JagexBaseApplet {
     achievementRequests.forEach(var1 -> C2SPacket.a093bo());
   }
 
-  static void drawLoadingScreen(final String var0, final int var1, final boolean var2) {
+  static void drawLoadingScreen(final int percent, final String message, final boolean clear) {
     try {
-      final Graphics var5 = canvas.getGraphics();
-      if (_haa == null) {
-        _haa = new java.awt.Font("Helvetica", java.awt.Font.BOLD, 13);
+      final Graphics2D g = (Graphics2D) canvas.getGraphics();
+      g.scale(canvas.getWidth() / 640.0, canvas.getHeight() / 480.0);
+
+      if (loadingScreenFont == null) {
+        loadingScreenFont = new java.awt.Font("Helvetica", java.awt.Font.BOLD, 13);
       }
 
-      if (var2) {
-        var5.setColor(Color.black);
-        var5.fillRect(0, 0, gameWidth, gameHeight);
+      if (clear) {
+        g.setColor(Color.black);
+        g.fillRect(0, 0, ShatteredPlansClient.SCREEN_WIDTH, ShatteredPlansClient.SCREEN_HEIGHT);
       }
 
       try {
@@ -1535,26 +1536,26 @@ public abstract class JagexApplet extends JagexBaseApplet {
         final Graphics var6 = _rma.getGraphics();
         var6.setColor(LOADING_SCREEN_PURPLE);
         var6.drawRect(0, 0, 303, 33);
-        var6.fillRect(2, 2, 3 * var1, 30);
+        var6.fillRect(2, 2, 3 * percent, 30);
         var6.setColor(Color.black);
         var6.drawRect(1, 1, 301, 31);
-        var6.fillRect(3 * var1 + 2, 2, 300 - var1 * 3, 30);
-        var6.setFont(_haa);
+        var6.fillRect(3 * percent + 2, 2, 300 - percent * 3, 30);
+        var6.setFont(loadingScreenFont);
         var6.setColor(Color.white);
-        var6.drawString(var0, (-(6 * var0.length()) + 304) / 2, 22);
-        var5.drawImage(_rma, gameWidth / 2 - 152, gameHeight / 2 - 18, null);
+        var6.drawString(message, (-(6 * message.length()) + 304) / 2, 22);
+        g.drawImage(_rma, 320 - 152, 240 - 18, null);
       } catch (final Exception var9) {
-        final int var7 = gameWidth / 2 - 152;
-        final int var8 = gameHeight / 2 - 18;
-        var5.setColor(LOADING_SCREEN_PURPLE);
-        var5.drawRect(var7, var8, 303, 33);
-        var5.fillRect(2 + var7, 2 + var8, 3 * var1, 30);
-        var5.setColor(Color.black);
-        var5.drawRect(1 + var7, var8 + 1, 301, 31);
-        var5.fillRect(var1 * 3 + var7 + 2, 2 + var8, 300 - 3 * var1, 30);
-        var5.setFont(_haa);
-        var5.setColor(Color.white);
-        var5.drawString(var0, (304 - 6 * var0.length()) / 2 + var7, 22 + var8);
+        final int var7 = 320 - 152;
+        final int var8 = 240 - 18;
+        g.setColor(LOADING_SCREEN_PURPLE);
+        g.drawRect(var7, var8, 303, 33);
+        g.fillRect(2 + var7, 2 + var8, 3 * percent, 30);
+        g.setColor(Color.black);
+        g.drawRect(1 + var7, var8 + 1, 301, 31);
+        g.fillRect(percent * 3 + var7 + 2, 2 + var8, 300 - 3 * percent, 30);
+        g.setFont(loadingScreenFont);
+        g.setColor(Color.white);
+        g.drawString(message, (304 - 6 * message.length()) / 2 + var7, 22 + var8);
       }
     } catch (final Exception var10) {
       canvas.repaint();
@@ -1562,7 +1563,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
   }
 
   private static void f150com() {
-    _haa = null;
+    loadingScreenFont = null;
     _rma = null;
   }
 
@@ -2082,9 +2083,6 @@ public abstract class JagexApplet extends JagexBaseApplet {
       isSimpleModeEnabled = Boolean.parseBoolean(this.getParameter("simplemode"));
 
       instance = this;
-
-      gameWidth = ShatteredPlansClient.SCREEN_WIDTH;
-      gameHeight = ShatteredPlansClient.SCREEN_HEIGHT;
 
       _eic = JagexBaseApplet.getInstance();
 
