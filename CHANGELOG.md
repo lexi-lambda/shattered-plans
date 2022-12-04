@@ -1,4 +1,4 @@
-## 0.0.6 (not yet released)
+## 0.0.6 (2022-12-04)
 
 * Added experimental support for custom UI scaling via the `funorb.shatteredplans.client.uiScale` and `funorb.shatteredplans.client.aspectRatio` JVM properties. See the README for more details.
 * Fixed game chat messages being sent as lobby chat messages.
