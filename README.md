@@ -20,6 +20,16 @@ java -jar shattered-plans-0.0.5.jar --host <HOST>
 
 replacing `<HOST>` with your IP address. By default, the server runs on port 43594, but you can specify a different port using the `--port` flag. A few other options are also available, pass `--help` to see them all.
 
+### Experimental: Adjusting the user interface scale
+
+Limited support for adjusting the UI scale is available by setting the `funorb.shatteredplans.client.uiScale` JVM property to a numeric value. The default is `1.0`. Larger values increase the internal resolution of the game’s renderer, which effectively makes individual user interface elements smaller. For example, the following command will force the game to render at 1.5× standard resolution:
+
+```sh
+java -Dfunorb.shatteredplans.client.uiScale=1.5 -jar shattered-plans-0.0.5.jar
+```
+
+This is particularly useful on large screens, as it makes the in-game user interface less cramped. However, the game was originally designed to run at a fixed resolution of 640×480, so altering the UI scale can cause layout glitches and other visual issues. The in-game user interface has been patched to automatically adapt to larger UI scales, but some visual issues remain.
+
 ## What works, what doesn’t, and other limitations
 
 All singleplayer functionality should work flawlessly. Most multiplayer functionality works as well. However, there are some bugs, unimplemented features, and other limitations:
