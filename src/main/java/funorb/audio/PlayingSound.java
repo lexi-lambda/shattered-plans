@@ -8,7 +8,7 @@ public final class PlayingSound {
 
   public PlayingSound(final AudioSamplePlayback_idk var1) {
     this._p = var1;
-    this.volume = var1.getVolume();
+    this.volume = var1.getVolX();
     this._p.setVolume((128 + (this.volume * Sounds.soundVolume)) >> 8);
   }
 

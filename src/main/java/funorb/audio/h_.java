@@ -207,7 +207,7 @@ public final class h_ extends AudioSource_idk {
         } else if (this.song1 == null) {
           var7 = false;
         } else {
-          var7 = this.crossfade < 524288;
+          var7 = this.crossfade < 0x80000;
         }
 
         if (var7) {

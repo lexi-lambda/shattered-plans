@@ -7,7 +7,7 @@ import java.util.Map;
 
 public final class SoundLoader {
   public static SoundLoader globalLoader;
-  private final Map<Long, fd_> _a = new HashMap<>();
+  private final Map<Long, SomeBufferReader_idk> _a = new HashMap<>();
   private final Map<Long, AudioSampleData_idk> _d = new HashMap<>();
   private final ResourceLoader loader1;
   private final ResourceLoader loader2;
@@ -59,9 +59,9 @@ public final class SoundLoader {
     final long var6 = 0x100000000L ^ (long) var5;
     AudioSampleData_idk var8 = this._d.get(var6);
     if (var8 == null) {
-      fd_ var9 = this._a.get(var6);
+      SomeBufferReader_idk var9 = this._a.get(var6);
       if (var9 == null) {
-        var9 = fd_.a740(this.loader2, var3, var2);
+        var9 = SomeBufferReader_idk.a740(this.loader2, var3, var2);
         if (var9 == null) {
           return null;
         }

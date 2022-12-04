@@ -88,16 +88,16 @@ public final class kn_ {
   private final int[] _e;
 
   public kn_() {
-    final int var1 = fd_.a137(16);
+    final int var1 = SomeBufferReader_idk.readBits(16);
     if (var1 == 1) {
-      final int var2 = fd_.a137(5);
+      final int var2 = SomeBufferReader_idk.readBits(5);
       int var3 = 0;
       this._l = new int[var2];
 
       int var4;
       int var5;
       for (var4 = 0; var4 < var2; ++var4) {
-        var5 = fd_.a137(4);
+        var5 = SomeBufferReader_idk.readBits(4);
         this._l[var4] = var5;
         if (var5 >= var3) {
           var3 = var5 + 1;
@@ -111,10 +111,10 @@ public final class kn_ {
 
       int var7;
       for (var4 = 0; var4 < var3; ++var4) {
-        this._e[var4] = fd_.a137(3) + 1;
-        var5 = this._c[var4] = fd_.a137(2);
+        this._e[var4] = SomeBufferReader_idk.readBits(3) + 1;
+        var5 = this._c[var4] = SomeBufferReader_idk.readBits(2);
         if (var5 != 0) {
-          this._h[var4] = fd_.a137(8);
+          this._h[var4] = SomeBufferReader_idk.readBits(8);
         }
 
         var5 = 1 << var5;
@@ -122,12 +122,12 @@ public final class kn_ {
         this._k[var4] = var6;
 
         for (var7 = 0; var7 < var5; ++var7) {
-          var6[var7] = fd_.a137(8) - 1;
+          var6[var7] = SomeBufferReader_idk.readBits(8) - 1;
         }
       }
 
-      this._b = fd_.a137(2) + 1;
-      var4 = fd_.a137(4);
+      this._b = SomeBufferReader_idk.readBits(2) + 1;
+      var4 = SomeBufferReader_idk.readBits(4);
       var5 = 2;
 
       int var9;
@@ -144,7 +144,7 @@ public final class kn_ {
         var7 = this._l[var9];
 
         for (int var8 = 0; var8 < this._e[var7]; ++var8) {
-          this._f[var5++] = fd_.a137(var4);
+          this._f[var5++] = SomeBufferReader_idk.readBits(var4);
         }
       }
 
@@ -192,7 +192,7 @@ public final class kn_ {
   }
 
   public boolean b801() {
-    final boolean var1 = fd_.c784() != 0;
+    final boolean var1 = SomeBufferReader_idk.readBit() != 0;
     if (var1) {
       final int var2 = this._f.length;
 
@@ -203,8 +203,8 @@ public final class kn_ {
 
       var3 = _a[this._b - 1];
       final int var4 = BitMath.lastSet(var3 - 1);
-      _i[0] = fd_.a137(var4);
-      _i[1] = fd_.a137(var4);
+      _i[0] = SomeBufferReader_idk.readBits(var4);
+      _i[1] = SomeBufferReader_idk.readBits(var4);
       int var5 = 2;
 
       for (final int var7 : this._l) {
@@ -213,13 +213,13 @@ public final class kn_ {
         final int var10 = (1 << var9) - 1;
         int var11 = 0;
         if (var9 > 0) {
-          var11 = fd_._L[this._h[var7]].a784();
+          var11 = SomeBufferReader_idk._L[this._h[var7]].a784();
         }
 
         for (int var12 = 0; var12 < var8; ++var12) {
           final int var13 = this._k[var7][var11 & var10];
           var11 >>>= var9;
-          _i[var5++] = var13 >= 0 ? fd_._L[var13].a784() : 0;
+          _i[var5++] = var13 >= 0 ? SomeBufferReader_idk._L[var13].a784() : 0;
         }
       }
 
