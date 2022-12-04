@@ -371,7 +371,7 @@ public final class ContextMenu {
 
   public void a430(final boolean var2) {
 
-    this.view.b540(var2);
+    this.view.draw(var2);
   }
 
   public void a408(final ChatMessage message) {

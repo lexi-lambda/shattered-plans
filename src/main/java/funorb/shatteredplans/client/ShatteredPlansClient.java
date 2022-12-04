@@ -126,7 +126,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   private static long cannotStartGameUntil;
   private static int joinRequestCount;
   private static boolean findOpponentsButtonClicked;
-  private static int _tmh = 0;
+  private static int lobbyChatPanelX = 0;
   private static Component<?> HIDE_CHAT_TEMPORARILY_LABEL;
   private static Component<Component<?>> invitePlayersDialogContents;
   public static String currentServerName;
@@ -905,9 +905,9 @@ public final class ShatteredPlansClient extends JagexApplet {
     }
 
     if (inGame) {
-      _tmh = _gnt;
+      lobbyChatPanelX = _gnt;
     } else {
-      _tmh = (Component.lastLayoutWidth - SCREEN_WIDTH) / 2;
+      lobbyChatPanelX = (Component.lastLayoutWidth - SCREEN_WIDTH) / 2;
     }
 
     tickLobbyTransitionCounters(inGame);
@@ -1330,7 +1330,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     final int var0 = 400;
     final int var1 = var0 - _pgJ * _pgJ;
     final int var3 = _flf + var1 * (_dmgm - _flf) / var0;
-    Component._tgc.setBounds(_tmh, var3, SCREEN_WIDTH, 120);
+    Component.lobbyChatPanel.setBounds(lobbyChatPanelX, var3, SCREEN_WIDTH, 120);
     a370qc(_dmgm - 24, _tga, ClientLobbyRoom._qob);
   }
 
@@ -1421,7 +1421,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   private static void a500er(final String var2, final boolean var4, final int var6) {
-    if (Component._taio.clickButton != MouseState.Button.NONE && !cannotChat) {
+    if (Component.lobbyChatMessageLabelPanel.clickButton != MouseState.Button.NONE && !cannotChat) {
       if (JagexApplet.canOnlyQuickChat) {
         ContextMenu.sendChannelMessageQC();
       } else {
@@ -1652,10 +1652,10 @@ public final class ShatteredPlansClient extends JagexApplet {
 
     if (_pgJ > 0) {
       a150bq();
-      Component._tgc.rootProcessMouseEvents(mouseNotYetHandled);
+      Component.lobbyChatPanel.rootProcessMouseEvents(mouseNotYetHandled);
       if (DobToEnableChatForm.instance != null) {
         if (cannotChat) {
-          DobToEnableChatForm.instance.tickRoot(Component._tgc.x2, Component._tgc.y2, mouseNotYetHandled);
+          DobToEnableChatForm.instance.tickRoot(Component.lobbyChatPanel.x2, Component.lobbyChatPanel.y2, mouseNotYetHandled);
         } else {
           DobToEnableChatForm.instance = null;
         }
@@ -1675,8 +1675,8 @@ public final class ShatteredPlansClient extends JagexApplet {
         }
       }
 
-      if (Component._a.clickButton != MouseState.Button.NONE) {
-        ReportAbuseDialog.openInstance = new ReportAbuseDialog(Component._a.x2, Component._a.y2, Component._a.width, Component._a.height, Component.TAB_ACTIVE, Component.CLOSE_BUTTON, Component.LABEL, Component.CHECKBOX, Component.UNSELECTED_LABEL, null, 0L);
+      if (Component.lobbyChatReportAbuseButton.clickButton != MouseState.Button.NONE) {
+        ReportAbuseDialog.openInstance = new ReportAbuseDialog(Component.lobbyChatReportAbuseButton.x2, Component.lobbyChatReportAbuseButton.y2, Component.lobbyChatReportAbuseButton.width, Component.lobbyChatReportAbuseButton.height, Component.TAB_ACTIVE, Component.CLOSE_BUTTON, Component.LABEL, Component.CHECKBOX, Component.UNSELECTED_LABEL, null, 0L);
       }
 
       final ChatMessage var7 = a249chmr(mouseWheelRotation, _tga);
@@ -2282,7 +2282,7 @@ public final class ShatteredPlansClient extends JagexApplet {
 
   private static ChatMessage a249chmr(final int mouseWheelRotation, final int var2) {
     ChatMessage var4 = null;
-    Component._jiI.content.children.clear();
+    Component.lobbyChatMessagesScrollPane.content.children.clear();
     int var5 = 0;
     int var6 = 0;
 
@@ -2323,7 +2323,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     for (var13 = 0; chatMessageCount > var13; ++var13) {
       final ChatMessage var14 = chatMessages[var13];
       if (var14.component != null) {
-        Component._jiI.content.addChild(var14.component);
+        Component.lobbyChatMessagesScrollPane.content.addChild(var14.component);
         var14.component.setBounds(var2, var7, var14.component.e474(), Component.LABEL_HEIGHT);
         if (var14.component.clickButton != MouseState.Button.NONE) {
           var4 = var14;
@@ -2333,32 +2333,32 @@ public final class ShatteredPlansClient extends JagexApplet {
       }
     }
 
-    var13 = -var7 + var6 + Component._jiI.content.height + Component._jiI.content._gb;
-    Component._jiI.content.height -= var13;
-    Component._jiI.content.y += var13;
+    var13 = -var7 + var6 + Component.lobbyChatMessagesScrollPane.content.height + Component.lobbyChatMessagesScrollPane.content._gb;
+    Component.lobbyChatMessagesScrollPane.content.height -= var13;
+    Component.lobbyChatMessagesScrollPane.content.y += var13;
     if (ContextMenu._fpv) {
-      Component._jiI.content.height = var7;
+      Component.lobbyChatMessagesScrollPane.content.height = var7;
     }
 
-    Component._jiI.content._gb = -Component._jiI.content.height + var7;
+    Component.lobbyChatMessagesScrollPane.content._gb = -Component.lobbyChatMessagesScrollPane.content.height + var7;
     if (ContextMenu._fpv) {
       ContextMenu._fpv = false;
-      Component._jiI.content._w = 0;
+      Component.lobbyChatMessagesScrollPane.content._w = 0;
       _K = true;
-      Component._jiI.content.y = -Component._jiI.content.height + Component._jiI.viewport.height;
+      Component.lobbyChatMessagesScrollPane.content.y = -Component.lobbyChatMessagesScrollPane.content.height + Component.lobbyChatMessagesScrollPane.viewport.height;
     }
 
     if (isChatboxSelected && _faX != null) {
       _K = true;
     }
 
-    final int var16 = Component._jiI.viewport.height - Component._jiI.content.height - Component._jiI.content._gb;
+    final int var16 = Component.lobbyChatMessagesScrollPane.viewport.height - Component.lobbyChatMessagesScrollPane.content.height - Component.lobbyChatMessagesScrollPane.content._gb;
     if (_K) {
-      Component._jiI.content._w = var16 - Component._jiI.content.y;
+      Component.lobbyChatMessagesScrollPane.content._w = var16 - Component.lobbyChatMessagesScrollPane.content.y;
     }
 
-    Component._jiI.a795(mouseWheelRotation * 2 * Component.LABEL_HEIGHT, Component.LABEL_HEIGHT);
-    _K = var16 == Component._jiI.content._w + Component._jiI.content.y;
+    Component.lobbyChatMessagesScrollPane.a795(mouseWheelRotation * 2 * Component.LABEL_HEIGHT, Component.LABEL_HEIGHT);
+    _K = var16 == Component.lobbyChatMessagesScrollPane.content._w + Component.lobbyChatMessagesScrollPane.content.y;
     return var4;
   }
 
@@ -2404,7 +2404,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   private static boolean a154vc() {
-    return (fullScreenCanvas != null || hadFocus) && (8 & currentTick) == 0;
+    return (fullScreenCanvas != null || hadFocus) && (currentTick & 8) == 0;
   }
 
   private static void b423jf() {
@@ -2528,7 +2528,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     }
 
     a877di(var0);
-    a893ml(var0);
+    drawLobbyChatPanel(var0);
   }
 
   private static void a877di(final boolean var0) {
@@ -2539,8 +2539,8 @@ public final class ShatteredPlansClient extends JagexApplet {
           LOBBY_ICON.c093(Component.lobbyBrowserLeftPanel.x, 0);
         }
 
-        Component.lobbyBrowserLeftPanel.b540(var0 && !showYouHaveBeenKickedDialog);
-        Component.LOBBY_RIGHT_PANEL.b540(var0 && !showYouHaveBeenKickedDialog);
+        Component.lobbyBrowserLeftPanel.draw(var0 && !showYouHaveBeenKickedDialog);
+        Component.LOBBY_RIGHT_PANEL.draw(var0 && !showYouHaveBeenKickedDialog);
       }
 
       if (ratedLobbyRoomTransitionCounter > 0 || unratedLobbyRoomTransitionCounter > 0) {
@@ -2548,8 +2548,8 @@ public final class ShatteredPlansClient extends JagexApplet {
           LOBBY_ICON.c093(lobbyRoomLeftPanel.x, 0);
         }
 
-        lobbyRoomLeftPanel.b540(var0 && !invitePlayersDialogOpen);
-        Component.GAME_INFO_CONTAINER.b540(var0 && !invitePlayersDialogOpen);
+        lobbyRoomLeftPanel.draw(var0 && !invitePlayersDialogOpen);
+        Component.GAME_INFO_CONTAINER.draw(var0 && !invitePlayersDialogOpen);
       }
     });
   }
@@ -2562,7 +2562,7 @@ public final class ShatteredPlansClient extends JagexApplet {
       chatPanelY += (-chatPanelY + _dmgm) * var2 / var1;
     }
 
-    Component._tgc.setBounds(_tmh, chatPanelY, SCREEN_WIDTH, GameUI.CHAT_PANEL_HEIGHT);
+    Component.lobbyChatPanel.setBounds(lobbyChatPanelX, chatPanelY, SCREEN_WIDTH, GameUI.CHAT_PANEL_HEIGHT);
     a370qc(_dmgm - 24, _tga, ClientLobbyRoom._qob);
   }
 
@@ -3815,7 +3815,7 @@ public final class ShatteredPlansClient extends JagexApplet {
 
     a893r(var1);
     if (ReportAbuseDialog.openInstance != null) {
-      ReportAbuseDialog.openInstance.b540(var1);
+      ReportAbuseDialog.openInstance.draw(var1);
     }
 
     a540ho(var1);
@@ -3870,7 +3870,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     final int var2 = 400;
     final int var3 = var2 - transitionCounter * transitionCounter;
     lobbyRoomLeftPanel.setBounds(var1 - 199 * var3 / var2, 90, 199, Drawing.height - 120 - 94);
-    Component.GAME_INFO_CONTAINER.setBounds(438 * var3 / var2 + var1 + 202, 0, 438, Drawing.height - 124);
+    Component.GAME_INFO_CONTAINER.setBounds(438 * var3 / var2 + var1 + 202, 0, SCREEN_WIDTH - 202, Drawing.height - 124);
   }
 
   private static void a630gr(final boolean var0) {
@@ -3899,17 +3899,16 @@ public final class ShatteredPlansClient extends JagexApplet {
     }
   }
 
-  private static void a893ml(final boolean var0) {
-    Component._tgc.b540(var0);
+  private static void drawLobbyChatPanel(final boolean var0) {
+    Component.lobbyChatPanel.draw(var0);
     final DobToEnableChatForm var1 = DobToEnableChatForm.instance;
     if (var1 != null) {
-      var1.drawRoot(Component._tgc.x2, Component._tgc.y2);
+      var1.drawRoot(Component.lobbyChatPanel.x2, Component.lobbyChatPanel.y2);
     }
-
   }
 
   private static void a877rad(final boolean var0) {
-    _faX.b540(var0);
+    _faX.draw(var0);
     if (ClientLobbyRoom.currentTooltip != null) {
       a407dk(ClientLobbyRoom.currentTooltip);
     }
@@ -4090,7 +4089,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   private static void b150lc() {
     if (isQuickChatOpen) {
       Drawing.h115(Drawing.left, Drawing.top, -Drawing.left + Drawing.right, -Drawing.top + Drawing.bottom);
-      Component._uaf.b540(false);
+      Component._uaf.draw(false);
     }
 
   }
@@ -4150,7 +4149,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   private static void a540ho(final boolean var0) {
     if (QuickChatHelpPanel.openInstance != null) {
       Drawing.h115(Drawing.left, Drawing.top, Drawing.right - Drawing.left, -Drawing.top + Drawing.bottom);
-      QuickChatHelpPanel.openInstance.b540(var0);
+      QuickChatHelpPanel.openInstance.draw(var0);
     }
   }
 
@@ -4207,7 +4206,7 @@ public final class ShatteredPlansClient extends JagexApplet {
 
   private static void a893r(final boolean var0) {
     if (AddOrRemovePlayerPopup.openInstance != null) {
-      AddOrRemovePlayerPopup.openInstance.b540(var0);
+      AddOrRemovePlayerPopup.openInstance.draw(var0);
     }
   }
 
@@ -4925,7 +4924,6 @@ public final class ShatteredPlansClient extends JagexApplet {
       } else if (f427kh()) {
         a630gr(true);
       } else if (Menu.isLobbyDialogOpen) {
-
         a326ts(Menu._ahR - Menu._ldj, Menu._rnb);
         Menu.a150rg();
       } else {

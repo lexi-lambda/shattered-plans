@@ -27,7 +27,7 @@ public class Component<T extends Component<?>> {
   public static final int[] CHANNEL_TEXT_COLORS_1 = new int[5];
   private static final int UNSELECTED_TEXT_COLOR = 0xffcc66;
   public static Component<?> LABEL_DARK_1;
-  public static Component<?> _cna;
+  public static Component<?> CHAT_PANEL;
   public static Component<?> CLOSE_BUTTON;
   public static Component<?> LABEL_DARK_2;
   public static int _si;
@@ -46,7 +46,7 @@ public class Component<T extends Component<?>> {
   private static Component<?> GAME_LIST_HEADING_OWNER;
   private static Component<?> GAME_LIST_HEADING_AVG_RATING;
   public static Component<?> YOU_HAVE_BEEN_KICKED_OK_BUTTON;
-  public static Component<?> _mpa;
+  public static Component<?> CHAT_MESSAGES_PANEL;
   public static ScrollPane<LobbyPlayer> JOINED_PLAYERS_TABLE;
   public static int lastLayoutHeight;
   public static int lastLayoutWidth;
@@ -67,12 +67,12 @@ public class Component<T extends Component<?>> {
   public static Component<?> FIND_OPPONENTS_BUTTON;
   public static PlayerList FRIEND_LIST;
   public static Component<?> _tmt;
-  public static Component<Component<?>> _tgc;
+  public static Component<Component<?>> lobbyChatPanel;
   public static int _rcl;
   public static int CROWNS_COUNT;
-  public static Component<Component<?>> _taio;
+  public static Component<Component<?>> lobbyChatMessageLabelPanel;
   public static Component<?> RETURN_TO_LOBBY_BUTTON;
-  public static ScrollPane<Component<?>> _jiI;
+  public static ScrollPane<Component<?>> lobbyChatMessagesScrollPane;
   private static Component<?> _rsEb;
   public static Component<Component<?>> WAITING_TO_START_LABEL;
   public static Component<?> NAME_LABEL_2;
@@ -120,8 +120,8 @@ public class Component<T extends Component<?>> {
   public static Component<?> YOU_HAVE_BEEN_KICKED_LABEL;
   public static Component<?> INVITE_PLAYER_LIST_HEADING_NAME;
   public static Sprite[] CHAT_FILTER_SPRITES;
-  public static Component<?> _a;
-  private static Component<Component<?>> _adc;
+  public static Component<?> lobbyChatReportAbuseButton;
+  private static Component<Component<?>> lobbyChatMessagesPanel;
   public static Component<?>[] chatFilterLabels;
   private static Component<?>[] chatFilterChannelLabels;
   public static Component<?> RATING_LABEL;
@@ -281,10 +281,10 @@ public class Component<T extends Component<?>> {
     var9.textAlignment = Font.HorizontalAlignment.CENTER;
     HEADING = new Component<>(var7);
     HEADING.nineSliceSprites = adjustForNineSlice(SpriteResource.loadSprites(spriteLoader, "lobby", "heading"));
-    _cna = new Component<>(null);
-    _cna.nineSliceSprites = createColumnHeadingSprites(120, 0x404040, 0x808080, false, false);
-    _mpa = new Component<>(null);
-    _mpa.nineSliceSprites = createGradientOutlineSprites(114, 0x606060, 0x606060, 1);
+    CHAT_PANEL = new Component<>(null);
+    CHAT_PANEL.nineSliceSprites = createColumnHeadingSprites(120, 0x404040, 0x808080, false, false);
+    CHAT_MESSAGES_PANEL = new Component<>(null);
+    CHAT_MESSAGES_PANEL.nineSliceSprites = createGradientOutlineSprites(114, 0x606060, 0x606060, 1);
     POPUP = new Component<>(null);
     POPUP.nineSliceSprites = adjustForNineSlice(SpriteResource.loadSprites(spriteLoader, "lobby", "popup"));
     final Sprite[] POPUP_MOUSE_OVER_SPRITES = adjustForNineSlice(SpriteResource.loadSprites(spriteLoader, "lobby", "popup_mouseover"));
@@ -637,23 +637,23 @@ public class Component<T extends Component<?>> {
     hatching.pixels[8] = 0x707070;
     hatching.pixels[15] = 0x707070;
 
-    _tgc = new Component<>(_cna);
-    _adc = new Component<>(_mpa);
-    _tgc.addChild(_adc);
+    lobbyChatPanel = new Component<>(CHAT_PANEL);
+    lobbyChatMessagesPanel = new Component<>(CHAT_MESSAGES_PANEL);
+    lobbyChatPanel.addChild(lobbyChatMessagesPanel);
     final Component<Component<?>> var16 = new Component<>(null);
     var16.children = new ArrayList<>();
-    _jiI = new ScrollPane<>(var16, LABEL_DARK_2, SCROLL_BAR);
-    _adc.addChild(_jiI);
-    _taio = new Component<>(LABEL_DARK_1);
-    _adc.addChild(_taio);
+    lobbyChatMessagesScrollPane = new ScrollPane<>(var16, LABEL_DARK_2, SCROLL_BAR);
+    lobbyChatMessagesPanel.addChild(lobbyChatMessagesScrollPane);
+    lobbyChatMessageLabelPanel = new Component<>(LABEL_DARK_1);
+    lobbyChatMessagesPanel.addChild(lobbyChatMessageLabelPanel);
     ShatteredPlansClient.chatMessageLabel = new Component<>(LABEL);
     ShatteredPlansClient.chatMessageLabel.font = CHAT_FONT;
-    _taio.addChild(ShatteredPlansClient.chatMessageLabel);
-    _taio.recursivelySet_H();
+    lobbyChatMessageLabelPanel.addChild(ShatteredPlansClient.chatMessageLabel);
+    lobbyChatMessageLabelPanel.recursivelySet_H();
     _cgC = new Component<>(null);
     _cgC.nineSliceSprites = new Sprite[9];
     _cgC.nineSliceSprites[NineSliceSprite.CENTER] = hatching;
-    _taio.addChild(_cgC);
+    lobbyChatMessageLabelPanel.addChild(_cgC);
     chatFilterIcons = new Component[5];
     chatFilterChannelLabels = new Component[5];
     chatFilterLabels = new Component[5];
@@ -683,13 +683,13 @@ public class Component<T extends Component<?>> {
       chatFilterButtons[i].addChild(chatFilterIcons[i]);
       chatFilterButtons[i].addChild(chatFilterLabels[i]);
       chatFilterButtons[i].recursivelySet_H();
-      _tgc.addChild(chatFilterButtons[i]);
+      lobbyChatPanel.addChild(chatFilterButtons[i]);
       ++chatFilterButtonCount;
     }
 
-    _a = new Component<>(CHAT_BUTTON);
-    _a.label = StringConstants.REPORT_ABUSE;
-    _tgc.addChild(_a);
+    lobbyChatReportAbuseButton = new Component<>(CHAT_BUTTON);
+    lobbyChatReportAbuseButton.label = StringConstants.REPORT_ABUSE;
+    lobbyChatPanel.addChild(lobbyChatReportAbuseButton);
     if (!JagexApplet.connectedAndLoggedIn() || JagexApplet.cannotChat) {
       DobToEnableChatForm.instance = new DobToEnableChatForm();
     }
@@ -762,7 +762,7 @@ public class Component<T extends Component<?>> {
 
   private static void a487te() {
     ShatteredPlansClient.a150bq();
-    a669hr(CHAT_FILTER_SPRITES[0].offsetX, ShatteredPlansClient._tga, _rcl);
+    setLobbyChatPanelBounds(CHAT_FILTER_SPRITES[0].offsetX, ShatteredPlansClient._tga, _rcl);
   }
 
   private static void a857ke(final QuickChatCategory var1) {
@@ -849,7 +849,7 @@ public class Component<T extends Component<?>> {
     final int var2 = 400;
     final int var3 = var2 - ShatteredPlansClient.lobbyBrowserTransitionCounter * ShatteredPlansClient.lobbyBrowserTransitionCounter;
     lobbyBrowserLeftPanel.setBounds(var1 - (199 * var3 / var2), 90, 199, Drawing.height - 90 - 124);
-    LOBBY_RIGHT_PANEL.setBounds(var1 + 202 + var3 * 438 / var2, 0, 438, Drawing.height - 124);
+    LOBBY_RIGHT_PANEL.setBounds(var1 + 202 + var3 * 438 / var2, 0, ShatteredPlansClient.SCREEN_WIDTH - 202, Drawing.height - 124);
   }
 
   private static Sprite[] adjustForNineSlice(final Sprite[] sprites) {
@@ -932,37 +932,38 @@ public class Component<T extends Component<?>> {
     }
   }
 
-  private static void a669hr(final int var0, final int var2, final int var4) {
-    final int var5 = LABEL_HEIGHT + 2 + 485 + 8 + var2 + 8;
-    _adc.setBounds(3, 3, var5 - 6, _tgc.height - 6);
-    int var6 = _adc.height - 5;
-    _taio.setBounds(5, -LABEL_HEIGHT + var6, 487 + var2 + LABEL_HEIGHT, LABEL_HEIGHT);
-    ShatteredPlansClient.chatMessageLabel.setBounds(var2, 0, -_cgC.width - var2 + _taio.width, LABEL_HEIGHT);
+  private static void setLobbyChatPanelBounds(final int var0, final int var2, final int var4) {
+    final int chatMessagesWidth = (ShatteredPlansClient.SCREEN_WIDTH - 155) + var2;
+    final int chatPanelWidth = LABEL_HEIGHT + 2 + chatMessagesWidth + 8 + 8;
+    lobbyChatMessagesPanel.setBounds(3, 3, chatPanelWidth - 6, lobbyChatPanel.height - 6);
+    int var6 = lobbyChatMessagesPanel.height - 5;
+    lobbyChatMessageLabelPanel.setBounds(5, -LABEL_HEIGHT + var6, chatMessagesWidth + 2 + LABEL_HEIGHT, LABEL_HEIGHT);
+    ShatteredPlansClient.chatMessageLabel.setBounds(var2, 0, -_cgC.width - var2 + lobbyChatMessageLabelPanel.width, LABEL_HEIGHT);
     var6 -= LABEL_HEIGHT + 2;
     _cgC.setBounds(var2 + ShatteredPlansClient.chatMessageLabel.width, 0, _cgC.width, LABEL_HEIGHT);
     //noinspection SuspiciousNameCombination
-    _jiI.setBounds(5, 5, 485 + var2 - (-17), var6 - 5, LABEL_HEIGHT);
+    lobbyChatMessagesScrollPane.setBounds(5, 5, chatMessagesWidth + 17, var6 - 5, LABEL_HEIGHT);
     if (DobToEnableChatForm.instance != null) {
-      DobToEnableChatForm.instance.setBounds(_jiI.x, _jiI.y, _jiI.width, _jiI.height);
+      DobToEnableChatForm.instance.setBounds(lobbyChatMessagesScrollPane.x, lobbyChatMessagesScrollPane.y, lobbyChatMessagesScrollPane.width, lobbyChatMessagesScrollPane.height);
     }
 
-    final int var7 = -var5 - var2 + _tgc.width;
+    final int var7 = -chatPanelWidth - var2 + lobbyChatPanel.width;
     final int var8 = var7 / 2;
     final int var9 = var2 + var0 + var8;
     int var10 = 0;
 
     for (int var11 = 0; var11 < 6; ++var11) {
       if (var11 == 5 || chatFilterButtons[var11] != null) {
-        final int var12 = (_tgc.height - 4) * var10 / (chatFilterButtonCount + 1) + 3;
+        final int var12 = (lobbyChatPanel.height - 4) * var10 / (chatFilterButtonCount + 1) + 3;
         ++var10;
-        var6 = -var12 + var10 * (_tgc.height - 4) / (1 + chatFilterButtonCount) + 3 - 2;
+        var6 = -var12 + var10 * (lobbyChatPanel.height - 4) / (1 + chatFilterButtonCount) + 3 - 2;
         if (var11 < 5) {
-          chatFilterButtons[var11].setBounds(var5, var12, var7, var6);
+          chatFilterButtons[var11].setBounds(chatPanelWidth, var12, var7, var6);
           chatFilterChannelLabels[var11].setBounds(var2, 0, var8 - var2, var6);
           chatFilterIcons[var11].setBounds(var8, var4, var0, -var4 + var6 - var4);
           chatFilterLabels[var11].setBounds(var9, var4, var7 - var2 - var9, var6 - var4 - var4);
         } else {
-          _a.setBounds(var5, var12, var7, var6);
+          lobbyChatReportAbuseButton.setBounds(chatPanelWidth, var12, var7, var6);
         }
       }
     }
@@ -1052,8 +1053,8 @@ public class Component<T extends Component<?>> {
     }
   }
 
-  public final void b540(final boolean var1) {
-    this.a360(true, false, 0, 0, false, Drawing.height, false, var1, Drawing.width);
+  public final void draw(final boolean var1) {
+    this.draw(0, 0, Drawing.width, Drawing.height, true, false, false, false, var1);
   }
 
   protected final void a811(final int var1, final boolean var3) {
@@ -1370,15 +1371,15 @@ public class Component<T extends Component<?>> {
     this.processMouseEvents(0, 0, Drawing.width, Drawing.height);
   }
 
-  private void a360(boolean var2, boolean dragging, final int var4, final int var5, boolean selected, final int var8, boolean isMouseOver, final boolean var10, final int var11) {
-    this.x2 = this.x + var4;
-    this.y2 = this.y + var5;
+  private void draw(final int x, final int y, final int width, final int height, boolean enabled, boolean selected, boolean isMouseOver, boolean dragging, final boolean var10) {
+    this.x2 = this.x + x;
+    this.y2 = this.y + y;
     final int var12 = Drawing.left;
     final int var13 = Drawing.top;
     final int var14 = Drawing.right;
     final int var15 = Drawing.bottom;
     Drawing.expandBoundsToInclude(this.x2, this.y2, this.x2 + this.width, this.height + this.y2);
-    var2 &= this.enabled;
+    enabled &= this.enabled;
 
     if (!this._H) {
       selected = this.selected;
@@ -1390,7 +1391,7 @@ public class Component<T extends Component<?>> {
     Sprite var17 = this.sprite;
     int color = this.textColor;
     int var19 = 0;
-    if (!var2) {
+    if (!enabled) {
       if (this.disabledSprite != null) {
         var17 = this.disabledSprite;
       }
@@ -1464,7 +1465,7 @@ public class Component<T extends Component<?>> {
     final int var21 = var19;
     int var22 = this._tb + var20;
     if (this._r) {
-      NineSliceSprite.draw(var16, var4, var5, var11, var8);
+      NineSliceSprite.draw(var16, x, y, width, height);
     } else {
       NineSliceSprite.draw(var16, this.x2, this.y2, this.width, this.height);
     }
@@ -1520,7 +1521,7 @@ public class Component<T extends Component<?>> {
 
     if (this.children != null) {
       for (final Component<?> var26 : this.children) {
-        var26.a360(var2, dragging, this.x2 + var19, var20 + this.y2, selected, this.height, isMouseOver, var10, this.width);
+        var26.draw(this.x2 + var19, var20 + this.y2, this.width, this.height, enabled, selected, isMouseOver, dragging, var10);
       }
     }
 

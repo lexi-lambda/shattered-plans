@@ -302,8 +302,8 @@ public final class GameUI {
       final Component<Component<?>> var6 = new Component<>(null);
       var6.children = new ArrayList<>();
       this.chatScrollPaneSinglePlayer = new ScrollPane<>(var6, Component.LABEL_DARK_2, Component.SCROLL_BAR);
-      final Component<Component<?>> var4 = new Component<>(Component._mpa);
-      this.chatPanelSinglePlayer = new Component<>(Component._cna);
+      final Component<Component<?>> var4 = new Component<>(Component.CHAT_MESSAGES_PANEL);
+      this.chatPanelSinglePlayer = new Component<>(Component.CHAT_PANEL);
       this.chatPanelSinglePlayer.setBounds(0, ShatteredPlansClient.SCREEN_HEIGHT, ShatteredPlansClient.SCREEN_WIDTH, CHAT_PANEL_HEIGHT);
       var4.setBounds(3, 3, ShatteredPlansClient.SCREEN_WIDTH - 6, this.chatPanelSinglePlayer.height - 6);
       this.chatPanelSinglePlayer.addChild(var4);
@@ -619,13 +619,13 @@ public final class GameUI {
 
   public static void a893(final boolean var1) {
     if (ShatteredPlansClient.lobbyBrowserTransitionCounter > 0 && ShatteredPlansClient.showYouHaveBeenKickedDialog) {
-      Drawing.h115(0, 0, Drawing.width, Component._tgc.y2);
-      Component.YOU_HAVE_BEEN_KICKED_DIALOG.b540(var1);
+      Drawing.h115(0, 0, Drawing.width, Component.lobbyChatPanel.y2);
+      Component.YOU_HAVE_BEEN_KICKED_DIALOG.draw(var1);
     }
 
     if ((ShatteredPlansClient.ratedLobbyRoomTransitionCounter > 0 || ShatteredPlansClient.unratedLobbyRoomTransitionCounter > 0) && ShatteredPlansClient.invitePlayersDialogOpen) {
-      Drawing.h115(0, 0, Drawing.width, Component._tgc.y2);
-      ShatteredPlansClient.invitePlayersDialog.b540(var1);
+      Drawing.h115(0, 0, Drawing.width, Component.lobbyChatPanel.y2);
+      ShatteredPlansClient.invitePlayersDialog.draw(var1);
     }
 
   }
@@ -2010,7 +2010,7 @@ public final class GameUI {
 
     d150vn();
     if (this.chatPanelSinglePlayer != null) {
-      this.chatPanelSinglePlayer.b540(false);
+      this.chatPanelSinglePlayer.draw(false);
     }
 
     if (this._U != -1) {
@@ -2243,7 +2243,7 @@ public final class GameUI {
     if (this.gameSession.isTutorial) {
       return ShatteredPlansClient.SCREEN_HEIGHT;
     } else {
-      return this.gameSession.isMultiplayer ? Component._tgc.y : this.chatPanelSinglePlayer.y;
+      return this.gameSession.isMultiplayer ? Component.lobbyChatPanel.y : this.chatPanelSinglePlayer.y;
     }
   }
 
@@ -2459,7 +2459,7 @@ public final class GameUI {
   }
 
   private boolean processInputHud(final boolean var1) {
-    final boolean var3 = this.hoveredComponent != null || Component._tgc.y <= JagexApplet.mouseY || this.chatPanelSinglePlayer != null && this.chatPanelSinglePlayer.y <= JagexApplet.mouseY;
+    final boolean var3 = this.hoveredComponent != null || Component.lobbyChatPanel.y <= JagexApplet.mouseY || this.chatPanelSinglePlayer != null && this.chatPanelSinglePlayer.y <= JagexApplet.mouseY;
     this.processMouseInput(this.components);
     if (this.mouseDownComponent != null) {
       for (final UIComponent<?> var4 : this.components) {

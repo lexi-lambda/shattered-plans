@@ -259,7 +259,7 @@ public final class ClientGameSession extends GameSession {
   private void showChatMessage(final Player player, final String message) {
     if (!this.isTutorial) {
       final String var4 = player.name + ": ";
-      int var5 = Component._jiI.width;
+      int var5 = Component.lobbyChatMessagesScrollPane.width;
       if (this.isMultiplayer) {
         var5 -= Component.CHAT_FONT.measureLineWidth("[" + Strings.format(StringConstants.XS_GAME, this.gameState.players[0].name) + "] ");
       }
