@@ -213,6 +213,9 @@ public final class GameUI {
     _kbw = new ArgbSprite(READY_BUTTON.offsetX + 20, READY_BUTTON.offsetY + 20);
     this.gameSession = session;
 
+    final int victoryPanelHeight = this.gameSession.gameState.victoryChecker.victoryPanelHeight();
+    final boolean hasVictoryPanel = victoryPanelHeight > 0;
+
     final int readyButtonX = getReadyButtonX();
     if (this.gameSession.localPlayer != null) {
       this.endTurnButton = new Button<>(readyButtonX, 20, READY_BUTTON.width, READY_BUTTON.height, READY_BUTTON, null, 0, READY_BUTTON_DOWN, null, 0);
@@ -222,7 +225,7 @@ public final class GameUI {
 
     final int hudIconWidth = HUD_ICON_1.width;
     final int victoryButtonX = readyButtonX - 6 - hudIconWidth;
-    if (this.victoryPanel != null) {
+    if (hasVictoryPanel) {
       this.victoryButton = new Button<>(victoryButtonX, 25, HUD_ICON_5.width, HUD_ICON_5.height, HUD_ICON_5, null, 0, HUD_ICON_RED_5, null, 0);
       this.victoryButton.tooltip = StringConstants.TOOLTIP_VICTORY_BUTTON_SHOW;
       this.addComponent(this.victoryButton);
@@ -257,8 +260,7 @@ public final class GameUI {
     this.addComponent(this.diplomacyPanel);
     this.fleetInfoPanel = createFleetInfoPanel(this.gameSession.gameState.playerCount);
     this.addComponent(this.fleetInfoPanel);
-    final int victoryPanelHeight = this.gameSession.gameState.victoryChecker.victoryPanelHeight();
-    if (victoryPanelHeight > 0) {
+    if (hasVictoryPanel) {
       this.victoryPanel = createVictoryPanel(victoryPanelHeight);
       this.addComponent(this.victoryPanel);
     }
