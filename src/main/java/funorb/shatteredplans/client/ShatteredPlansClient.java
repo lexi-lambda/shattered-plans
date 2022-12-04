@@ -66,6 +66,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.sound.sampled.LineUnavailableException;
 import java.awt.Canvas;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -81,19 +82,24 @@ import java.util.Random;
 import static funorb.shatteredplans.S2CPacket.Type;
 
 public final class ShatteredPlansClient extends JagexApplet {
+  public static final int ORIGINAL_SCREEN_WIDTH = 640;
+  public static final int ORIGINAL_SCREEN_HEIGHT = 480;
+
+  public static final double UI_SCALE;
   public static final int SCREEN_WIDTH;
   public static final int SCREEN_HEIGHT;
   static {
     final String uiScaleStr = System.getProperty("funorb.shatteredplans.client.uiScale", "1.0");
-    final double uiScale;
     try {
-      uiScale = Double.parseDouble(uiScaleStr);
+      UI_SCALE = Double.parseDouble(uiScaleStr);
     } catch (final NumberFormatException e) {
       throw new RuntimeException("non-numeric value for property ‘funorb.shatteredplans.client.uiScale’: " + uiScaleStr, e);
     }
-    SCREEN_WIDTH = (int) (640 * uiScale);
-    SCREEN_HEIGHT = (int) (480 * uiScale);
+    SCREEN_WIDTH = (int) (ORIGINAL_SCREEN_WIDTH * UI_SCALE);
+    SCREEN_HEIGHT = (int) (ORIGINAL_SCREEN_HEIGHT * UI_SCALE);
   }
+
+  public static final AffineTransform ORIGINAL_TO_SCALED_TRANSFORM = AffineTransform.getScaleInstance(UI_SCALE, UI_SCALE);
 
   public static final int[] NUM_PLAYERS_OPTION_VALUES = {2, 3, 4, 5, 6};
   public static final int[] GAMEOPT_CHOICES_COUNTS = {5, 7, 4, 5, 2};
@@ -140,7 +146,6 @@ public final class ShatteredPlansClient extends JagexApplet {
   public static ClientLobbyRoom unratedLobbyRoom;
   private static byte[] playerSeatsFilledBitmap;
   private static boolean justRecievedRoomDetailsFromServer;
-  private static int[] rowBuffer;
   private static int _dmgm = SCREEN_HEIGHT;
   public static final String[] STAT_NAMES = new String[16];
   public static final String[] STAT_DESCS = new String[16];
@@ -2450,54 +2455,19 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   public static void f423fr() {
-    final int x = (int) (1600.0D * (1.0D + Math.cos((float) currentTick / 500.0F)));
-    final int y = (int) (1600.0D * (1.0D - Math.sin((float) currentTick / 500.0F)));
-    if (renderQuality.antialiasStarfieldBackground && SCREEN_WIDTH == 640 && SCREEN_HEIGHT == 480) {
-      a034il(x, y, STAR_FIELD);
-      Drawing.horizontalLine(0, 0, SCREEN_WIDTH, 0);
-    } else {
-      Drawing.clear();
-      STAR_FIELD.c093(-x >> 4, -y >> 4);
-    }
+    final double x = 100.0D * (1.0D + Math.cos((float) currentTick / 500.0F));
+    final double y = 100.0D * (1.0D - Math.sin((float) currentTick / 500.0F));
+    drawStarField(-x, -y);
   }
 
-  private static void a034il(int x, int y, final Sprite sprite) {
-    if (rowBuffer == null || rowBuffer.length != Drawing.width) {
-      rowBuffer = new int[Drawing.width];
-    }
-
-    final int ySubpixels = y & 15;
-    y >>= 4;
-    final int xSubpixels = x & 15;
-    x >>= 4;
-    int outPos = 0;
-    int inPos = sprite.width * y + x;
-    final int var14 = sprite.width - Drawing.width;
-
-    for (int var15 = -Drawing.height; var15 < 0; inPos += var14) {
-      int var16 = 0;
-
-      for (int var17 = Drawing.width - 1; var17 >= 0; --var17) {
-        final int var6 = sprite.pixels[inPos];
-        final int var8 = var6 & '\uff00';
-        final int var7 = var6 & 16711935;
-        final int var10 = 267390960 & xSubpixels * var7;
-        final int var11 = xSubpixels * var8 & 1044480;
-        final int var9 = var11 | var10;
-        final int i = var16 + var9;
-        final int i1 = 267390960 & i;
-        var16 = (var6 << 4) - var9;
-        final int i2 = i & 1044480;
-        final int i3 = -16711936 & ySubpixels * i1;
-        final int i4 = 16711680 & i2 * ySubpixels;
-        final int i5 = i3 | i4;
-        Drawing.screenBuffer[outPos] = rowBuffer[var17] + i5 >> 8;
-        rowBuffer[var17] = (i << 4) - i5;
-        ++outPos;
-        ++inPos;
-      }
-
-      ++var15;
+  public static void drawStarField(final double x, final double y) {
+    if (renderQuality.antialiasStarfieldBackground || SCREEN_WIDTH != 640 || SCREEN_HEIGHT != 480) {
+      final AffineTransform transform = new AffineTransform();
+      transform.translate(x, y);
+      transform.concatenate(ORIGINAL_TO_SCALED_TRANSFORM);
+      STAR_FIELD.drawAntialiased(transform);
+    } else {
+      STAR_FIELD.c093((int) x, (int) y);
     }
   }
 

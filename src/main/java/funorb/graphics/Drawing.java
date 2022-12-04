@@ -3,7 +3,15 @@ package funorb.graphics;
 import funorb.util.ArrayUtil;
 import funorb.util.MathUtil;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBufferInt;
+import java.awt.image.DirectColorModel;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.util.Arrays;
+import java.util.Hashtable;
 
 public final class Drawing {
   public static final int[] SHADES_OF_GRAY = ArrayUtil.build(256, i -> i * 0x010101);
@@ -2090,6 +2098,18 @@ public final class Drawing {
         screenBuffer[var4 + i] = color;
       }
     }
+  }
+
+  private static final ColorModel RGB_COLOR_MODEL = new DirectColorModel(32, 0xff0000, 0x00ff00, 0x0000ff);
+
+  public static BufferedImage createRgbBufferedImage(final int width, final int height, final int[] pixels) {
+    final DataBufferInt buffer = new DataBufferInt(pixels, pixels.length);
+    final WritableRaster raster = Raster.createWritableRaster(RGB_COLOR_MODEL.createCompatibleSampleModel(width, height), buffer, null);
+    return new BufferedImage(RGB_COLOR_MODEL, raster, false, new Hashtable<>());
+  }
+
+  public static Graphics2D createGraphics() {
+    return createRgbBufferedImage(width, height, screenBuffer).createGraphics();
   }
 
   public static int alphaOver(final int color1, final int color2, final int alpha) {

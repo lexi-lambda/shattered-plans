@@ -1,9 +1,12 @@
 package funorb.graphics;
 
 import java.awt.Component;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MediaTracker;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
 import java.awt.image.PixelGrabber;
 
 public class Sprite {
@@ -25,10 +28,10 @@ public class Sprite {
     this.pixels = pixels;
   }
 
-  public Sprite(final int var1, final int var2) {
-    this.pixels = new int[var1 * var2];
-    this.width = this.offsetX = var1;
-    this.height = this.offsetY = var2;
+  public Sprite(final int width, final int height) {
+    this.pixels = new int[width * height];
+    this.width = this.offsetX = width;
+    this.height = this.offsetY = height;
     this.y = 0;
     this.x = 0;
   }
@@ -49,6 +52,15 @@ public class Sprite {
       new PixelGrabber(image, 0, 0, this.width, this.height, this.pixels, 0, this.width).grabPixels();
     } catch (final InterruptedException var6) {
     }
+  }
+
+  private Image image;
+
+  public final Image asImage() {
+    if (this.image == null) {
+      this.image = Drawing.createRgbBufferedImage(this.width, this.height, this.pixels);
+    }
+    return this.image;
   }
 
   private static void compositeOverTinted(final int[] src, final int srcStride, int srcPos, final int[] dest, final int destStride, int destPos, final int cols, final int rows, final int color) {
@@ -1246,6 +1258,14 @@ public class Sprite {
     if (cols > 0 && rows > 0) {
       this.compositeOver(this.pixels, srcStride, srcPos, Drawing.screenBuffer, destStride, destPos, cols, rows);
     }
+  }
+
+  public final void drawAntialiased(final AffineTransform transform) {
+    final Graphics2D g = Drawing.createGraphics();
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    g.drawImage(this.asImage(), transform, null);
   }
 
   public final Sprite horizontallyFlipped() {
