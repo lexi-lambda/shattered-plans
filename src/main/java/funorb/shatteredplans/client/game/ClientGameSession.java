@@ -749,9 +749,8 @@ public final class ClientGameSession extends GameSession {
     }
 
     if (!mouseHandled && JagexApplet.mouseWheelRotation != 0) {
-      final short var11 = 320;
       final int var7 = this.ui.getHeight() / 2;
-      final float var8 = var3 + (float) (JagexApplet.mouseX - var11) * this.gameView.unitScalingFactor / 300.0F;
+      final float var8 = var3 + (float) (JagexApplet.mouseX - ShatteredPlansClient.SCREEN_CENTER_X) * this.gameView.unitScalingFactor / 300.0F;
       final float var9 = (float) (JagexApplet.mouseY - var7) * this.gameView.unitScalingFactor / 300.0F + var4;
       int var10;
       if (JagexApplet.mouseWheelRotation <= 0) {
@@ -772,7 +771,7 @@ public final class ClientGameSession extends GameSession {
         }
       }
 
-      var3 = var8 - var5 * (float) (-320 + JagexApplet.mouseX) / 300.0F;
+      var3 = var8 - var5 * (float) (JagexApplet.mouseX - ShatteredPlansClient.SCREEN_CENTER_X) / 300.0F;
       var4 = var9 - var5 * (float) (JagexApplet.mouseY - var7) / 300.0F;
       if (var3 < 0.0F) {
         var3 = 0.0F;
