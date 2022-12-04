@@ -73,75 +73,75 @@ public final class MidiPlayerNoteSet_idk extends AudioSource_idk {
 
   }
 
-  private void a222(final MidiPlayerNoteState_idk var2, int var3) {
-    if ((4 & this.midiPlayer.chFlags[var2.channel]) != 0 && var2.notePlaying_idfk < 0) {
-      final int var4 = this.midiPlayer._u[var2.channel] / SampledAudioChannel.SAMPLES_PER_SECOND;
-      final int var5 = (1048575 + var4 - var2._j) / var4;
-      var2._j = 1048575 & var2._j + var3 * var4;
-      if (var5 <= var3) {
-        if (this.midiPlayer.chGeneral1[var2.channel] == 0) {
-          var2.playback = AudioSamplePlayback_idk.start(var2.sampleData, var2.playback.f784(), var2.playback.getVolume(), var2.playback.panClampedX());
+  private void a222(final MidiPlayerNoteState_idk note, int totalLen) {
+    if ((MidiPlayer.FLAG_GENERAL_6 & this.midiPlayer.chFlags[note.channel]) != 0 && note.notePlaying_idfk < 0) {
+      final int var4 = this.midiPlayer._u[note.channel] / SampledAudioChannel.SAMPLES_PER_SECOND;
+      final int var5 = (1048575 + var4 - note._j) / var4;
+      note._j = 1048575 & note._j + totalLen * var4;
+      if (var5 <= totalLen) {
+        if (this.midiPlayer.chGeneral1[note.channel] == 0) {
+          note.playback = AudioSamplePlayback_idk.start(note.sampleData, note.playback.getPitchX(), note.playback.getVolX(), note.playback.getPanX());
         } else {
-          var2.playback = AudioSamplePlayback_idk.start(var2.sampleData, var2.playback.f784(), 0, var2.playback.panClampedX());
-          this.midiPlayer.a559(var2, var2.instrument.noteTuning_idk[var2.note] < 0);
+          note.playback = AudioSamplePlayback_idk.start(note.sampleData, note.playback.getPitchX(), 0, note.playback.getPanX());
+          this.midiPlayer.a559(note, note.instrument.noteTuning_idk[note.note] < 0);
         }
 
-        if (var2.instrument.noteTuning_idk[var2.note] < 0) {
-          assert var2.playback != null;
-          var2.playback.f150();
+        if (note.instrument.noteTuning_idk[note.note] < 0) {
+          assert note.playback != null;
+          note.playback.f150();
         }
 
-        var3 = var2._j / var4;
+        totalLen = note._j / var4;
       }
     }
 
-    assert var2.playback != null;
-    var2.playback.processAndDiscard(var3);
+    assert note.playback != null;
+    note.playback.processAndDiscard(totalLen);
   }
 
-  private void a829(final int[] var1, int var2, final MidiPlayerNoteState_idk var3, int var4, final int var6) {
-    if ((4 & this.midiPlayer.chFlags[var3.channel]) != 0 && var3.notePlaying_idfk < 0) {
-      final int var7 = this.midiPlayer._u[var3.channel] / SampledAudioChannel.SAMPLES_PER_SECOND;
+  private void a829(final int[] dest, int offset, final MidiPlayerNoteState_idk note, int totalLen, final int var6) {
+    if ((MidiPlayer.FLAG_GENERAL_6 & this.midiPlayer.chFlags[note.channel]) != 0 && note.notePlaying_idfk < 0) {
+      final int var7 = this.midiPlayer._u[note.channel] / SampledAudioChannel.SAMPLES_PER_SECOND;
 
       while (true) {
-        final int var8 = (-var3._j + 1048575 + var7) / var7;
-        if (var8 > var4) {
-          var3._j += var7 * var4;
+        final int len = (-note._j + 0xfffff + var7) / var7;
+        if (len > totalLen) {
+          note._j += var7 * totalLen;
           break;
         }
 
-        var3.playback.processAndWrite(var1, var2, var8);
-        var3._j += var8 * var7 - 1048576;
-        var2 += var8;
-        var4 -= var8;
+        note.playback.processAndWrite(dest, offset, len);
+        note._j += len * var7 - 0x100000;
+        offset += len;
+        totalLen -= len;
         int var9 = SampledAudioChannel.SAMPLES_PER_SECOND / 100;
-        final int var10 = 262144 / var7;
+        final int var10 = 0x40000 / var7;
         if (var10 < var9) {
           var9 = var10;
         }
 
-        final AudioSamplePlayback_idk var11 = var3.playback;
-        if (this.midiPlayer.chGeneral1[var3.channel] == 0) {
-          var3.playback = AudioSamplePlayback_idk.start(var3.sampleData, var11.f784(), var11.getVolume(), var11.panClampedX());
+        final AudioSamplePlayback_idk playback = note.playback;
+        if (this.midiPlayer.chGeneral1[note.channel] == 0) {
+          note.playback = AudioSamplePlayback_idk.start(note.sampleData, playback.getPitchX(), playback.getVolX(), playback.getPanX());
         } else {
-          var3.playback = AudioSamplePlayback_idk.start(var3.sampleData, var11.f784(), 0, var11.panClampedX());
-          this.midiPlayer.a559(var3, var3.instrument.noteTuning_idk[var3.note] < 0);
-          var3.playback.a093(var9, var11.getVolume());
+          note.playback = AudioSamplePlayback_idk.start(note.sampleData, playback.getPitchX(), 0, playback.getPanX());
+          this.midiPlayer.a559(note, note.instrument.noteTuning_idk[note.note] < 0);
+          note.playback.a093(var9, playback.getVolX());
         }
 
-        if (var3.instrument.noteTuning_idk[var3.note] < 0) {
-          assert var3.playback != null;
-          var3.playback.f150();
+        if (note.instrument.noteTuning_idk[note.note] < 0) {
+          assert note.playback != null;
+          note.playback.f150();
         }
 
-        var11.g150(var9);
-        var11.processAndWrite(var1, var2, var6 - var2);
-        if (var11.volDeltaNonZero()) {
-          this.sum.addFirst(var11);
+        playback.g150(var9);
+        playback.processAndWrite(dest, offset, var6 - offset);
+        if (playback.volDeltaNonZero()) {
+          this.sum.addFirst(playback);
         }
       }
     }
 
-    var3.playback.processAndWrite(var1, var2, var4);
+    note.playback.processAndWrite(dest, offset, totalLen);
   }
 }

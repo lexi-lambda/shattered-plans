@@ -7,7 +7,7 @@ import funorb.util.BitMath;
 import java.io.IOException;
 import java.util.stream.IntStream;
 
-public final class fd_ {
+public final class SomeBufferReader_idk {
   public static vb_[] _L;
   private static float[] _k;
   private static to_[] _o;
@@ -17,59 +17,58 @@ public final class fd_ {
   private static float[] _u;
   private static float[] _C;
   private static boolean _x = false;
-  private static byte[] _w;
+  private static byte[] buffer;
   private static float[] _z;
   private static boolean[] _t;
   private static float[] _y;
   private static float[] _j;
   private static int _r;
   private static float[] _l;
-  private static int _K;
+  private static int curBit;
   private static int[] _F;
   private static int _E;
   private static kn_[] _h;
-  private static int _p;
-  private int _q;
-  private int _G;
-  private boolean _I;
-  private int _H;
+  private static int curByte;
+  private int sampleLength;
+  private int loopEnd;
+  private boolean isLooped;
+  private int loopStart;
   private int _i;
   private int _s;
   private boolean _A;
-  private byte[][] _v;
+  private byte[][] sections;
   private int _M;
-  private int _B;
-  private byte[] _N;
+  private int sampleRate;
+  private byte[] sampleData;
   private float[] _n;
-  private int _m;
+  private int sectionIndex;
 
-  private fd_(final byte[] var1) throws IOException {
-    this.a604(var1);
+  private SomeBufferReader_idk(final byte[] data) throws IOException {
+    this.load(data);
   }
 
-  public static float d134(final int var0) {
-    int var1 = var0 & 2097151;
-    final int var2 = var0 & Integer.MIN_VALUE;
-    final int var3 = (var0 & 2145386496) >> 21;
-    if (var2 != 0) {
-      var1 = -var1;
+  public static float parseAsFloat(final int value) {
+    int significand = value & 0x1fffff;
+    final int sign = value & Integer.MIN_VALUE;
+    final int exponent = (value & 0x7fe00000) >> 21;
+    if (sign != 0) {
+      significand = -significand;
     }
-
-    return (float) ((double) var1 * Math.pow(2.0D, var3 - 788));
+    return (float) ((double) significand * Math.pow(2.0D, exponent - 788));
   }
 
-  public static int c784() {
-    final int var0 = _w[_p] >> _K & 1;
-    ++_K;
-    _p += _K >> 3;
-    _K &= 7;
-    return var0;
+  public static int readBit() {
+    final int bit = buffer[curByte] >> curBit & 1;
+    ++curBit;
+    curByte += curBit >> 3;
+    curBit &= 7;
+    return bit;
   }
 
-  public static void b604(final byte[] var0) {
-    a167(var0);
-    _E = 1 << a137(4);
-    _r = 1 << a137(4);
+  public static void b604(final byte[] section) {
+    setBuffer(section);
+    _E = 1 << readBits(4);
+    _r = 1 << readBits(4);
     _k = new float[_r];
 
     int var1;
@@ -104,7 +103,7 @@ public final class fd_ {
       }
 
       final int var10 = BitMath.lastSet(var5 - 1);
-      final int[] var15 = IntStream.range(0, var5).map(var11 -> a586js(var11, var10)).toArray();
+      final int[] var15 = IntStream.range(0, var5).map(var11 -> reverseBits(var11, var10)).toArray();
 
       if (var1 == 0) {
         _l = var6;
@@ -119,65 +118,65 @@ public final class fd_ {
       }
     }
 
-    var1 = a137(8) + 1;
+    var1 = readBits(8) + 1;
     _L = new vb_[var1];
 
     for (var2 = 0; var2 < var1; ++var2) {
       _L[var2] = new vb_();
     }
 
-    var2 = a137(6) + 1;
+    var2 = readBits(6) + 1;
 
     for (var3 = 0; var3 < var2; ++var3) {
-      a137(16);
+      readBits(16);
     }
 
-    var2 = a137(6) + 1;
+    var2 = readBits(6) + 1;
     _h = new kn_[var2];
 
     for (var3 = 0; var3 < var2; ++var3) {
       _h[var3] = new kn_();
     }
 
-    var3 = a137(6) + 1;
+    var3 = readBits(6) + 1;
     _o = new to_[var3];
 
     for (var4 = 0; var4 < var3; ++var4) {
       _o[var4] = new to_();
     }
 
-    var4 = a137(6) + 1;
+    var4 = readBits(6) + 1;
     _O = new fq_[var4];
 
     for (var5 = 0; var5 < var4; ++var5) {
       _O[var5] = new fq_();
     }
 
-    var5 = a137(6) + 1;
+    var5 = readBits(6) + 1;
     _t = new boolean[var5];
     _J = new int[var5];
 
     for (int var12 = 0; var12 < var5; ++var12) {
-      _t[var12] = c784() != 0;
-      a137(16);
-      a137(16);
-      _J[var12] = a137(8);
+      _t[var12] = readBit() != 0;
+      readBits(16);
+      readBits(16);
+      _J[var12] = readBits(8);
     }
 
     _x = true;
   }
 
   @SuppressWarnings("SameParameterValue")
-  public static fd_ a968(final ResourceLoader loader, final String group, final String item) {
+  public static SomeBufferReader_idk a968(final ResourceLoader loader, final String group, final String item) {
     if (a521(loader)) {
       final byte[] var3 = loader.getResource(group, item);
       if (var3 == null) {
         return null;
       } else {
-        fd_ var4 = null;
+        SomeBufferReader_idk var4 = null;
 
         try {
-          var4 = new fd_(var3);
+          var4 = new SomeBufferReader_idk(var3);
         } catch (final IOException var6) {
           var6.printStackTrace();
         }
@@ -190,58 +189,58 @@ public final class fd_ {
     }
   }
 
-  private static boolean a521(final ResourceLoader var0) {
+  private static boolean a521(final ResourceLoader loader) {
     if (!_x) {
-      final byte[] var1 = var0.getResource(0, 0);
-      if (var1 == null) {
+      final byte[] data = loader.getResource(0, 0);
+      if (data == null) {
         return false;
       }
 
-      b604(var1);
+      b604(data);
     }
 
     return true;
   }
 
-  private static void a167(final byte[] var0) {
-    _w = var0;
-    _p = 0;
-    _K = 0;
+  private static void setBuffer(final byte[] section) {
+    buffer = section;
+    curByte = 0;
+    curBit = 0;
   }
 
-  public static int a137(int var0) {
-    int var1 = 0;
+  public static int readBits(int numBits) {
+    int result = 0;
 
-    int var2;
-    int var3;
-    for (var2 = 0; var0 >= 8 - _K; var0 -= var3) {
-      var3 = 8 - _K;
-      final int var4 = (1 << var3) - 1;
-      var1 += (_w[_p] >> _K & var4) << var2;
-      _K = 0;
-      ++_p;
-      var2 += var3;
+    int bitsUsed;
+    int bitsLeft;
+    for (bitsUsed = 0; 8 - curBit <= numBits; numBits -= bitsLeft) {
+      bitsLeft = 8 - curBit;
+      final int mask = (1 << bitsLeft) - 1;
+      result += (buffer[curByte] >> curBit & mask) << bitsUsed;
+      curBit = 0;
+      ++curByte;
+      bitsUsed += bitsLeft;
     }
 
-    if (var0 > 0) {
-      var3 = (1 << var0) - 1;
-      var1 += (_w[_p] >> _K & var3) << var2;
-      _K += var0;
+    if (numBits > 0) {
+      bitsLeft = (1 << numBits) - 1;
+      result += (buffer[curByte] >> curBit & bitsLeft) << bitsUsed;
+      curBit += numBits;
     }
 
-    return var1;
+    return result;
   }
 
-  public static fd_ a740(final ResourceLoader var0, final int var1, final int var2) {
-    if (a521(var0)) {
-      final byte[] var3 = var0.getResource(var1, var2);
+  public static SomeBufferReader_idk a740(final ResourceLoader loader, final int groupId, final int itemId) {
+    if (a521(loader)) {
+      final byte[] var3 = loader.getResource(groupId, itemId);
       if (var3 == null) {
         return null;
       } else {
-        fd_ var4 = null;
+        SomeBufferReader_idk var4 = null;
 
         try {
-          var4 = new fd_(var3);
+          var4 = new SomeBufferReader_idk(var3);
         } catch (final IOException var6) {
           var6.printStackTrace();
         }
@@ -249,38 +248,37 @@ public final class fd_ {
         return var4;
       }
     } else {
-      var0.loadGroupDataForItem(var1, var2);
+      loader.loadGroupDataForItem(groupId, itemId);
       return null;
     }
   }
 
-  private static int a586js(int var0, int var1) {
-    int var2;
-    for (var2 = 0; var1 > 0; var0 >>>= 1) {
-      var2 = var2 << 1 | 1 & var0;
-      --var1;
+  private static int reverseBits(int value, int count) {
+    int i = 0;
+    for (; count > 0; --count) {
+      i = (i << 1) | (1 & value);
+      value >>>= 1;
     }
-
-    return var2;
+    return i;
   }
 
   public AudioSampleData_idk a582() {
-    if (this._N == null) {
+    if (this.sampleData == null) {
       this._M = 0;
       this._n = new float[_r];
-      this._N = new byte[this._q];
+      this.sampleData = new byte[this.sampleLength];
       this._s = 0;
-      this._m = 0;
+      this.sectionIndex = 0;
     }
 
-    for (; this._m < this._v.length; ++this._m) {
+    for (; this.sectionIndex < this.sections.length; ++this.sectionIndex) {
 
-      final float[] var2 = this.e875(this._m);
+      final float[] var2 = this.e875(this.sectionIndex);
       if (var2 != null) {
         int var3 = this._s;
         int var4 = var2.length;
-        if (var4 > this._q - var3) {
-          var4 = this._q - var3;
+        if (var4 > this.sampleLength - var3) {
+          var4 = this.sampleLength - var3;
         }
 
         for (int var5 = 0; var5 < var4; ++var5) {
@@ -289,7 +287,7 @@ public final class fd_ {
             var6 = ~var6 >> 31;
           }
 
-          this._N[var3++] = (byte) (var6 - 128);
+          this.sampleData[var3++] = (byte) (var6 - 128);
         }
 
         this._s = var3;
@@ -297,22 +295,22 @@ public final class fd_ {
     }
 
     this._n = null;
-    final byte[] var7 = this._N;
-    this._N = null;
-    return new AudioSampleData_idk(this._B, var7, this._H, this._G, this._I);
+    final byte[] sampleData = this.sampleData;
+    this.sampleData = null;
+    return new AudioSampleData_idk(this.sampleRate, sampleData, this.loopStart, this.loopEnd, this.isLooped);
   }
 
-  private float[] e875(final int var1) {
-    a167(this._v[var1]);
-    c784();
-    final int var2 = a137(BitMath.lastSet(_J.length - 1));
+  private float[] e875(final int sectionIndex) {
+    setBuffer(this.sections[sectionIndex]);
+    readBit();
+    final int var2 = readBits(BitMath.lastSet(_J.length - 1));
     final boolean var3 = _t[var2];
     final int var4 = var3 ? _r : _E;
     boolean var5 = false;
     boolean var6 = false;
     if (var3) {
-      var5 = c784() != 0;
-      var6 = c784() != 0;
+      var5 = readBit() != 0;
+      var6 = readBit() != 0;
     }
 
     final int var7 = var4 >> 1;
@@ -554,35 +552,35 @@ public final class fd_ {
     return var43;
   }
 
-  private void a604(final byte[] var1) throws IOException {
-    final Buffer var2 = new Buffer(var1);
-    this._B = var2.readInt();
-    this._q = var2.readInt();
-    this._H = var2.readInt();
-    this._G = var2.readInt();
-    if (this._G < 0) {
-      this._G = ~this._G;
-      this._I = true;
+  private void load(final byte[] data) throws IOException {
+    final Buffer buf = new Buffer(data);
+    this.sampleRate = buf.readInt();
+    this.sampleLength = buf.readInt();
+    this.loopStart = buf.readInt();
+    this.loopEnd = buf.readInt();
+    if (this.loopEnd < 0) {
+      this.loopEnd = ~this.loopEnd;
+      this.isLooped = true;
     }
 
-    final int var3 = var2.readInt();
-    if (var3 < 0) {
+    final int count = buf.readInt();
+    if (count < 0) {
       throw new IOException();
     } else {
-      this._v = new byte[var3][];
+      this.sections = new byte[count][];
 
-      for (int var4 = 0; var4 < var3; ++var4) {
-        int var5 = 0;
+      for (int i = 0; i < count; ++i) {
+        int total = 0;
 
-        int var6;
+        int x;
         do {
-          var6 = var2.readUByte();
-          var5 += var6;
-        } while (var6 >= 255);
+          x = buf.readUByte();
+          total += x;
+        } while (x >= 255);
 
-        final byte[] var7 = new byte[var5];
-        var2.readBytes(var7, var5);
-        this._v[var4] = var7;
+        final byte[] section = new byte[total];
+        buf.readBytes(section, total);
+        this.sections[i] = section;
       }
 
     }
@@ -591,8 +589,8 @@ public final class fd_ {
   public void b720() {
     this._M = 0;
     this._n = new float[_r];
-    for (int var3 = 0; var3 < this._v.length; ++var3) {
-      this.e875(var3);
+    for (int i = 0; i < this.sections.length; ++i) {
+      this.e875(i);
     }
   }
 }

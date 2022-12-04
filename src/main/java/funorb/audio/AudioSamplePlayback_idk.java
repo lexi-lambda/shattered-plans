@@ -14,7 +14,7 @@ public final class AudioSamplePlayback_idk extends AudioSource_idk {
   private int volActualX;
   private int ampRateR;
   private int ampRateL;
-  private int playhead;
+  private int playhead; // sample data index << 8
   private int volX;
   private int volDeltaX;
   private int loopDirection_idk;
@@ -24,9 +24,9 @@ public final class AudioSamplePlayback_idk extends AudioSource_idk {
 
   private AudioSamplePlayback_idk(final AudioSampleData_idk var1, final int pitchX, final int volX, final int panX) {
     this.sampleData = var1;
-    this.loopStart_idfk = var1._l;
-    this.loopEnd_idfk = var1._k;
-    this._o = var1._i;
+    this.loopStart_idfk = var1.loopStart_idfk;
+    this.loopEnd_idfk = var1.loopEnd_idfk;
+    this._o = var1.isLooped_idk;
     this.pitchX = pitchX;
     this.volX = volX;
     this.panX = panX;
@@ -528,25 +528,23 @@ public final class AudioSamplePlayback_idk extends AudioSource_idk {
     }
   }
 
-  public synchronized int getVolume() {
+  public synchronized int getVolX() {
     return this.volX == Integer.MIN_VALUE ? 0 : this.volX;
   }
 
-  public synchronized void a093(final int var1, final int var2) {
-    this.a326(var1, var2, this.panClampedX());
+  public synchronized void a093(final int var1, final int volX) {
+    this.a326(var1, volX, this.getPanX());
   }
 
-  public synchronized void h150(int var1) {
-    final int var2 = this.sampleData.data.length << 8;
-    if (var1 < -1) {
-      var1 = -1;
+  public synchronized void setPlayhead(int playhead) {
+    final int maxPlayhead = this.sampleData.data.length << 8;
+    if (playhead < -1) {
+      playhead = -1;
     }
-
-    if (var1 > var2) {
-      var1 = var2;
+    if (playhead > maxPlayhead) {
+      playhead = maxPlayhead;
     }
-
-    this.playhead = var1;
+    this.playhead = playhead;
   }
 
   public synchronized void g150(int var1) {
@@ -746,7 +744,7 @@ public final class AudioSamplePlayback_idk extends AudioSource_idk {
     }
   }
 
-  public synchronized boolean g801() {
+  public synchronized boolean isPlayheadOutOfBounds() {
     return this.playhead < 0 || this.playhead >= this.sampleData.data.length << 8;
   }
 
@@ -1018,7 +1016,7 @@ public final class AudioSamplePlayback_idk extends AudioSource_idk {
 
   }
 
-  public synchronized int f784() {
+  public synchronized int getPitchX() {
     return this.pitchX < 0 ? -this.pitchX : this.pitchX;
   }
 
@@ -1125,12 +1123,12 @@ public final class AudioSamplePlayback_idk extends AudioSource_idk {
     }
   }
 
-  public synchronized int panClampedX() {
+  public synchronized int getPanX() {
     return this.panX < 0 ? -1 : this.panX;
   }
 
   public synchronized void setVolume(final int volume) {
-    this.setVolAndPanX(volume, this.panClampedX());
+    this.setVolAndPanX(volume, this.getPanX());
   }
 
   public synchronized void f150() {
