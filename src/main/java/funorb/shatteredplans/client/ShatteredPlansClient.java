@@ -120,7 +120,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   private static Component<?> _erj;
   private static boolean areAchievementsInitialized;
   public static AchievementRequest achievementRequest;
-  private static Component<Component<?>> _faX;
+  private static Component<Component<?>> tabChatPopupPanel;
   private static int _pgJ;
   private static String playerWhoKickedYou;
   private static long cannotStartGameUntil;
@@ -675,7 +675,7 @@ public final class ShatteredPlansClient extends JagexApplet {
       chatMessageLabel.mouseOverTextColor = -(8355711 & _hoc >> 1) + _hoc + ((Component.UNSELECTED_LABEL.mouseOverTextColor & 16711422) >> 1);
       _erj = Component._cgC;
       chatMessageLabel._qb = -(_hoc >> 1 & 8355711) + _hoc + (Component.UNSELECTED_LABEL._qb >> 1 & 8355711);
-      _faX = new Component<>(null);
+      tabChatPopupPanel = new Component<>(null);
       _mbn = new Component<>(var2);
       _few = new Component<>(null);
       _abAb = new Component<>(null);
@@ -686,8 +686,8 @@ public final class ShatteredPlansClient extends JagexApplet {
       _abAb.addChild(Component._cgC);
       HIDE_CHAT_TEMPORARILY_LABEL = new Component<>(Component.UNSELECTED_LABEL, StringConstants.TAB_HIDE_CHAT_TEMPORARILY);
       _cbl = new Component<>(Component.UNSELECTED_LABEL);
-      _faX.addChild(_mbn);
-      _faX.addChild(_few);
+      tabChatPopupPanel.addChild(_mbn);
+      tabChatPopupPanel.addChild(_few);
       _few.addChild(_abAb);
       _few.addChild(HIDE_CHAT_TEMPORARILY_LABEL);
       _few.addChild(_cbl);
@@ -778,7 +778,7 @@ public final class ShatteredPlansClient extends JagexApplet {
 
     if (_cjx && _tli) {
       final boolean var2 = playingGame && isChatboxSelected;
-      a813qr(var1 && !var2 && a154vc());
+      drawLobby(var1 && !var2 && a154vc());
       if (playingGame && isChatboxSelected) {
         a877rad(var1 && a154vc());
       }
@@ -1372,8 +1372,8 @@ public final class ShatteredPlansClient extends JagexApplet {
     LOSE_SPRITE = loadJpgSprite(loader, "lose");
   }
 
-  private static void a813qr(final boolean var0) {
-    a540ta(var0);
+  private static void drawLobby(final boolean var0) {
+    drawLobbyPanels(var0);
     a877im(var0);
     a430mj(var0);
   }
@@ -1430,8 +1430,8 @@ public final class ShatteredPlansClient extends JagexApplet {
     }
 
     if (isChatboxSelected) {
-      a411ca(var2, var6);
-      _faX.rootProcessMouseEvents(var4);
+      layoutTabChatPopupPanel(var2, var6);
+      tabChatPopupPanel.rootProcessMouseEvents(var4);
       if (var4) {
         if (HIDE_CHAT_TEMPORARILY_LABEL.clickButton != MouseState.Button.NONE) {
           isChatboxSelected = false;
@@ -1446,7 +1446,7 @@ public final class ShatteredPlansClient extends JagexApplet {
 
   }
 
-  private static void a411ca(final String var3, final int var4) {
+  private static void layoutTabChatPopupPanel(final String var3, final int var4) {
     _mbn.label = var3;
     if (currentChatChannel == Channel.PRIVATE) {
       _cbl.label = ReportAbuseDialog._Kb;
@@ -1454,8 +1454,8 @@ public final class ShatteredPlansClient extends JagexApplet {
       _cbl.label = StringConstants.ESC_CANCEL_THIS_LINE;
     }
 
-    final short var9 = 495;
-    final byte var10 = 5;
+    final int tabChatPopupWidth = 495;
+    final int var10 = 5;
     _abAb.setBounds(5, var10, 485, Component.LABEL_HEIGHT);
     chatMessageLabel.setBounds(0, 0, -Component._cgC.width + _abAb.width, Component.LABEL_HEIGHT);
     Component._cgC.setBounds(chatMessageLabel.width, 0, Component._cgC.width, Component.LABEL_HEIGHT);
@@ -1464,11 +1464,11 @@ public final class ShatteredPlansClient extends JagexApplet {
     final int var11 = _cbl.e474();
     _cbl.setBounds(-var11 + (490), var13, var11, Component.LABEL_HEIGHT);
     int var12 = 5 + var13 + Component.LABEL_HEIGHT;
-    _mbn.setBounds(0, 0, var9, 20);
-    _few.setBounds(0, 20, var9, var12);
+    _mbn.setBounds(0, 0, tabChatPopupWidth, 20);
+    _few.setBounds(0, 20, tabChatPopupWidth, var12);
     _few.nineSliceSprites = Component.createGradientOutlineSprites(_few.height, 11579568, 8421504, 2105376);
     var12 += 20;
-    _faX.setBounds(73, -(var12 / 2) + 180, var9, var12);
+    tabChatPopupPanel.setBounds((SCREEN_WIDTH - tabChatPopupWidth) / 2, (SCREEN_HEIGHT * 3 / 8) - (var12 / 2), tabChatPopupWidth, var12);
   }
 
   private static void a111ph() {
@@ -1711,7 +1711,7 @@ public final class ShatteredPlansClient extends JagexApplet {
       }
     }
 
-    if (var1 == null && !_K && _faX == null) {
+    if (var1 == null && !_K && tabChatPopupPanel == null) {
       var1 = StringConstants.CHAT_VIEW_SCROLLED_UP;
     }
 
@@ -1933,7 +1933,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   private static boolean processChatKeyboardInput() {
-    final boolean var3 = (_K || _faX != null)
+    final boolean var3 = (_K || tabChatPopupPanel != null)
         && !(currentChatChannel == Channel.LOBBY && ratedLobbyRoom != null)
         && !(currentChatChannel == Channel.PRIVATE && !a788(ContextMenu.recipientPlayerId, ContextMenu.normalizedRecipientPlayerName));
 
@@ -2024,7 +2024,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   private static void b150nj() {
-    _faX = null;
+    tabChatPopupPanel = null;
     if (_cka != null) {
       Component._cgC = _erj;
       chatMessageLabel = _cka;
@@ -2348,7 +2348,7 @@ public final class ShatteredPlansClient extends JagexApplet {
       Component.lobbyChatMessagesScrollPane.content.y = -Component.lobbyChatMessagesScrollPane.content.height + Component.lobbyChatMessagesScrollPane.viewport.height;
     }
 
-    if (isChatboxSelected && _faX != null) {
+    if (isChatboxSelected && tabChatPopupPanel != null) {
       _K = true;
     }
 
@@ -2522,16 +2522,16 @@ public final class ShatteredPlansClient extends JagexApplet {
     return color;
   }
 
-  private static void a540ta(boolean var0) {
+  private static void drawLobbyPanels(boolean var0) {
     if (isPopupOpen()) {
       var0 = false;
     }
 
-    a877di(var0);
+    drawLobbyBrowser(var0);
     drawLobbyChatPanel(var0);
   }
 
-  private static void a877di(final boolean var0) {
+  private static void drawLobbyBrowser(final boolean var0) {
     Drawing.withLocalContext(() -> {
       Drawing.expandBoundsToInclude(Drawing.width - SCREEN_WIDTH >> 1, 0, Drawing.width + SCREEN_WIDTH >> 1, Drawing.height);
       if (lobbyBrowserTransitionCounter > 0) {
@@ -3908,7 +3908,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   private static void a877rad(final boolean var0) {
-    _faX.draw(var0);
+    tabChatPopupPanel.draw(var0);
     if (ClientLobbyRoom.currentTooltip != null) {
       a407dk(ClientLobbyRoom.currentTooltip);
     }
@@ -4091,7 +4091,6 @@ public final class ShatteredPlansClient extends JagexApplet {
       Drawing.h115(Drawing.left, Drawing.top, -Drawing.left + Drawing.right, -Drawing.top + Drawing.bottom);
       Component._uaf.draw(false);
     }
-
   }
 
   public static void saveProfile() {
@@ -4911,7 +4910,7 @@ public final class ShatteredPlansClient extends JagexApplet {
       }
 
       if (!_cjx || !_tli) {
-        a813qr(a154vc());
+        drawLobby(a154vc());
       }
 
       if (_ebb > 0) {

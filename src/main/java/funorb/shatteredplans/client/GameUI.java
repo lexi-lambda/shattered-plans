@@ -627,7 +627,6 @@ public final class GameUI {
       Drawing.h115(0, 0, Drawing.width, Component.lobbyChatPanel.y2);
       ShatteredPlansClient.invitePlayersDialog.draw(var1);
     }
-
   }
 
   private static Sprite a800cle(final int var0) {
