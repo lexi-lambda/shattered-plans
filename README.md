@@ -22,13 +22,19 @@ replacing `<HOST>` with your IP address. By default, the server runs on port 435
 
 ### Experimental: Adjusting the user interface scale
 
-Limited support for adjusting the UI scale is available by setting the `funorb.shatteredplans.client.uiScale` JVM property to a numeric value. The default is `1.0`. Larger values increase the internal resolution of the game’s renderer, which effectively makes individual user interface elements smaller. For example, the following command will force the game to render at 1.5× standard resolution:
+Limited support for adjusting the UI scale is available by setting one or both of the following JVM properties:
+
+  * `funorb.shatteredplans.client.uiScale` — Accepts any real value, but reasonable values are in the range `1.0`–`3.0`. The default is `1.0`. Larger values increase the internal resolution of the game’s renderer, which effectively makes individual user interface elements smaller.
+
+  * `funorb.shatteredplans.client.aspectRatio` — Accepts a ratio of two integers in the format `N:M`. The default is `4:3`, and the most reasonable alternative value is `16:9`.
+
+For example, the following command will force the game to render at 1.5× standard height using a widescreen aspect ratio:
 
 ```sh
-java -Dfunorb.shatteredplans.client.uiScale=1.5 -jar shattered-plans-0.0.5.jar
+java -Dfunorb.shatteredplans.client.uiScale=1.5 -Dfunorb.shatteredplans.client.aspectRatio=16:9 -jar shattered-plans-0.0.5.jar
 ```
 
-This is particularly useful on large screens, as it makes the in-game user interface less cramped. However, the game was originally designed to run at a fixed resolution of 640×480, so altering the UI scale can cause layout glitches and other visual issues. The in-game user interface has been patched to automatically adapt to larger UI scales, but some visual issues remain.
+This is particularly useful on large screens, as it makes the in-game user interface less cramped. However, the game was originally designed to run at a fixed resolution of 640×480, so altering the UI scale may cause rendering glitches, and particularly large resolutions may cause performance problems on slower machines. All the critical UIs in the game have been patched to automatically adapt to larger UI scales, but some minor visual issues remain.
 
 ## What works, what doesn’t, and other limitations
 

@@ -86,6 +86,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   public static final int ORIGINAL_SCREEN_HEIGHT = 480;
 
   public static final double UI_SCALE;
+  public static final double ASPECT_RATIO;
   public static final int SCREEN_WIDTH;
   public static final int SCREEN_HEIGHT;
   static {
@@ -95,11 +96,34 @@ public final class ShatteredPlansClient extends JagexApplet {
     } catch (final NumberFormatException e) {
       throw new RuntimeException("non-numeric value for property ‘funorb.shatteredplans.client.uiScale’: " + uiScaleStr, e);
     }
-    SCREEN_WIDTH = (int) (ORIGINAL_SCREEN_WIDTH * UI_SCALE);
+
+    final String aspectRatioStr = System.getProperty("funorb.shatteredplans.client.aspectRatio", "4:3");
+    final String[] aspectRatioStrs = aspectRatioStr.split(":");
+    if (aspectRatioStrs.length != 2) {
+      throw new RuntimeException("value for property ‘funorb.shatteredplans.client.aspectRatio’ is not in the form ‘N:M’: " + aspectRatioStr);
+    }
+    try {
+      ASPECT_RATIO = (double) Integer.parseInt(aspectRatioStrs[0]) / Integer.parseInt(aspectRatioStrs[1]);
+    } catch (final NumberFormatException e) {
+      throw new RuntimeException("value for property ‘funorb.shatteredplans.client.aspectRatio’ is not in the form ‘N:M’: " + aspectRatioStr, e);
+    }
+
     SCREEN_HEIGHT = (int) (ORIGINAL_SCREEN_HEIGHT * UI_SCALE);
+    SCREEN_WIDTH = (int) (ORIGINAL_SCREEN_HEIGHT * UI_SCALE * ASPECT_RATIO);
   }
 
-  public static final AffineTransform ORIGINAL_TO_SCALED_TRANSFORM = AffineTransform.getScaleInstance(UI_SCALE, UI_SCALE);
+  public static final AffineTransform STAR_FIELD_TRANSFORM = new AffineTransform();
+  static {
+    final double originalAspectRatio = 4.0 / 3.0;
+    if (ASPECT_RATIO > originalAspectRatio) {
+      final double scale = UI_SCALE * ASPECT_RATIO;
+      STAR_FIELD_TRANSFORM.scale(scale, scale);
+      STAR_FIELD_TRANSFORM.translate(0.0, ORIGINAL_SCREEN_HEIGHT * (1.0/originalAspectRatio - 1.0/ASPECT_RATIO) * -0.5);
+    } else {
+      STAR_FIELD_TRANSFORM.scale(UI_SCALE, UI_SCALE);
+      STAR_FIELD_TRANSFORM.translate(ORIGINAL_SCREEN_WIDTH * (ASPECT_RATIO - originalAspectRatio) * -0.5, 0.0);
+    }
+  }
 
   public static final int[] NUM_PLAYERS_OPTION_VALUES = {2, 3, 4, 5, 6};
   public static final int[] GAMEOPT_CHOICES_COUNTS = {5, 7, 4, 5, 2};
@@ -2464,7 +2488,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     if (renderQuality.antialiasStarfieldBackground || SCREEN_WIDTH != 640 || SCREEN_HEIGHT != 480) {
       final AffineTransform transform = new AffineTransform();
       transform.translate(x, y);
-      transform.concatenate(ORIGINAL_TO_SCALED_TRANSFORM);
+      transform.concatenate(STAR_FIELD_TRANSFORM);
       STAR_FIELD.drawAntialiased(transform);
     } else {
       STAR_FIELD.c093((int) x, (int) y);
