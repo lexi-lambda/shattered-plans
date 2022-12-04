@@ -78,10 +78,15 @@ public final class GameUI {
   private static final int STATS_GRAPH_HEIGHT = 220;
   private static final int _rga = 56;
   private static final int ADD_CHAT_MESSAGE_TIMER_MAX = 18;
-  public static final int CHAT_PANEL_OPEN_AMOUNT_MAX = 20;
-  public static final int CHAT_PANEL_OPEN_AMOUNT_MAX_SQ = CHAT_PANEL_OPEN_AMOUNT_MAX * CHAT_PANEL_OPEN_AMOUNT_MAX;
+  private static final int CHAT_PANEL_OPEN_AMOUNT_MAX = 20;
+  private static final int CHAT_PANEL_OPEN_AMOUNT_MAX_SQ = CHAT_PANEL_OPEN_AMOUNT_MAX * CHAT_PANEL_OPEN_AMOUNT_MAX;
   public static final int CHAT_PANEL_HEIGHT = 120;
-  public static final int TOOLTIP_HEIGHT = 13;
+  private static final int TOOLTIP_HEIGHT = 13;
+  private static final int PANEL_MARGIN = 5;
+  private static final int STATUS_PANEL_HEIGHT = 45;
+  private static final int DIPLOMACY_PANEL_WIDTH = 200;
+  private static final int PROJECTS_PANEL_HEIGHT = 186;
+  private static final int PROJECTS_PANEL_WIDTH = 150;
   public static int chatPanelOpenAmount;
 
   private static ArgbSprite _kbw;
@@ -207,23 +212,6 @@ public final class GameUI {
     _fjr = new Sprite(20 + PRODUCTION_BUTTON.offsetX, PRODUCTION_BUTTON.offsetY + 20);
     _kbw = new ArgbSprite(READY_BUTTON.offsetX + 20, READY_BUTTON.offsetY + 20);
     this.gameSession = session;
-    this.productionPanel = createProductionPanel();
-    this.addComponent(this.productionPanel);
-    if (this.gameSession.localPlayer != null) {
-      this.projectsPanel = createProjectsPanel();
-      this.addComponent(this.projectsPanel);
-    }
-
-    this.diplomacyPanel = createDiplomacyPanel(this.gameSession.gameState.playerCount);
-    this.initialize();
-    this.addComponent(this.diplomacyPanel);
-    this.fleetInfoPanel = createFleetInfoPanel(this.gameSession.gameState.playerCount);
-    this.addComponent(this.fleetInfoPanel);
-    final int victoryPanelHeight = this.gameSession.gameState.victoryChecker.victoryPanelHeight();
-    if (victoryPanelHeight > 0) {
-      this.victoryPanel = createVictoryPanel(victoryPanelHeight);
-      this.addComponent(this.victoryPanel);
-    }
 
     final int readyButtonX = getReadyButtonX();
     if (this.gameSession.localPlayer != null) {
@@ -257,6 +245,23 @@ public final class GameUI {
 
     this.statusPanel = createStatusPanel(projectsButtonX);
     this.addComponent(this.statusPanel);
+
+    this.productionPanel = createProductionPanel();
+    this.addComponent(this.productionPanel);
+    if (this.gameSession.localPlayer != null) {
+      this.projectsPanel = createProjectsPanel();
+      this.addComponent(this.projectsPanel);
+    }
+    this.diplomacyPanel = createDiplomacyPanel(this.gameSession.gameState.playerCount);
+    this.initialize();
+    this.addComponent(this.diplomacyPanel);
+    this.fleetInfoPanel = createFleetInfoPanel(this.gameSession.gameState.playerCount);
+    this.addComponent(this.fleetInfoPanel);
+    final int victoryPanelHeight = this.gameSession.gameState.victoryChecker.victoryPanelHeight();
+    if (victoryPanelHeight > 0) {
+      this.victoryPanel = createVictoryPanel(victoryPanelHeight);
+      this.addComponent(this.victoryPanel);
+    }
 
     this.animationControlsPanel = new FixedPanel(ShatteredPlansClient.SCREEN_WIDTH - 50, ShatteredPlansClient.SCREEN_HEIGHT - Menu.SMALL_FONT.ascent, 60, 2 * Menu.SMALL_FONT.ascent);
     this.addComponent(this.animationControlsPanel, 0);
@@ -540,7 +545,7 @@ public final class GameUI {
   }
 
   private static FloatingPanel<ProductionPanelState> createProductionPanel() {
-    final FloatingPanel<ProductionPanelState> panel = new FloatingPanel<>(0, 60, 238, 300, StringConstants.TAB_NAME_PRODUCTION.toUpperCase());
+    final FloatingPanel<ProductionPanelState> panel = new FloatingPanel<>(PANEL_MARGIN, STATUS_PANEL_HEIGHT + Menu.SMALL_FONT.ascent + 2 + PANEL_MARGIN * 3, 238, 300, StringConstants.TAB_NAME_PRODUCTION.toUpperCase());
     final fe_<FloatingPanel<ProductionPanelState>> var0 = new fe_<>(panel.x - 16 + panel.width, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var0.data = panel;
     final ScrollBar scrollBar = new ScrollBar(panel.width - 20, panel.y + 20, 11, panel.height - 28);
@@ -557,7 +562,12 @@ public final class GameUI {
   }
 
   private static FloatingPanel<ProjectsPanelState> createProjectsPanel() {
-    final FloatingPanel<ProjectsPanelState> panel = new FloatingPanel<>(250, 60, 150, 186, StringConstants.TAB_NAME_PROJECTS.toUpperCase());
+    final FloatingPanel<ProjectsPanelState> panel = new FloatingPanel<>(
+        ShatteredPlansClient.SCREEN_WIDTH - PROJECTS_PANEL_WIDTH - PANEL_MARGIN,
+        ShatteredPlansClient.SCREEN_HEIGHT - PROJECTS_PANEL_HEIGHT - 30,
+        PROJECTS_PANEL_WIDTH,
+        PROJECTS_PANEL_HEIGHT,
+        StringConstants.TAB_NAME_PROJECTS.toUpperCase());
     final fe_<FloatingPanel<ProjectsPanelState>> var0 = new fe_<>(panel.x + panel.width - 16, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
     var0.data = panel;
     panel.addChild(var0);
@@ -569,7 +579,12 @@ public final class GameUI {
   }
 
   private static FloatingPanel<DiplomacyPanelState> createDiplomacyPanel(final int playerCount) {
-    final FloatingPanel<DiplomacyPanelState> panel = new FloatingPanel<>(420, 60, 200, 28 + _rga * playerCount, StringConstants.TAB_NAME_DIPLOMACY.toUpperCase());
+    final FloatingPanel<DiplomacyPanelState> panel = new FloatingPanel<>(
+        ShatteredPlansClient.SCREEN_WIDTH - DIPLOMACY_PANEL_WIDTH - PANEL_MARGIN,
+        STATUS_PANEL_HEIGHT + PANEL_MARGIN * 2,
+        DIPLOMACY_PANEL_WIDTH,
+        28 + _rga * playerCount,
+        StringConstants.TAB_NAME_DIPLOMACY.toUpperCase());
     final fe_<FloatingPanel<DiplomacyPanelState>> var2 = new fe_<>(panel.x + 200 - 16, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var2.data = panel;
     panel.addChild(var2);
@@ -581,7 +596,8 @@ public final class GameUI {
   }
 
   private static FloatingPanel<PanelState> createFleetInfoPanel(final int playerCount) {
-    final FloatingPanel<PanelState> panel = new FloatingPanel<>(0, -((4 + SHIP.offsetX) * playerCount) + 479 - 28, 200, (SHIP.offsetX + 4) * playerCount + 28, StringConstants.TAB_NAME_FLEET_INFO.toUpperCase());
+    final int height = (SHIP.offsetX + 4) * playerCount + 28;
+    final FloatingPanel<PanelState> panel = new FloatingPanel<>(PANEL_MARGIN, ShatteredPlansClient.SCREEN_HEIGHT - height - 30, 200, height, StringConstants.TAB_NAME_FLEET_INFO.toUpperCase());
     final fe_<FloatingPanel<PanelState>> var2 = new fe_<>(184 + panel.x, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var2.data = panel;
     panel.addChild(var2);
@@ -603,7 +619,7 @@ public final class GameUI {
   }
 
   private static FixedPanel createStatusPanel(final int width) {
-    final FixedPanel _goE = new FixedPanel(5, 5, width - 10, 45);
+    final FixedPanel _goE = new FixedPanel(PANEL_MARGIN, PANEL_MARGIN, width - (PANEL_MARGIN * 2), STATUS_PANEL_HEIGHT);
     final StatusPanelState var1 = new StatusPanelState();
     _goE.state = var1;
     final Icon var2 = new Icon(15, 10, 36, 36, null);
@@ -2014,7 +2030,7 @@ public final class GameUI {
 
     if (this._U != -1) {
       final int var4 = this._x;
-      final int var5 = 5 + this.statusPanel.height + this.statusPanel.y;
+      final int var5 = this.statusPanel.y + this.statusPanel.height + 5;
       Drawing.fillRoundedRect(this.statusPanel.x + 1, var5, this._T.width + 10, Menu.SMALL_FONT.ascent, 5, 0);
       Drawing.f669(this.statusPanel.x, var5 - 1, 12 + this._T.width, Menu.SMALL_FONT.ascent + 2, 6, 2052949);
       TutorialState.a833sa(var4 * 5, this.statusPanel.x + 6, 32, this._T, var5 - 4);
