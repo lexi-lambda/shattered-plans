@@ -34,7 +34,11 @@ For example, the following command will force the game to render at 1.5× standa
 java -Dfunorb.shatteredplans.client.uiScale=1.5 -Dfunorb.shatteredplans.client.aspectRatio=16:9 -jar shattered-plans-0.0.5.jar
 ```
 
-This is particularly useful on large screens, as it makes the in-game user interface less cramped. However, the game was originally designed to run at a fixed resolution of 640×480, so altering the UI scale may cause rendering glitches, and particularly large resolutions may cause performance problems on slower machines. All the critical UIs in the game have been patched to automatically adapt to larger UI scales, but some minor visual issues remain.
+In-game, the result looks like this:
+
+[![Screenshot of widescreen Shattered Plans gameplay.][screenshot-widescreen.png]][screenshot-widescreen.png]
+
+Setting these options is particularly useful on large screens, as it makes the in-game user interface less cramped. However, the game was originally designed to run at a fixed resolution of 640×480, so altering the UI scale may cause rendering glitches, and particularly large resolutions may cause performance problems on slower machines. All the critical UIs in the game have been patched to automatically adapt to larger UI scales, but some minor visual issues remain.
 
 ## What works, what doesn’t, and other limitations
 
@@ -71,3 +75,4 @@ Shattered Plans and FunOrb are the property of [Jagex Ltd.][jagex] This project 
 [funorb-wiki:shattered-plans]: https://funorb.fandom.com/wiki/Shattered_Plans
 [jagex]: https://www.jagex.com/
 [screenshot.png]: docs/screenshot.png
+[screenshot-widescreen.png]: docs/screenshot-widescreen.png
