@@ -11,8 +11,7 @@ public final class TutorialMessage {
   public String[] _m;
   public TutorialMessage next;
   @MagicConstant(valuesFromClass = Anchor.class)
-  public
-  int anchor;
+  public int anchor;
   public int _t;
   public TutorialObjective[] objectives;
   public boolean clearStack;

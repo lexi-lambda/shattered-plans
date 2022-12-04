@@ -3362,7 +3362,7 @@ public final class GameView extends AbstractGameView {
       Menu.FONT.drawCentered("Failure", 320, Menu.FONT.ascent + 240, Drawing.RED, alpha);
     }
 
-    this.gameUI.render();
+    this.gameUI.draw();
   }
 
   @Override

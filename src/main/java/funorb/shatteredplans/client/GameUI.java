@@ -355,7 +355,7 @@ public final class GameUI {
       TutorialState.a018jr("continuekey", StringConstants.TUTORIAL_CONTINUE_KEY);
       TutorialState.a018jr("captureAll", StringConstants.TUTORIAL_CAPTURE_ALL);
       TutorialState.a018jr("exit", StringConstants.TUTORIAL_EXIT);
-      TutorialState._hod = this.gameSession.localPlayer;
+      TutorialState.localPlayer = this.gameSession.localPlayer;
 
       for (int i = 0; i < this.gameSession.gameState.playerCount; ++i) {
         final Player var7 = this.gameSession.gameState.players[i];
@@ -1392,7 +1392,7 @@ public final class GameUI {
       }
     }
 
-    Menu.drawShine(statsX, STATS_SCREEN_Y, width, STATS_SCREEN_HEIGHT);
+    Menu.drawPanel(statsX, STATS_SCREEN_Y, width, STATS_SCREEN_HEIGHT);
     final int[] bounds = new int[4];
     Drawing.saveBoundsTo(bounds);
     Drawing.setBounds(statsX, STATS_SCREEN_Y, statsX + width, STATS_SCREEN_Y + STATS_SCREEN_HEIGHT);
@@ -1581,7 +1581,7 @@ public final class GameUI {
 
     final int var9 = this._ob[var1];
 
-    Menu.drawShine(var3, var2, 190, var9);
+    Menu.drawPanel(var3, var2, 190, var9);
     Menu.SMALL_FONT.draw(ShatteredPlansClient.STAT_NAMES[var5], 10 + var3, var2 + Menu.SMALL_FONT.ascent, Drawing.WHITE);
     final short var10 = 210;
     final int var11 = var10 / (6 + var6);
@@ -1972,9 +1972,9 @@ public final class GameUI {
     }
   }
 
-  public void render() {
+  public void draw() {
     if (this.gameSession.isTutorial) {
-      TutorialState.a423mq();
+      TutorialState.draw();
     }
 
     if (this.gameSession.isMultiplayer && !this.gameSession.gameState.hasEnded) {
@@ -2273,7 +2273,7 @@ public final class GameUI {
     final int var4 = (ShatteredPlansClient.SCREEN_WIDTH - var3) / 2;
     final byte var5 = 80;
     final short var6 = 250;
-    Menu.drawShine(var4, var5, var3, var6, 3974311, true);
+    Menu.drawPanel(var4, var5, var3, var6, 3974311, true);
     final int[] var7 = new int[4];
     Drawing.saveBoundsTo(var7);
     Drawing.setBounds(var4 + Menu.SMALL_FONT.ascent / 2, var5, -(Menu.SMALL_FONT.ascent / 2) + var4 + var3, 330);
@@ -2297,7 +2297,7 @@ public final class GameUI {
     }
 
     Menu.SMALL_FONT.draw(var8.toUpperCase(), 10 + var4, Menu.SMALL_FONT.ascent + var5, Drawing.WHITE);
-    Menu.drawShine(var4 + Menu.SMALL_FONT.ascent / 2, Menu.SMALL_FONT.ascent + var5 + 5, -Menu.SMALL_FONT.ascent + 450 + 1, 10 + FACTION_ICONS_LARGE[0].height, 0);
+    Menu.drawPanel(var4 + Menu.SMALL_FONT.ascent / 2, Menu.SMALL_FONT.ascent + var5 + 5, -Menu.SMALL_FONT.ascent + 450 + 1, 10 + FACTION_ICONS_LARGE[0].height, 0);
     int var10 = 0;
     if (this.gameSession.localPlayer != null) {
       var10 = this.gameSession.localPlayer.index;

@@ -212,8 +212,8 @@ public final class Menu {
     }
   }
 
-  public static void drawShine(final int x, final int y, final int width, final int height) {
-    drawShine(x, y, width, height, 0x3ca4a7);
+  public static void drawPanel(final int x, final int y, final int width, final int height) {
+    drawPanel(x, y, width, height, 0x3ca4a7);
   }
 
   private static void register(@MagicConstant(valuesFromClass = Id.class) final int id,
@@ -531,7 +531,7 @@ public final class Menu {
     }
   }
 
-  public static void drawShine(final int x, final int y, final int width, final int height, final int color, final boolean var0) {
+  public static void drawPanel(final int x, final int y, final int width, final int height, final int color, final boolean shiny) {
     if (width > 20 && height > 20) {
       final int[] bounds = new int[4];
       Drawing.saveBoundsTo(bounds);
@@ -558,7 +558,7 @@ public final class Menu {
         Drawing.setPixel(width + (x - 1), var8 + 10 + y, color2);
       }
 
-      if (var0) {
+      if (shiny) {
         SHINE_LEFT.drawAdd(x + 4, y + 3, 256);
         final int var8 = x + 4 + SHINE_LEFT.width;
         final int var9 = x + width - 3 - SHINE_RIGHT.width;
@@ -572,8 +572,8 @@ public final class Menu {
     }
   }
 
-  public static void drawShine(final int x, final int y, final int width, final int height, final int color) {
-    drawShine(x, y, width, height, color, false);
+  public static void drawPanel(final int x, final int y, final int width, final int height, final int color) {
+    drawPanel(x, y, width, height, color, false);
   }
 
   private static void a669ks(int var0, final int var2, int var3, int var4) {
@@ -1133,7 +1133,7 @@ public final class Menu {
         Drawing.fillRect(var4, var9, var8, var10, 0x0d0d14, (128 - var2) << 1);
       }
 
-      drawShine(var4, var9, var8, var10);
+      drawPanel(var4, var9, var8, var10);
       Drawing.saveBoundsTo(_sf);
       Drawing.setBounds(var4, var9, var4 + var8, var9 + var10);
       this.e093(var5, 7903);
@@ -1495,7 +1495,7 @@ public final class Menu {
     final int var4 = this.b474() - (var2 - this.c137() >> 1);
     final int var5 = this.h137() - 48 - var3;
     if (var2 > 20) {
-      drawShine(var4, var5, var2, var3);
+      drawPanel(var4, var5, var2, var3);
     }
 
     if (_onc == 32) {
@@ -1624,7 +1624,7 @@ public final class Menu {
     final int var12 = 20 + var4;
     final int var13 = var5 - 10;
     final int var14 = var6 + 10;
-    drawShine(var9, var13, var12, var14);
+    drawPanel(var9, var13, var12, var14);
     Drawing.saveBoundsTo(_sf);
     final int var15 = var10 + (var9 - 20);
     final int var16 = var12 + var9;
@@ -1651,7 +1651,7 @@ public final class Menu {
       final int var4 = this.b474() - (-this.c137() + var2 >> 1);
       final int var5 = this.h137() - var3 - 24;
       if (var2 > 20) {
-        drawShine(var4, var5, var2, var3);
+        drawPanel(var4, var5, var2, var3);
       }
 
       Drawing.setBounds(var4 + 8, 8 + var5, var2 + (var4 - 8), var3 + var5 - 8);
@@ -1711,7 +1711,7 @@ public final class Menu {
     final int var5 = this.b474() - (var3 - this.c137() >> 1);
     final int var6 = this.h137() - 60 - var4 - 48;
     if (var3 > 20) {
-      drawShine(var5, var6, var3, var4);
+      drawPanel(var5, var6, var3, var4);
     }
 
     Drawing.setBounds(8 + var5, 8 + var6, var5 + var3 - 8, var6 - 8 + var4);
@@ -2378,7 +2378,7 @@ public final class Menu {
     final int var7 = 20 + var2;
     final int var8 = var4 - 10;
     final int var9 = var3 + 10;
-    drawShine(var5, var8, var7, var9);
+    drawPanel(var5, var8, var7, var9);
     this.e093(var4, 7903);
   }
 
@@ -2574,7 +2574,7 @@ public final class Menu {
     final int var12 = (ShatteredPlansClient.SCREEN_WIDTH - var30) / 2;
     final short var13 = 220;
     if (var30 > 20) {
-      drawShine(var12, var13, var30, var11);
+      drawPanel(var12, var13, var30, var11);
     }
 
     Drawing.setBounds(10 + var12, var13, var12 + var30 - 10, 375);

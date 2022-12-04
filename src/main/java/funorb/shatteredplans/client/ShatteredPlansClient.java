@@ -3979,7 +3979,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   private static void a326ts(int var0, int var2) {
     var0 += 30;
     var2 += 30;
-    Menu.drawShine(-var0 + SCREEN_WIDTH >> 1, -var2 + SCREEN_HEIGHT >> 1, var0, var2);
+    Menu.drawPanel(-var0 + SCREEN_WIDTH >> 1, -var2 + SCREEN_HEIGHT >> 1, var0, var2);
   }
 
   private static void tickIgnoreList(final boolean mouseStill, final int mouseWheelRotation) {
@@ -4940,7 +4940,7 @@ public final class ShatteredPlansClient extends JagexApplet {
           final int height = 36;
           final int x = 10 + (maxWidth - width >> 1);
           final int y = 10;
-          Menu.drawShine(x, y, width, height);
+          Menu.drawPanel(x, y, width, height);
           Drawing.withBounds(x, y, x + width, y + height, () -> {
             final int var7 = 10 + (maxWidth / 2);
             Menu.achievementIcon(var3.achievementIndex).draw(var7 + maxWidth / 2 - 36, 14);
