@@ -487,43 +487,43 @@ public final class ShatteredPlansClient extends JagexApplet {
 
     GameUI.ANIM_ICONS = SpriteResource.loadSprites(spriteLoader, "", "anim_icons");
 
-    GameView._cos = new ArgbSprite(6, 6);
-    GameView._cos.pixels[ 0] = 0;
-    GameView._cos.pixels[ 1] = 0;
-    GameView._cos.pixels[ 2] = 0x33ffffff;
-    GameView._cos.pixels[ 3] = 0x22ffffff;
-    GameView._cos.pixels[ 4] = 0;
-    GameView._cos.pixels[ 5] = 0;
-    GameView._cos.pixels[ 6] = 0;
-    GameView._cos.pixels[ 7] = 0xffa2a2a2;
-    GameView._cos.pixels[ 8] = 0xffc7c7c7;
-    GameView._cos.pixels[ 9] = 0xffaeaeae;
-    GameView._cos.pixels[10] = 0xff545454;
-    GameView._cos.pixels[11] = 0;
-    GameView._cos.pixels[12] = 0x10000000;
-    GameView._cos.pixels[13] = 0xffa9a9a9;
-    GameView._cos.pixels[14] = 0xffc5c5c5;
-    GameView._cos.pixels[15] = 0xffb2b2b2;
-    GameView._cos.pixels[16] = 0xff5d5d5d;
-    GameView._cos.pixels[17] = 0x44000000;
-    GameView._cos.pixels[18] = 0x20000000;
-    GameView._cos.pixels[19] = 0xff707070;
-    GameView._cos.pixels[20] = 0xff909090;
-    GameView._cos.pixels[21] = 0xff666666;
-    GameView._cos.pixels[22] = 0xff2a2a2a;
-    GameView._cos.pixels[23] = 0x48000000;
-    GameView._cos.pixels[24] = 0;
-    GameView._cos.pixels[25] = 0xff323232;
-    GameView._cos.pixels[26] = 0xff2b2b2b;
-    GameView._cos.pixels[27] = 0xff1d1d1d;
-    GameView._cos.pixels[28] = 0xff202020;
-    GameView._cos.pixels[29] = 0;
-    GameView._cos.pixels[30] = 0;
-    GameView._cos.pixels[31] = 0;
-    GameView._cos.pixels[32] = 503316480;
-    GameView._cos.pixels[33] = 0x1bffffff;
-    GameView._cos.pixels[34] = 0;
-    GameView._cos.pixels[35] = 0;
+    GameView.PROJECT_LAMP = new ArgbSprite(6, 6);
+    GameView.PROJECT_LAMP.pixels[ 0] = 0;
+    GameView.PROJECT_LAMP.pixels[ 1] = 0;
+    GameView.PROJECT_LAMP.pixels[ 2] = 0x33ffffff;
+    GameView.PROJECT_LAMP.pixels[ 3] = 0x22ffffff;
+    GameView.PROJECT_LAMP.pixels[ 4] = 0;
+    GameView.PROJECT_LAMP.pixels[ 5] = 0;
+    GameView.PROJECT_LAMP.pixels[ 6] = 0;
+    GameView.PROJECT_LAMP.pixels[ 7] = 0xffa2a2a2;
+    GameView.PROJECT_LAMP.pixels[ 8] = 0xffc7c7c7;
+    GameView.PROJECT_LAMP.pixels[ 9] = 0xffaeaeae;
+    GameView.PROJECT_LAMP.pixels[10] = 0xff545454;
+    GameView.PROJECT_LAMP.pixels[11] = 0;
+    GameView.PROJECT_LAMP.pixels[12] = 0x10000000;
+    GameView.PROJECT_LAMP.pixels[13] = 0xffa9a9a9;
+    GameView.PROJECT_LAMP.pixels[14] = 0xffc5c5c5;
+    GameView.PROJECT_LAMP.pixels[15] = 0xffb2b2b2;
+    GameView.PROJECT_LAMP.pixels[16] = 0xff5d5d5d;
+    GameView.PROJECT_LAMP.pixels[17] = 0x44000000;
+    GameView.PROJECT_LAMP.pixels[18] = 0x20000000;
+    GameView.PROJECT_LAMP.pixels[19] = 0xff707070;
+    GameView.PROJECT_LAMP.pixels[20] = 0xff909090;
+    GameView.PROJECT_LAMP.pixels[21] = 0xff666666;
+    GameView.PROJECT_LAMP.pixels[22] = 0xff2a2a2a;
+    GameView.PROJECT_LAMP.pixels[23] = 0x48000000;
+    GameView.PROJECT_LAMP.pixels[24] = 0;
+    GameView.PROJECT_LAMP.pixels[25] = 0xff323232;
+    GameView.PROJECT_LAMP.pixels[26] = 0xff2b2b2b;
+    GameView.PROJECT_LAMP.pixels[27] = 0xff1d1d1d;
+    GameView.PROJECT_LAMP.pixels[28] = 0xff202020;
+    GameView.PROJECT_LAMP.pixels[29] = 0;
+    GameView.PROJECT_LAMP.pixels[30] = 0;
+    GameView.PROJECT_LAMP.pixels[31] = 0;
+    GameView.PROJECT_LAMP.pixels[32] = 503316480;
+    GameView.PROJECT_LAMP.pixels[33] = 0x1bffffff;
+    GameView.PROJECT_LAMP.pixels[34] = 0;
+    GameView.PROJECT_LAMP.pixels[35] = 0;
 
     GameView.RES_SIDES = new ArgbSprite[6];
     GameView.RES_LOWS = new ArgbSprite[6];
@@ -769,11 +769,11 @@ public final class ShatteredPlansClient extends JagexApplet {
 
   private static void a430u(final boolean var1) {
     if (ClientGameSession.playSession != null) {
-      ClientGameSession.playSession.render();
+      ClientGameSession.playSession.draw();
     }
 
     if (ClientGameSession.spectateSession != null) {
-      ClientGameSession.spectateSession.render();
+      ClientGameSession.spectateSession.draw();
     }
 
     if (_cjx && _tli) {

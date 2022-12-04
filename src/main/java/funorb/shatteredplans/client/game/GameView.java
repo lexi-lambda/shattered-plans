@@ -33,6 +33,8 @@ import java.util.Objects;
 public final class GameView extends AbstractGameView {
   public static final int[] RESOURCE_COLORS = new int[]{0x7fbfff, 0x7fdf2f, 0xff7f00, 0xff00ff};
   public static final double COS_THIRTY_DEGREES = Math.cos(0.5235987755982988D); // sqrt(3)/2
+  public static final int[] systemScoreOrbXOffsets = new int[4];
+  public static final int[] systemScoreOrbYOffsets = new int[4];
   private static final int[] _rj = new int[]{-65536, -65536, -65536, 0, -65536};
   private static final int TICKS_PER_ANIMATION_PHASE = 200;
   public static Sprite[] DEFNET_ANIM_MID;
@@ -54,7 +56,7 @@ public final class GameView extends AbstractGameView {
   public static Sprite[] FLEET_BUTTONS;
   public static Sprite[] RES_SIDES;
   public static Sprite[] RES_LOWS;
-  public static ArgbSprite _cos;
+  public static ArgbSprite PROJECT_LAMP;
   public static Sprite[] DEFNET_ANIM_SMALL;
   public static Sprite[] SYSTEM_ICONS;
   private static int[] _aib;
@@ -188,116 +190,115 @@ public final class GameView extends AbstractGameView {
     }
   }
 
-  public static void a070eo(final boolean var0, final int var1, final int var2, final int var3, final int var4, final int var5) {
-    final double var6 = Math.sqrt(MathUtil.euclideanDistanceSquared(var4 - var5, var2 - var1));
-    final double var8 = (double) (var4 - var5) / var6;
-    final double var10 = (double) (-var1 + var2) / var6;
-    int var12;
-    int var13;
-    if (var4 <= var5) {
-      var13 = var5;
-      var12 = var4;
+  public static void a070eo(final int x1, final int y1, final int x2, final int y2, final int var3, final boolean var0) {
+    final double distance = Math.sqrt(MathUtil.euclideanDistanceSquared(x2 - x1, y2 - y1));
+    final double cosine = (double) (x2 - x1) / distance;
+    final double sine = (double) (y2 - y1) / distance;
+    int xa;
+    int xb;
+    if (x2 <= x1) {
+      xb = x1;
+      xa = x2;
     } else {
-      var12 = var5;
-      var13 = var4;
+      xa = x1;
+      xb = x2;
     }
 
-    int var14;
-    int var15;
-    if (var2 > var1) {
-      var15 = var2;
-      var14 = var1;
+    int ya;
+    int yb;
+    if (y2 > y1) {
+      yb = y2;
+      ya = y1;
     } else {
-      var15 = var1;
-      var14 = var2;
+      yb = y1;
+      ya = y2;
     }
 
-    if (var8 > 0.0D) {
-      var14 -= 4;
-      var15 = (int) ((double) var15 + 4.0D + var8 * var6 / 10.0D);
+    if (cosine > 0.0D) {
+      ya -= 4;
+      yb = (int) ((double) yb + 4.0D + cosine * distance / 10.0D);
     } else {
-      var15 += 4;
-      var14 = (int) ((double) var14 + (var6 * var8 / 10.0D - 5.0D));
+      yb += 4;
+      ya = (int) ((double) ya + (distance * cosine / 10.0D - 5.0D));
     }
 
-    if (var10 > 0.0D) {
-      var13 += 4;
-      var12 = (int) ((double) var12 - (5.0D + var6 * var10 / 10.0D));
+    if (sine > 0.0D) {
+      xb += 4;
+      xa = (int) ((double) xa - (5.0D + distance * sine / 10.0D));
     } else {
-      var13 = (int) ((double) var13 - (-5.0 + var6 * var10 / 10.0D));
-      var12 -= 4;
+      xb = (int) ((double) xb - (-5.0 + distance * sine / 10.0D));
+      xa -= 4;
     }
 
-    if (var12 < 0) {
-      var12 = 0;
+    if (xa < 0) {
+      xa = 0;
     }
 
-    if (var14 < 0) {
-      var14 = 0;
+    if (ya < 0) {
+      ya = 0;
     }
 
-    if (var13 > 639) {
-      var13 = 639;
+    if (xb > Drawing.width - 1) {
+      xb = Drawing.width - 1;
+    }
+    if (yb > Drawing.height - 1) {
+      yb = Drawing.height - 1;
     }
 
-    if (var15 > 479) {
-      var15 = 479;
-    }
-
-    final double var36 = 1.0D / var6;
-    final double var38 = var6 / 2.0D;
+    final double var36 = 1.0D / distance;
+    final double var38 = distance / 2.0D;
     final double var40 = 1.0D / var38;
-    final double var42 = var10 != 0.0D ? 1.0D / var10 : 0.0D;
-    final double var44 = var6 / 10.0D;
-    double var46 = var1 - var2;
-    double var48 = -var4 + var5;
+    final double var42 = sine != 0.0D ? 1.0D / sine : 0.0D;
+    final double var44 = distance / 10.0D;
+    double var46 = y1 - y2;
+    double var48 = -x2 + x1;
     final double var50 = Math.sqrt(var46 * var46 + var48 * var48);
     var48 /= var50;
     var46 /= var50;
-    double var52 = (var44 + 4.0D) / Math.cos(Math.atan(var8 / var10));
+    double var52 = (var44 + 4.0D) / Math.cos(Math.atan(cosine / sine));
     if (var52 < 0.0D) {
       var52 = -var52;
     }
 
-    for (int var55 = 0; var55 < var15 + (1 - var14); ++var55) {
-      final int var33 = var14 + (var55 - var1);
+    for (int var55 = 0; var55 < yb + (1 - ya); ++var55) {
+      final int var33 = ya + (var55 - y1);
       final double var25 = (double) var33 * var42;
-      final double var27 = (double) var5 + var8 * var25;
+      final double var27 = (double) x1 + cosine * var25;
       int var34;
       int var35;
-      if (var10 >= 0.0D) {
-        if (var10 == 0.0D) {
-          var35 = 1 + var13 - var12;
+      if (sine >= 0.0D) {
+        if (sine == 0.0D) {
+          var35 = 1 + xb - xa;
           var34 = 0;
         } else {
-          var35 = (int) ((double) (-var12) + 8.0D + var27);
-          var34 = -var12 + (int) (var27 - var52);
+          var35 = (int) ((double) (-xa) + 8.0D + var27);
+          var34 = -xa + (int) (var27 - var52);
           if (var34 < 0) {
             var34 = 0;
           }
         }
       } else {
-        var35 = (int) (var27 + var52) + 1 - var12;
-        var34 = (int) ((double) (-var12) + (var27 - 8.0D));
-        if (-var12 + var13 + 1 < var35) {
-          var35 = 1 + (var13 - var12);
+        var35 = (int) (var27 + var52) + 1 - xa;
+        var34 = (int) ((double) (-xa) + (var27 - 8.0D));
+        if (-xa + xb + 1 < var35) {
+          var35 = 1 + (xb - xa);
         }
       }
 
       for (int var56 = var34; var35 > var56; ++var56) {
-        final double var31 = -var27 + (double) (var56 + var12);
+        final double var31 = -var27 + (double) (var56 + xa);
         final double var19 = -(var31 * var48) + var25;
-        if (var19 >= 0.0D && var19 <= var6 * (double) var3 / 200.0D) {
+        if (var19 >= 0.0D && var19 <= distance * (double) var3 / 200.0D) {
           final double var17;
-          if (var6 / 4.0D <= var19) {
+          if (distance / 4.0D <= var19) {
             var17 = 4.0D;
           } else {
             var17 = 1.0D + var36 * 4.0D * var19 * 3.0D;
           }
 
           final double var23;
-          if (var10 == 0.0D) {
-            var23 = var8 * (double) var33;
+          if (sine == 0.0D) {
+            var23 = cosine * (double) var33;
           } else {
             var23 = var31 * var46;
           }
@@ -309,8 +310,8 @@ public final class GameView extends AbstractGameView {
           }
 
           if (var29 <= var17) {
-            if (var19 > var6) {
-              var29 = Math.sqrt((var12 + var56 - var4) * (-var4 + var12 + var56) + (var14 - (-var55 + var2)) * (-var2 + var55 + var14));
+            if (var19 > distance) {
+              var29 = Math.sqrt((xa + var56 - x2) * (-x2 + xa + var56) + (ya - (-var55 + y2)) * (-y2 + var55 + ya));
               if (var29 > var17) {
                 continue;
               }
@@ -320,7 +321,7 @@ public final class GameView extends AbstractGameView {
             if (var0) {
               Drawing.setPixel(var56, var55, var16 << 24 | Drawing.WHITE);
             } else {
-              Drawing.addPixel(var12 + var56, var55 + var14, Drawing.WHITE, var16);
+              Drawing.addPixel(xa + var56, var55 + ya, Drawing.WHITE, var16);
             }
           }
         }
@@ -1879,16 +1880,31 @@ public final class GameView extends AbstractGameView {
 
   }
 
-  private void c815(final StarSystem var1) {
-    this.drawSystemResources(var1);
-    this.drawSystemProjectHighlights(var1);
-    this.b815(var1);
+  public static void a487ai() {
+    double var0 = Math.PI * (double) (ShatteredPlansClient.currentTick % 512) / 256.0D;
+    final int var2 = 16 * (GameUI.FACTION_RING.width / 2 - 9);
+    systemScoreOrbXOffsets[0] = (int) ((double) var2 * Math.sin(var0));
+    systemScoreOrbYOffsets[0] = (int) (Math.cos(var0) * (double) var2);
+    systemScoreOrbXOffsets[1] = -systemScoreOrbXOffsets[0];
+    systemScoreOrbYOffsets[1] = -systemScoreOrbYOffsets[0];
+    var0 += 2.0943951023931953D;
+    systemScoreOrbXOffsets[2] = (int) (Math.sin(var0) * (double) var2);
+    systemScoreOrbYOffsets[2] = (int) ((double) var2 * Math.cos(var0));
+    var0 += 2.0943951023931953D;
+    systemScoreOrbXOffsets[3] = (int) (Math.sin(var0) * (double) var2);
+    systemScoreOrbYOffsets[3] = (int) (Math.cos(var0) * (double) var2);
+  }
+
+  private void drawSystemInformation(final StarSystem system) {
+    this.drawSystemResources(system);
+    this.drawSystemProjectHighlights(system);
+    this.drawSystemFactionRingAndNameplate(system);
     if (this.unitScalingFactor < 1024.0F) {
-      this.d815(var1);
+      this.drawSystemProjectLamps(system);
     }
   }
 
-  private void drawSystems() {
+  private void drawSystemsAndPendingOrders() {
     if (this.unitScalingFactor > 1024.0F) {
       final int maxRemainingGarrison = Arrays.stream(this.map.systems)
           .mapToInt(var5 -> var5.remainingGarrison)
@@ -1941,7 +1957,7 @@ public final class GameView extends AbstractGameView {
 
       for (final StarSystem system : this.map.systems) {
         if (isOnScreen(this.systemBounds[system.index])) {
-          this.c815(system);
+          this.drawSystemInformation(system);
           if (this.unitScalingFactor > 330.0F && system.hasDefensiveNet) {
             this.drawDefensiveNet(system);
           }
@@ -2167,13 +2183,13 @@ public final class GameView extends AbstractGameView {
             this._K.draw(-this._K.width + var5 + 4, var6 - 4);
           }
         } else {
-          a070eo(false, var16, var6, TICKS_PER_ANIMATION_PHASE, var5, var15);
+          a070eo(var15, var16, var5, var6, TICKS_PER_ANIMATION_PHASE, false);
         }
 
         if (this.unitScalingFactor < 700.0F && var4 <= 12) {
           Drawing.strokeCircle(var5, var6, 30, Drawing.WHITE);
           Drawing.fillCircle(var5, var6, 30, Drawing.WHITE, 92);
-          a194ie((ArgbSprite) this.localPlayer._n, ARROW_SHIP.width << 3, ARROW_SHIP.height << 3, var5 * 16, var6 * 16, 3800 + (var37 - 16384), 4096);
+          a194ie((ArgbSprite) this.localPlayer.shipSprite, ARROW_SHIP.width << 3, ARROW_SHIP.height << 3, var5 * 16, var6 * 16, 3800 + (var37 - 16384), 4096);
           Drawing.fillCircle(var5, var6, 9, 0, 92);
           Menu.SMALL_FONT.drawCentered(Integer.toString(this._rb.quantity), var5, var6 + 4, Drawing.WHITE);
           FLEET_BUTTONS[0].draw(30 + (var5 - FLEET_BUTTONS[0].width / 2), -(FLEET_BUTTONS[0].height / 2) + var6);
@@ -2185,7 +2201,7 @@ public final class GameView extends AbstractGameView {
           --var39;
           Drawing.strokeCircle(var38, var39, 30, Drawing.WHITE);
           Drawing.fillCircle(var38, var39, 30, Drawing.WHITE, 92);
-          a194ie((ArgbSprite) this.localPlayer._n, ARROW_SHIP.width << 3, ARROW_SHIP.height << 3, 16 * var38, 16 * var39, var37 - 16384, 4096);
+          a194ie((ArgbSprite) this.localPlayer.shipSprite, ARROW_SHIP.width << 3, ARROW_SHIP.height << 3, 16 * var38, 16 * var39, var37 - 16384, 4096);
           Drawing.fillCircle(var38, var39, 9, 0, 92);
           Menu.SMALL_FONT.drawCentered(Integer.toString(this._rb.quantity), var38, var39 + 4, Drawing.WHITE);
           FLEET_BUTTONS[0].draw(30 + var38 - FLEET_BUTTONS[0].width / 2, -(FLEET_BUTTONS[0].height / 2) + var39);
@@ -2232,7 +2248,7 @@ public final class GameView extends AbstractGameView {
 
         Drawing.strokeCircle(var2, var24, 30, Drawing.WHITE);
         Drawing.fillCircle(var2, var24, 30, Drawing.WHITE, 92);
-        a194ie((ArgbSprite) this.localPlayer._n, ARROW_SHIP.width << 3, ARROW_SHIP.height << 3, var2 * 16, 16 * var24, var6 - 16384, 4096);
+        a194ie((ArgbSprite) this.localPlayer.shipSprite, ARROW_SHIP.width << 3, ARROW_SHIP.height << 3, var2 * 16, 16 * var24, var6 - 16384, 4096);
         Drawing.fillCircle(var2, var24, 9, 0, 92);
         Menu.SMALL_FONT.drawCentered(Integer.toString(this._rb.quantity), var2, 4 + var24, Drawing.WHITE);
         FLEET_BUTTONS[0].draw(var2 + (30 - FLEET_BUTTONS[0].width / 2), -(FLEET_BUTTONS[0].height / 2) + var24);
@@ -2383,41 +2399,33 @@ public final class GameView extends AbstractGameView {
     }
   }
 
-  private void a527(final StarSystem system, final boolean var1) {
-    int var10;
-    int var12;
-    int var13;
-    int var14;
-    int var15;
-    int var16;
-    int var17;
-    int var18;
+  private void a527(final StarSystem target, final boolean var1) {
     if (this.unitScalingFactor > 1024.0F) {
       final int[] var5 = new int[]{-14671840, -12566464, -10461088, -8355712};
 
-      for (final MoveFleetsOrder var6 : system.incomingOrders) {
-        final StarSystem var7 = var6.source;
-        final int var8 = var7.index;
-        final int var9 = system.index;
-        var10 = this.systemDrawX[var8];
-        final int var11 = this.systemDrawY[var8];
-        var12 = this.systemDrawX[var9];
-        var13 = this.systemDrawY[var9];
-        var14 = (int) Math.sqrt(MathUtil.euclideanDistanceSquared(var12 - var10, -var11 + var13)) + 1;
+      for (final MoveFleetsOrder order : target.incomingOrders) {
+        final StarSystem source = order.source;
+        final int index1 = source.index;
+        final int index2 = target.index;
+        final int x1 = this.systemDrawX[index1];
+        final int y1 = this.systemDrawY[index1];
+        final int x2 = this.systemDrawX[index2];
+        final int y2 = this.systemDrawY[index2];
+        final int distance = MathUtil.euclideanDistance(x2 - x1, y2 - y1) + 1;
 
-        for (var15 = ShatteredPlansClient.currentTick / 2 % 10; var14 > var15; var15 += 10) {
-          var16 = (1 + 2 * var15 * (var12 - var10)) / (var14 * 2) + var10;
-          var17 = var11 + (var15 * 2 * (var13 - var11) + 1) / (var14 * 2);
+        for (int i = ShatteredPlansClient.currentTick / 2 % 10; i < distance; i += 10) {
+          final int var16 = (1 + 2 * i * (x2 - x1)) / (distance * 2) + x1;
+          final int var17 = y1 + (i * 2 * (y2 - y1) + 1) / (distance * 2);
           Drawing.drawCircleGradientAdd(var16 << 4, var17 << 4, 30, 3, var5);
         }
 
-        var15 = (var10 + var12) / 2;
-        var16 = (var11 + var13) / 2;
+        final int var15 = (x1 + x2) / 2;
+        final int var16 = (y1 + y2) / 2;
         Drawing.fillCircle(var15, var16 - 1, 9, Drawing.WHITE, 192);
-        Menu.SMALL_FONT.drawCentered(Integer.toString(var6.quantity), var15, 3 + var16, 0);
-        if (var6 == this._rb) {
-          var17 = (var10 + var12) / 2;
-          var18 = (var13 + var11) / 2;
+        Menu.SMALL_FONT.drawCentered(Integer.toString(order.quantity), var15, 3 + var16, 0);
+        if (order == this._rb) {
+          final int var17 = (x1 + x2) / 2;
+          final int var18 = (y2 + y1) / 2;
           this._ub[0] = var17;
           this._ub[1] = var18;
           if (this._rb == this._Db) {
@@ -2428,7 +2436,7 @@ public final class GameView extends AbstractGameView {
       }
 
     } else {
-      final int var32 = (int) system.incomingOrders.stream().filter(var6 -> this.localPlayer == var6.player).count();
+      final int var32 = (int) target.incomingOrders.stream().filter(var6 -> this.localPlayer == var6.player).count();
       if (var32 != 0) {
         final int var33;
         if (this.unitScalingFactor < 330.0F) {
@@ -2440,7 +2448,7 @@ public final class GameView extends AbstractGameView {
         final boolean[] var34 = new boolean[var33];
         final int[] var35 = new int[2 * var33];
 
-        for (var10 = 0; var33 > var10; ++var10) {
+        for (int var10 = 0; var33 > var10; ++var10) {
           final double var37 = Math.PI * (double) (var10 * 2) / (double) var33;
           if (this.unitScalingFactor < 330.0F && var37 >= 4.4505895925855405D && var37 <= 4.97418836818384D) {
             var34[var10] = true;
@@ -2450,47 +2458,46 @@ public final class GameView extends AbstractGameView {
 
           final double var39 = Math.sin(var37);
           final double var40 = Math.cos(var37);
-          var35[2 * var10] = this.systemDrawX[system.index] + (int) (var40 * 150.0D * this._wb);
-          var35[1 + 2 * var10] = this.systemDrawY[system.index] + (int) (150.0D * this._wb * var39);
+          var35[2 * var10] = this.systemDrawX[target.index] + (int) (var40 * 150.0D * this._wb);
+          var35[1 + 2 * var10] = this.systemDrawY[target.index] + (int) (150.0D * this._wb * var39);
         }
 
-        for (final MoveFleetsOrder var6 : system.incomingOrders) {
-          if (this.localPlayer == var6.player) {
-            final StarSystem var36 = var6.source;
-            final StarSystem var38 = var6.target;
-            var12 = var36.index;
-            var13 = var38.index;
-            var14 = this.systemDrawX[var12];
-            var15 = this.systemDrawY[var12];
-            var16 = this.systemDrawX[var13];
-            var17 = this.systemDrawY[var13];
+        for (final MoveFleetsOrder order : target.incomingOrders) {
+          if (this.localPlayer == order.player) {
+            final StarSystem source = order.source;
+            final int var12 = source.index;
+            final int var13 = target.index;
+            final int var14 = this.systemDrawX[var12];
+            final int var15 = this.systemDrawY[var12];
+            final int var16 = this.systemDrawX[var13];
+            final int var17 = this.systemDrawY[var13];
             final double var22 = Math.sqrt((var16 - var14) * (-var14 + var16) + (-var15 + var17) * (var17 - var15));
             final double var24 = (double) (-var14 + var16) / var22;
             final int var20 = -((int) (150.0D * this.zoomFactor * var24)) + var16;
             final double var26 = (double) (-var15 + var17) / var22;
             final int var21 = var17 - (int) (var26 * 150.0D * this.zoomFactor);
             final int var28 = this.a357(var20, var35, var34, var15, var26, var21, var14, var24);
-            final int i = var35[2 * var28];
-            final int i1 = var35[2 * var28 + 1];
-            double sqrt = Math.sqrt((i - var14) * (-var14 + i) + (i1 - var15) * (-var15 + i1));
-            final double v = (double) (i1 - var15) / sqrt;
-            final double v1 = (double) (-var14 + i) / sqrt;
-            final int var19 = var15 + (int) ((double) this._Hb * v);
-            var18 = var14 + (int) ((double) this._Hb * v1);
+            final int targetX = var35[2 * var28];
+            final int targetY = var35[2 * var28 + 1];
+            double sqrt = Math.sqrt((targetX - var14) * (-var14 + targetX) + (targetY - var15) * (-var15 + targetY));
+            final double v = (double) (targetY - var15) / sqrt;
+            final double v1 = (double) (-var14 + targetX) / sqrt;
+            final int sourceY = var15 + (int) ((double) this._Hb * v);
+            final int sourceX = var14 + (int) ((double) this._Hb * v1);
             int var41;
             int var42;
-            if (var6 == this._rb) {
+            if (order == this._rb) {
               if (this.unitScalingFactor < 700.0F && var33 <= 12) {
-                this._ub[1] = i1;
-                this._ub[0] = i;
+                this._ub[1] = targetY;
+                this._ub[0] = targetX;
                 if (this._Db == this._rb) {
-                  this._tb[0] = i;
-                  this._tb[1] = i1;
+                  this._tb[0] = targetX;
+                  this._tb[1] = targetY;
                 }
               } else {
-                var41 = (i + var18) / 2;
-                sqrt = Math.sqrt(MathUtil.euclideanDistanceSquared(-i + var18, var19 - i1));
-                var42 = (i1 + var19) / 2;
+                var41 = (targetX + sourceX) / 2;
+                sqrt = Math.sqrt(MathUtil.euclideanDistanceSquared(-targetX + sourceX, sourceY - targetY));
+                var42 = (targetY + sourceY) / 2;
                 var41 = (int) ((double) var41 + sqrt * -v / 10.0D);
                 var42 = (int) ((double) var42 + sqrt * v1 / 10.0D);
                 this._ub[0] = var41;
@@ -2516,7 +2523,7 @@ public final class GameView extends AbstractGameView {
                 var41 = 0;
               }
             } else {
-              double var30 = -var15 + i1;
+              double var30 = -var15 + targetY;
               if (var30 < 0.0D) {
                 var30 = -var30;
               }
@@ -2535,37 +2542,37 @@ public final class GameView extends AbstractGameView {
 
             if (var1) {
               if (this.unitScalingFactor < 700.0F && var33 <= 12) {
-                a194ie((ArgbSprite) this.localPlayer._n, ARROW_SHIP.width << 3, ARROW_SHIP.height << 3, 16 * i, i1 * 16, var41 + 3800 - 16384, 4096);
-                Drawing.fillCircle(i, i1, 9, 0, 92);
-                Menu.SMALL_FONT.drawCentered(Integer.toString(var6.quantity), i, 4 + i1, Drawing.WHITE);
+                a194ie((ArgbSprite) this.localPlayer.shipSprite, ARROW_SHIP.width << 3, ARROW_SHIP.height << 3, 16 * targetX, targetY * 16, var41 + 3800 - 16384, 4096);
+                Drawing.fillCircle(targetX, targetY, 9, 0, 92);
+                Menu.SMALL_FONT.drawCentered(Integer.toString(order.quantity), targetX, 4 + targetY, Drawing.WHITE);
               } else {
-                Drawing.drawCircleGradientAdd(16 * i, i1 * 16, 60, _rj.length - 1, new int[]{-65536, -65536, 0, -65536, -65536});
+                Drawing.drawCircleGradientAdd(16 * targetX, targetY * 16, 60, _rj.length - 1, new int[]{-65536, -65536, 0, -65536, -65536});
               }
 
               if (this.unitScalingFactor > 700.0F) {
-                var42 = (i + var18) / 2;
-                int var31 = (i1 + var19) / 2;
+                var42 = (targetX + sourceX) / 2;
+                int var31 = (targetY + sourceY) / 2;
                 var42 -= (int) (v * (sqrt / 10.0D));
                 var31 += (int) (v1 * (sqrt / 10.0D));
                 Drawing.fillCircle(var42, var31 - 1, 9, Drawing.WHITE, 192);
-                Menu.SMALL_FONT.drawCentered(Integer.toString(var6.quantity), var42, 3 + var31, 0);
+                Menu.SMALL_FONT.drawCentered(Integer.toString(order.quantity), var42, 3 + var31, 0);
               }
             } else if (sqrt > 1.0D + (0.5D + this.zoomFactor * 300.0D - 150.0D * this._wb)) {
-              a070eo(false, var19, i1, 200, i, var18);
+              a070eo(sourceX, sourceY, targetX, targetY, 200, false);
             } else if (var41 == 0) {
-              this._Cb.draw(-this._Cb.width + i + 4, var19 - 4);
+              this._Cb.draw(-this._Cb.width + targetX + 4, sourceY - 4);
             } else if (var41 == 32768) {
-              this._Cb.i093(i - 3, 4 + var19 - this._Cb.height + 1);
+              this._Cb.i093(targetX - 3, 4 + sourceY - this._Cb.height + 1);
             } else if (var41 >= 16384) {
               if (var41 > 16384 && var41 < 32768) {
-                this._Ob.draw(i - 4, i1 - 4);
+                this._Ob.draw(targetX - 4, targetY - 4);
               } else if (var41 > 32768 && var41 < 49152) {
-                this._K.i093(1 + i - 4, -this._K.height + i1 + 5);
+                this._K.i093(1 + targetX - 4, -this._K.height + targetY + 5);
               } else if (var41 > 49152) {
-                this._Ob.i093(4 - this._Ob.width + i + 1, 4 + i1 - (this._Ob.height - 1));
+                this._Ob.i093(4 - this._Ob.width + targetX + 1, 4 + targetY - (this._Ob.height - 1));
               }
             } else {
-              this._K.draw(4 + (i - this._K.width), i1 - 4);
+              this._K.draw(4 + (targetX - this._K.width), targetY - 4);
             }
           }
         }
@@ -2667,12 +2674,12 @@ public final class GameView extends AbstractGameView {
 
           var39 -= 16384;
           var39 = var39 + 7600 * this.animationTick / TICKS_PER_ANIMATION_PHASE - 3800;
-          final ArgbSprite var40 = (ArgbSprite) (var3 ? var5.player._b : var5.player._n);
+          final ArgbSprite var40 = (ArgbSprite) (var3 ? var5.player._b : var5.player.shipSprite);
           a194ie(var40, ARROW_SHIP.width << 3, ARROW_SHIP.height << 3, var34, var35, var39, 4096);
           Drawing.fillCircle(var34 >> 4, var35 >> 4, 9, 0, 92);
           Menu.SMALL_FONT.drawCentered(Integer.toString(var5.quantity), var34 >> 4, (var35 >> 4) + 4, Drawing.WHITE);
         } else {
-          a070eo(false, var17, var19, this.animationTick, var18, var16);
+          a070eo(var16, var17, var18, var19, this.animationTick, false);
         }
       }
 
@@ -2693,12 +2700,12 @@ public final class GameView extends AbstractGameView {
         this._ib[var2]._v.pixels[var4] = (-16777216 & FLEETS_ARROW_SHIP.pixels[var4]) + (Drawing.WHITE & this._ib[var2]._v.pixels[var4]);
       }
 
-      this._ib[var2]._n = new ArgbSprite(ARROW_SHIP.offsetX, ARROW_SHIP.offsetY);
-      this._ib[var2]._n.installForDrawing();
+      this._ib[var2].shipSprite = new ArgbSprite(ARROW_SHIP.offsetX, ARROW_SHIP.offsetY);
+      this._ib[var2].shipSprite.installForDrawing();
       ARROW_SHIP.drawTinted(0, 0, var3);
 
       for (var4 = 0; var4 < ARROW_SHIP.pixels.length; ++var4) {
-        this._ib[var2]._n.pixels[var4] = (-16777216 & ARROW_SHIP.pixels[var4]) + (this._ib[var2]._n.pixels[var4] & Drawing.WHITE);
+        this._ib[var2].shipSprite.pixels[var4] = (-16777216 & ARROW_SHIP.pixels[var4]) + (this._ib[var2].shipSprite.pixels[var4] & Drawing.WHITE);
       }
 
       this._ib[var2]._b = new ArgbSprite(ARROW_SHIP_DAMAGED.offsetX, ARROW_SHIP_DAMAGED.offsetY);
@@ -2970,11 +2977,11 @@ public final class GameView extends AbstractGameView {
     }
   }
 
-  private void d815(final StarSystem var1) {
+  private void drawSystemProjectLamps(final StarSystem system) {
     for (final ProjectOrder order : this.projectOrders) {
-      if (order.target == var1 || order.type == ResourceType.EXOTICS && order.source == var1) {
-        int var4 = this.systemDrawX[var1.index];
-        int var5 = this.systemDrawY[var1.index];
+      if (order.target == system || order.type == ResourceType.EXOTICS && order.source == system) {
+        int var4 = this.systemDrawX[system.index];
+        int var5 = this.systemDrawY[system.index];
         if (this.unitScalingFactor < 330.0F) {
           var5 -= 7 * this._n / 10 + 44;
         }
@@ -2993,7 +3000,7 @@ public final class GameView extends AbstractGameView {
           var5 -= 20;
         }
 
-        _cos.drawTinted(var4, var5, RESOURCE_COLORS[order.type]);
+        PROJECT_LAMP.drawTinted(var4, var5, RESOURCE_COLORS[order.type]);
       }
     }
   }
@@ -3083,48 +3090,46 @@ public final class GameView extends AbstractGameView {
     }
   }
 
-  private void b815(final StarSystem var1) {
-    final int var3 = var1.index;
-    final Player var4 = this.clonedSystemOwners[var3];
-    final int var5 = var4 == null ? 8421504 : var4.color1;
+  private void drawSystemFactionRingAndNameplate(final StarSystem system) {
+    final int index = system.index;
+    final Player owner = this.clonedSystemOwners[index];
+    final int color = owner == null ? 0x808080 : owner.color1;
 
     if (this.unitScalingFactor < 330.0F) {
-      GameUI.FACTION_RING_CENTER.drawTinted(-(GameUI.FACTION_RING_CENTER.width / 2) + this.systemDrawX[var1.index], -(7 * this._n / 10) + this.systemDrawY[var1.index] - 63, var5);
+      GameUI.FACTION_RING_CENTER.drawTinted(-(GameUI.FACTION_RING_CENTER.width / 2) + this.systemDrawX[system.index], -(7 * this._n / 10) + this.systemDrawY[system.index] - 63, color);
       if (this.isTutorial && TutorialState._vcj) {
-        GameUI.FACTION_RING_CENTER.draw(-(GameUI.FACTION_RING_CENTER.width / 2) + this.systemDrawX[var1.index], -(7 * this._n / 10) + this.systemDrawY[var1.index] - 63, uiPulseCounter);
+        GameUI.FACTION_RING_CENTER.draw(-(GameUI.FACTION_RING_CENTER.width / 2) + this.systemDrawX[system.index], -(7 * this._n / 10) + this.systemDrawY[system.index] - 63, uiPulseCounter);
       }
+      GameUI.FACTION_RING_TAG.draw(-(GameUI.FACTION_RING_TAG.width / 2) + this.systemDrawX[system.index], -(this._n * 7 / 10) + this.systemDrawY[system.index] - 72);
+      Menu.SMALL_FONT.drawCentered(Integer.toString(this.clonedRemainingGarrisons[index]), this.systemDrawX[index], this.systemDrawY[index] - 41 - 7 * this._n / 10, Drawing.WHITE);
+      Menu.SMALL_FONT.drawCentered(system.name, this.systemDrawX[index], this.systemDrawY[index] - 7 * this._n / 10 - 11, Drawing.WHITE);
 
-      GameUI.FACTION_RING_TAG.draw(-(GameUI.FACTION_RING_TAG.width / 2) + this.systemDrawX[var1.index], -(this._n * 7 / 10) + this.systemDrawY[var1.index] - 72);
-      Menu.SMALL_FONT.drawCentered(Integer.toString(this.clonedRemainingGarrisons[var3]), this.systemDrawX[var3], this.systemDrawY[var3] - 41 - 7 * this._n / 10, Drawing.WHITE);
-      Menu.SMALL_FONT.drawCentered(var1.name, this.systemDrawX[var3], this.systemDrawY[var3] - 7 * this._n / 10 - 11, Drawing.WHITE);
-      if (var1.score > 0 && var1.type < 6) {
-        Drawing.drawCircleGradientAdd(Menu._emc[0] + (this.systemDrawX[var3] << 4), (this.systemDrawY[var3] - (7 * this._n / 10 + 45) << 4) + Menu._pmDb[0], 50, 7, GameUI._hs);
-        if (var1.score == StarSystem.Score.NEUTRAL_HOMEWORLD) {
-          Drawing.drawCircleGradientAdd(Menu._emc[1] + (this.systemDrawX[var3] << 4), Menu._pmDb[1] + (this.systemDrawY[var3] - 45 - this._n * 7 / 10 << 4), 50, 7, GameUI._hs);
+      if (system.score > 0 && system.type < StarSystem.Type.ALIEN_MINER) {
+        Drawing.drawCircleGradientAdd((this.systemDrawX[index] << 4) + systemScoreOrbXOffsets[0], (this.systemDrawY[index] - (7 * this._n / 10 + 45) << 4) + systemScoreOrbYOffsets[0], 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
+        if (system.score == StarSystem.Score.NEUTRAL_HOMEWORLD) {
+          Drawing.drawCircleGradientAdd(systemScoreOrbXOffsets[1] + (this.systemDrawX[index] << 4), systemScoreOrbYOffsets[1] + (this.systemDrawY[index] - 45 - this._n * 7 / 10 << 4), 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
         }
-
-        if (var1.score == StarSystem.Score.PLAYER_HOMEWORLD) {
-          Drawing.drawCircleGradientAdd(Menu._emc[2] + (this.systemDrawX[var3] << 4), Menu._pmDb[2] + (this.systemDrawY[var3] + (-(this._n * 7 / 10) - 45) << 4), 50, 7, GameUI._hs);
-          Drawing.drawCircleGradientAdd((this.systemDrawX[var3] << 4) + Menu._emc[3], Menu._pmDb[3] + (this.systemDrawY[var3] - 7 * this._n / 10 - 45 << 4), 50, 7, GameUI._hs);
+        if (system.score == StarSystem.Score.PLAYER_HOMEWORLD) {
+          Drawing.drawCircleGradientAdd(systemScoreOrbXOffsets[2] + (this.systemDrawX[index] << 4), systemScoreOrbYOffsets[2] + (this.systemDrawY[index] + (-(this._n * 7 / 10) - 45) << 4), 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
+          Drawing.drawCircleGradientAdd((this.systemDrawX[index] << 4) + systemScoreOrbXOffsets[3], systemScoreOrbYOffsets[3] + (this.systemDrawY[index] - 7 * this._n / 10 - 45 << 4), 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
         }
       }
     } else if (this.unitScalingFactor < 1024.0F) {
-      GameUI.FACTION_RING_CENTER.drawTinted(-(GameUI.FACTION_RING_CENTER.width / 2) + this.systemDrawX[var1.index], this.systemDrawY[var1.index] - GameUI.FACTION_RING_CENTER.height / 2, var5);
-      GameUI.FACTION_RING.draw(this.systemDrawX[var1.index] - GameUI.FACTION_RING.width / 2, this.systemDrawY[var1.index] - 3 - GameUI.FACTION_RING.height / 2);
-      Menu.SMALL_FONT.drawCentered(Integer.toString(this.clonedRemainingGarrisons[var3]), this.systemDrawX[var3], this.systemDrawY[var3] + 4, Drawing.WHITE);
-      if (var1.score > 0 && var1.type < 6) {
-        Drawing.drawCircleGradientAdd((this.systemDrawX[var3] << 4) + Menu._emc[0], (this.systemDrawY[var3] << 4) + Menu._pmDb[0], 50, 7, GameUI._hs);
-        if (var1.score == StarSystem.Score.NEUTRAL_HOMEWORLD) {
-          Drawing.drawCircleGradientAdd((this.systemDrawX[var3] << 4) + Menu._emc[1], Menu._pmDb[1] + (this.systemDrawY[var3] << 4), 50, 7, GameUI._hs);
-        }
+      GameUI.FACTION_RING_CENTER.drawTinted(-(GameUI.FACTION_RING_CENTER.width / 2) + this.systemDrawX[system.index], this.systemDrawY[system.index] - GameUI.FACTION_RING_CENTER.height / 2, color);
+      GameUI.FACTION_RING.draw(this.systemDrawX[system.index] - GameUI.FACTION_RING.width / 2, this.systemDrawY[system.index] - 3 - GameUI.FACTION_RING.height / 2);
+      Menu.SMALL_FONT.drawCentered(Integer.toString(this.clonedRemainingGarrisons[index]), this.systemDrawX[index], this.systemDrawY[index] + 4, Drawing.WHITE);
 
-        if (var1.score == StarSystem.Score.PLAYER_HOMEWORLD) {
-          Drawing.drawCircleGradientAdd(Menu._emc[2] + (this.systemDrawX[var3] << 4), Menu._pmDb[2] + (this.systemDrawY[var3] << 4), 50, 7, GameUI._hs);
-          Drawing.drawCircleGradientAdd((this.systemDrawX[var3] << 4) + Menu._emc[3], (this.systemDrawY[var3] << 4) + Menu._pmDb[3], 50, 7, GameUI._hs);
+      if (system.score > 0 && system.type < StarSystem.Type.ALIEN_MINER) {
+        Drawing.drawCircleGradientAdd((this.systemDrawX[index] << 4) + systemScoreOrbXOffsets[0], (this.systemDrawY[index] << 4) + systemScoreOrbYOffsets[0], 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
+        if (system.score == StarSystem.Score.NEUTRAL_HOMEWORLD) {
+          Drawing.drawCircleGradientAdd((this.systemDrawX[index] << 4) + systemScoreOrbXOffsets[1], (this.systemDrawY[index] << 4) + systemScoreOrbYOffsets[1], 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
+        }
+        if (system.score == StarSystem.Score.PLAYER_HOMEWORLD) {
+          Drawing.drawCircleGradientAdd((this.systemDrawX[index] << 4) + systemScoreOrbXOffsets[2], (this.systemDrawY[index] << 4) + systemScoreOrbYOffsets[2], 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
+          Drawing.drawCircleGradientAdd((this.systemDrawX[index] << 4) + systemScoreOrbXOffsets[3], (this.systemDrawY[index] << 4) + systemScoreOrbYOffsets[3], 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
         }
       }
     }
-
   }
 
   private void tickAnimations(final Collection<TurnEventLog.Event> turnEvents) {
@@ -3238,10 +3243,10 @@ public final class GameView extends AbstractGameView {
     }
   }
 
-  public void render(final Collection<TannhauserLink> tannhauserLinks, final Collection<ProjectOrder> projectOrders, final boolean showDesyncMessage) {
+  public void draw(final Collection<TannhauserLink> tannhauserLinks, final Collection<ProjectOrder> projectOrders, final boolean showDesyncMessage) {
     this.projectOrders = projectOrders;
     this.tannhauserLinks = tannhauserLinks;
-    Menu.a487ai();
+    a487ai();
 
     if (this._Nb != this._wb) {
       this._Nb = this._wb;
@@ -3293,11 +3298,11 @@ public final class GameView extends AbstractGameView {
       this._Ob = new ArgbSprite((int) (4.0D + (double) var11 * 0.5D), (int) (4.0D + COS_THIRTY_DEGREES * (double) var11));
       Drawing.saveContext();
       this._Cb.installForDrawing();
-      a070eo(true, 4, 4, 200, var11, 0);
+      a070eo(0, 4, var11, 4, 200, true);
       this._K.installForDrawing();
-      a070eo(true, this._K.height - 1, 4, 200, var11 / 2, 0);
+      a070eo(0, this._K.height - 1, var11 / 2, 4, 200, true);
       this._Ob.installForDrawing();
-      a070eo(true, this._K.height - 1, 4, 200, 4, this._Ob.width - 1);
+      a070eo(this._Ob.width - 1, this._K.height - 1, 4, 4, 200, true);
       Drawing.restoreContext();
       if (this._xb == null) {
         this._xb = new Sprite[13];
@@ -3350,7 +3355,7 @@ public final class GameView extends AbstractGameView {
     }
 
     this.drawBackground();
-    this.drawSystems();
+    this.drawSystemsAndPendingOrders();
     this.drawCombatAnimations();
 
     if (showDesyncMessage) {

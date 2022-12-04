@@ -445,8 +445,8 @@ public final class ClientGameSession extends GameSession {
     this.recalculateTacticalOverlay();
   }
 
-  public void render() {
-    this.gameView.render(this.gameState.tannhauserLinks, this.gameState.projectOrders, ShatteredPlansClient.debugModeEnabled && this.desynced);
+  public void draw() {
+    this.gameView.draw(this.gameState.tannhauserLinks, this.gameState.projectOrders, ShatteredPlansClient.debugModeEnabled && this.desynced);
   }
 
   private void handleRightClickOrderCanceling(final int mouseX, final int mouseY) {
