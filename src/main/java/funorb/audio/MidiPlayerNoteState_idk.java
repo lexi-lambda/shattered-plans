@@ -9,7 +9,7 @@ public final class MidiPlayerNoteState_idk extends NodeList.Node {
   public int _v;
   public int _F;
   public int note;
-  public AudioSampleData_idk sampleData;
+  public RawSampleS8 sampleData;
   public KeyParams_idk keyParams_idk;
   public AudioSamplePlayback_idk playback;
   public MidiInstrument instrument;

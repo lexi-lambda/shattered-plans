@@ -7,7 +7,7 @@ import funorb.util.BitMath;
 import java.io.IOException;
 import java.util.stream.IntStream;
 
-public final class SomeBufferReader_idk {
+public final class FmtVorbis {
   public static vb_[] _L;
   private static float[] _k;
   private static to_[] _o;
@@ -43,7 +43,7 @@ public final class SomeBufferReader_idk {
   private float[] _n;
   private int sectionIndex;
 
-  private SomeBufferReader_idk(final byte[] data) throws IOException {
+  private FmtVorbis(final byte[] data) throws IOException {
     this.load(data);
   }
 
@@ -167,16 +167,16 @@ public final class SomeBufferReader_idk {
   }
 
   @SuppressWarnings("SameParameterValue")
-  public static SomeBufferReader_idk a968(final ResourceLoader loader, final String group, final String item) {
+  public static FmtVorbis a968(final ResourceLoader loader, final String group, final String item) {
     if (a521(loader)) {
       final byte[] var3 = loader.getResource(group, item);
       if (var3 == null) {
         return null;
       } else {
-        SomeBufferReader_idk var4 = null;
+        FmtVorbis var4 = null;
 
         try {
-          var4 = new SomeBufferReader_idk(var3);
+          var4 = new FmtVorbis(var3);
         } catch (final IOException var6) {
           var6.printStackTrace();
         }
@@ -231,16 +231,16 @@ public final class SomeBufferReader_idk {
     return result;
   }
 
-  public static SomeBufferReader_idk a740(final ResourceLoader loader, final int groupId, final int itemId) {
+  public static FmtVorbis load(final ResourceLoader loader, final int groupId, final int itemId) {
     if (a521(loader)) {
       final byte[] var3 = loader.getResource(groupId, itemId);
       if (var3 == null) {
         return null;
       } else {
-        SomeBufferReader_idk var4 = null;
+        FmtVorbis var4 = null;
 
         try {
-          var4 = new SomeBufferReader_idk(var3);
+          var4 = new FmtVorbis(var3);
         } catch (final IOException var6) {
           var6.printStackTrace();
         }
@@ -262,7 +262,7 @@ public final class SomeBufferReader_idk {
     return i;
   }
 
-  public AudioSampleData_idk a582() {
+  public RawSampleS8 toRawSample() {
     if (this.sampleData == null) {
       this._M = 0;
       this._n = new float[_r];
@@ -297,7 +297,7 @@ public final class SomeBufferReader_idk {
     this._n = null;
     final byte[] sampleData = this.sampleData;
     this.sampleData = null;
-    return new AudioSampleData_idk(this.sampleRate, sampleData, this.loopStart, this.loopEnd, this.isLooped);
+    return new RawSampleS8(this.sampleRate, sampleData, this.loopStart, this.loopEnd, this.isLooped);
   }
 
   private float[] e875(final int sectionIndex) {

@@ -22,7 +22,7 @@ public final class AudioSamplePlayback_idk extends AudioSource_idk {
   private int volActualRateX;
   private int ampR;
 
-  private AudioSamplePlayback_idk(final AudioSampleData_idk var1, final int pitchX, final int volX, final int panX) {
+  private AudioSamplePlayback_idk(final RawSampleS8 var1, final int pitchX, final int volX, final int panX) {
     this.sampleData = var1;
     this.loopStart_idfk = var1.loopStart_idfk;
     this.loopEnd_idfk = var1.loopEnd_idfk;
@@ -73,7 +73,7 @@ public final class AudioSamplePlayback_idk extends AudioSource_idk {
     return var5 >> 1;
   }
 
-  public static AudioSamplePlayback_idk start(final AudioSampleData_idk sampleData, final int pitchX, final int volX, final int panX) {
+  public static AudioSamplePlayback_idk start(final RawSampleS8 sampleData, final int pitchX, final int volX, final int panX) {
     return (sampleData.data == null || sampleData.data.length == 0)
       ? null
       : new AudioSamplePlayback_idk(sampleData, pitchX, volX, panX);
@@ -299,7 +299,7 @@ public final class AudioSamplePlayback_idk extends AudioSource_idk {
     return var5 >> 1;
   }
 
-  public static AudioSamplePlayback_idk a638(final AudioSampleData_idk var0, final int volume) {
+  public static AudioSamplePlayback_idk a638(final RawSampleS8 var0, final int volume) {
     if (var0.data == null || var0.data.length == 0) {
       return null;
     } else {
@@ -628,7 +628,7 @@ public final class AudioSamplePlayback_idk extends AudioSource_idk {
       }
     }
 
-    final AudioSampleData_idk sampleData = this.sampleData;
+    final RawSampleS8 sampleData = this.sampleData;
     final int loopStart_idfk = this.loopStart_idfk << 8;
     final int loopEnd_idfk = this.loopEnd_idfk << 8;
     final int sampleLength = sampleData.data.length << 8;

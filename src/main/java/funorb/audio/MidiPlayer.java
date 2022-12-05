@@ -543,7 +543,7 @@ public final class MidiPlayer extends AudioSource_idk {
 
     final MidiInstrument instrument = this.instruments.get(this.chCurrentProgram[channel]);
     if (instrument != null) {
-      final AudioSampleData_idk sample = instrument.noteSample[noteNumber];
+      final RawSampleS8 sample = instrument.noteSample[noteNumber];
       if (sample != null) {
         final MidiPlayerNoteState_idk note = new MidiPlayerNoteState_idk();
         note.channel = channel;

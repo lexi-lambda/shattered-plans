@@ -2,9 +2,9 @@ package funorb.audio;
 
 public final class SoundEffect {
   public final int volume;
-  public final AudioSampleData_idk sample;
+  public final RawSampleS8 sample;
 
-  private SoundEffect(final AudioSampleData_idk sample, final int volume) {
+  private SoundEffect(final RawSampleS8 sample, final int volume) {
     this.volume = volume;
     this.sample = sample;
   }

@@ -17,7 +17,7 @@ public final class fh_ {
     return var1 * 3.1415927F / 11025.0F;
   }
 
-  public void a086(final Buffer var1, final OscillatorConfig_idk var2) {
+  public void a086(final Buffer var1, final OscillatorState var2) {
     final int var3 = var1.readUByte();
     this._d[0] = var3 >> 4;
     this._d[1] = var3 & 15;

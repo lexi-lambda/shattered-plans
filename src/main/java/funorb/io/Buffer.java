@@ -125,7 +125,7 @@ public class Buffer implements ReadableBuffer, WritableBuffer {
     this.writeInt(computeCrc(this.data, startPos, this.pos));
   }
 
-  public final int d410() {
+  public final int readBiasedVariable8_16() {
     final int nextByte = this.data[this.pos] & 255;
     if (nextByte < 128) {
       return this.readUByte() - 64;
