@@ -7,7 +7,7 @@ import funorb.audio.SoundEffect;
 import funorb.audio.SoundLoader;
 import funorb.audio.AudioSamplePlayback_idk;
 import funorb.audio.h_;
-import funorb.audio.AudioSampleData_idk;
+import funorb.audio.RawSampleS8;
 import funorb.audio.AudioSourceSum_idk;
 import funorb.cache.ResourceLoader;
 
@@ -75,7 +75,7 @@ public final class Sounds {
     return play(effect.sample, effect.volume * volume / 96);
   }
 
-  private static PlayingSound play(final AudioSampleData_idk var1, final int volume) {
+  private static PlayingSound play(final RawSampleS8 var1, final int volume) {
     final AudioSamplePlayback_idk var01 = AudioSamplePlayback_idk.a638(var1, volume);
     assert var01 != null;
     final PlayingSound sound = new PlayingSound(var01);

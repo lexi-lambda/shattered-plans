@@ -1218,7 +1218,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
     if (var2 == 0) {
       shutdownServerConnection();
     } else if (var2 == 1) {
-      var1.d410();
+      var1.readBiasedVariable8_16();
       shutdownServerConnection();
     } else {
       clientError(null, "LR1: " + a738w());

@@ -3,7 +3,7 @@ package funorb.audio;
 import funorb.io.Buffer;
 
 public final class MidiInstrument {
-  public final AudioSampleData_idk[] noteSample = new AudioSampleData_idk[128];
+  public final RawSampleS8[] noteSample = new RawSampleS8[128];
   public final KeyParams_idk[] keyParams_idk = new KeyParams_idk[128];
   public final byte[] notePan_idk = new byte[128];
   public final int mainVolume_idk;
@@ -454,7 +454,7 @@ public final class MidiInstrument {
   public boolean loadNoteSamples(final SoundLoader loader, final byte[] restrictNotes) {
     boolean success = true;
     int var6 = 0;
-    AudioSampleData_idk sampleData = null;
+    RawSampleS8 sampleData = null;
 
     for (int noteNumber = 0; noteNumber < 128; ++noteNumber) {
       if (restrictNotes == null || restrictNotes[noteNumber] != 0) {

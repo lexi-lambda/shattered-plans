@@ -1,6 +1,6 @@
 package funorb.audio;
 
-public final class AudioSampleData_idk {
+public final class RawSampleS8 {
   public final int loopEnd_idfk;
   public final int loopStart_idfk;
   public final int sampleRate;
@@ -8,11 +8,11 @@ public final class AudioSampleData_idk {
   public final boolean isLooped_idk;
   public int _h;
 
-  public AudioSampleData_idk(final byte[] data, final int loopStart, final int loopEnd) {
+  public RawSampleS8(final byte[] data, final int loopStart, final int loopEnd) {
     this(SampledAudioChannel.SAMPLES_PER_SECOND, data, loopStart, loopEnd, false);
   }
 
-  public AudioSampleData_idk(
+  public RawSampleS8(
     final int sampleRate,
     final byte[] data,
     final int loopStart,

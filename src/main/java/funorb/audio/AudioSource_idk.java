@@ -6,7 +6,7 @@ public abstract class AudioSource_idk extends NodeList.Node implements Iterable<
   public volatile boolean enabled = true;
   public int _i;
   public AudioSource_idk _h;
-  public AudioSampleData_idk sampleData;
+  public RawSampleS8 sampleData;
 
   protected AudioSource_idk() {}
 

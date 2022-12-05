@@ -132,7 +132,7 @@ public final class SampledAudioChannel implements Closeable {
                   break label100;
                 }
 
-                final AudioSampleData_idk var12 = var11.sampleData;
+                final RawSampleS8 var12 = var11.sampleData;
                 if (var12 != null && var12._h > var8) {
                   var5 |= 1 << var7;
                   var10 = var11;

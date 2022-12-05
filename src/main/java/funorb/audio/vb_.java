@@ -10,43 +10,43 @@ public final class vb_ {
   private int[] _f;
 
   public vb_() {
-    SomeBufferReader_idk.readBits(24);
-    this._a = SomeBufferReader_idk.readBits(16);
-    this._c = SomeBufferReader_idk.readBits(24);
+    FmtVorbis.readBits(24);
+    this._a = FmtVorbis.readBits(16);
+    this._c = FmtVorbis.readBits(24);
     this._b = new int[this._c];
-    final boolean var1 = SomeBufferReader_idk.readBit() != 0;
+    final boolean var1 = FmtVorbis.readBit() != 0;
     int var2;
     int var3;
     int var5;
     if (var1) {
       var2 = 0;
 
-      for (var3 = SomeBufferReader_idk.readBits(5) + 1; var2 < this._c; ++var3) {
-        final int var4 = SomeBufferReader_idk.readBits(BitMath.lastSet(this._c - var2));
+      for (var3 = FmtVorbis.readBits(5) + 1; var2 < this._c; ++var3) {
+        final int var4 = FmtVorbis.readBits(BitMath.lastSet(this._c - var2));
 
         for (var5 = 0; var5 < var4; ++var5) {
           this._b[var2++] = var3;
         }
       }
     } else {
-      final boolean var14 = SomeBufferReader_idk.readBit() != 0;
+      final boolean var14 = FmtVorbis.readBit() != 0;
 
       for (var3 = 0; var3 < this._c; ++var3) {
-        if (var14 && SomeBufferReader_idk.readBit() == 0) {
+        if (var14 && FmtVorbis.readBit() == 0) {
           this._b[var3] = 0;
         } else {
-          this._b[var3] = SomeBufferReader_idk.readBits(5) + 1;
+          this._b[var3] = FmtVorbis.readBits(5) + 1;
         }
       }
     }
 
     this.b797();
-    var2 = SomeBufferReader_idk.readBits(4);
+    var2 = FmtVorbis.readBits(4);
     if (var2 > 0) {
-      final float var15 = SomeBufferReader_idk.parseAsFloat(SomeBufferReader_idk.readBits(32));
-      final float var16 = SomeBufferReader_idk.parseAsFloat(SomeBufferReader_idk.readBits(32));
-      var5 = SomeBufferReader_idk.readBits(4) + 1;
-      final boolean var6 = SomeBufferReader_idk.readBit() != 0;
+      final float var15 = FmtVorbis.parseAsFloat(FmtVorbis.readBits(32));
+      final float var16 = FmtVorbis.parseAsFloat(FmtVorbis.readBits(32));
+      var5 = FmtVorbis.readBits(4) + 1;
+      final boolean var6 = FmtVorbis.readBit() != 0;
       final int var7;
       if (var2 == 1) {
         var7 = a080(this._c, this._a);
@@ -58,7 +58,7 @@ public final class vb_ {
 
       int var8;
       for (var8 = 0; var8 < var7; ++var8) {
-        _e[var8] = SomeBufferReader_idk.readBits(var5);
+        _e[var8] = FmtVorbis.readBits(var5);
       }
 
       this._d = new float[this._c][this._a];
@@ -133,7 +133,7 @@ public final class vb_ {
   public int a784() {
     int var1 = 0;
     while (this._f[var1] >= 0) {
-      var1 = SomeBufferReader_idk.readBit() != 0 ? this._f[var1] : var1 + 1;
+      var1 = FmtVorbis.readBit() != 0 ? this._f[var1] : var1 + 1;
     }
     return ~this._f[var1];
   }

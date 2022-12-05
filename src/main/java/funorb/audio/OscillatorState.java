@@ -2,7 +2,7 @@ package funorb.audio;
 
 import funorb.io.Buffer;
 
-public final class OscillatorConfig_idk {
+public final class OscillatorState {
   public int _d;
   public int _i;
   public int waveform;
@@ -15,7 +15,7 @@ public final class OscillatorConfig_idk {
   private int _j;
   private int pos;
 
-  public OscillatorConfig_idk() {
+  public OscillatorState() {
     this.values1[1] = 65535;
     this.values2[1] = 65535;
   }
@@ -45,14 +45,14 @@ public final class OscillatorConfig_idk {
     this._g = 0;
   }
 
-  public int next(final int volume) {
+  public int next(final int len) {
     if (this._g >= this._e) {
       this._j = this.values2[this.pos++] << 15;
       if (this.pos >= this.count) {
         this.pos = this.count - 1;
       }
 
-      this._e = (int) (((double) this.values1[this.pos] / 65536.0D) * (double) volume);
+      this._e = (int) (((double) this.values1[this.pos] / 65536.0D) * (double) len);
       if (this._e > this._g) {
         this._b = ((this.values2[this.pos] << 15) - this._j) / (this._e - this._g);
       }
