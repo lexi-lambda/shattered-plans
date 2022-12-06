@@ -3,7 +3,7 @@ package funorb.shatteredplans.client.ui;
 import funorb.graphics.Sprite;
 import funorb.shatteredplans.client.Menu;
 
-public final class Button<T> extends UIComponent<T> {
+public final class ToggleButton<T> extends UIComponent<T> {
   private final Sprite inactiveIcon;
   private final String inactiveLabel;
   private final int inactiveLabelColor;
@@ -14,16 +14,16 @@ public final class Button<T> extends UIComponent<T> {
 
   private boolean isActive = false;
 
-  public Button(final int x,
-                final int y,
-                final int width,
-                final int height,
-                final Sprite inactiveIcon,
-                final String inactiveLabel,
-                final int inactiveLabelColor,
-                final Sprite activeIcon,
-                final String activeLabel,
-                final int activeLabelColor) {
+  public ToggleButton(final int x,
+                      final int y,
+                      final int width,
+                      final int height,
+                      final Sprite inactiveIcon,
+                      final String inactiveLabel,
+                      final int inactiveLabelColor,
+                      final Sprite activeIcon,
+                      final String activeLabel,
+                      final int activeLabelColor) {
     super(x, y, width, height);
     this.inactiveIcon = inactiveIcon;
     this.inactiveLabel = inactiveLabel;

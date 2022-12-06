@@ -8,7 +8,7 @@ import java.util.List;
 
 public final class ProductionPanelState implements PanelState {
   public List<ScrollView<Force>> _f;
-  public List<Button<Force>> buildFleetsButtons;
+  public List<ToggleButton<Force>> buildFleetsButtons;
   public List<Label> buildFleetsLabels;
   public ScrollBar scrollBar;
 
@@ -25,7 +25,7 @@ public final class ProductionPanelState implements PanelState {
   }
 
   private void updateFleetPlacement(final int forceIndex, final Force activeForce) {
-    final Button<Force> buildButton = this.buildFleetsButtons.get(forceIndex);
+    final ToggleButton<Force> buildButton = this.buildFleetsButtons.get(forceIndex);
     final Label buildLabel = this.buildFleetsLabels.get(forceIndex);
     final Force force = buildButton.data;
     final boolean isActive = force == activeForce;

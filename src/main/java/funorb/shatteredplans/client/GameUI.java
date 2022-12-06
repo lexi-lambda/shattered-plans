@@ -18,7 +18,7 @@ import funorb.shatteredplans.client.game.ClientGameSession;
 import funorb.shatteredplans.client.game.GameView;
 import funorb.shatteredplans.client.game.PlayerStats;
 import funorb.shatteredplans.client.game.TutorialState;
-import funorb.shatteredplans.client.ui.Button;
+import funorb.shatteredplans.client.ui.ToggleButton;
 import funorb.shatteredplans.client.ui.ChatMessage;
 import funorb.shatteredplans.client.ui.DiplomacyPanelState;
 import funorb.shatteredplans.client.ui.FixedPanel;
@@ -34,7 +34,7 @@ import funorb.shatteredplans.client.ui.ScrollBar;
 import funorb.shatteredplans.client.ui.ScrollView;
 import funorb.shatteredplans.client.ui.StatusPanelState;
 import funorb.shatteredplans.client.ui.UIComponent;
-import funorb.shatteredplans.client.ui.fe_;
+import funorb.shatteredplans.client.ui.TextButton;
 import funorb.shatteredplans.client.ui.kb_;
 import funorb.shatteredplans.client.ui.uc_;
 import funorb.shatteredplans.game.ContiguousForce;
@@ -133,24 +133,24 @@ public final class GameUI {
   private static Sprite _ncd;
   public static Sprite _R;
 
-  private final Button<StatsScreenTab> systemsTabButton;
+  private final ToggleButton<StatsScreenTab> systemsTabButton;
   private final FixedPanel fleetsTabControl;
   private final FixedPanel overviewTabControl;
   private final FixedPanel showChatButtonPanel;
-  private final Button<StatsScreenTab> overviewTabButton;
+  private final ToggleButton<StatsScreenTab> overviewTabButton;
   private final FixedPanel systemsTabControl;
   private final FixedPanel productionTabControl;
   private final int[] _p = new int[]{32, 0, 0, 0};
   private final List<UIComponent<?>> statsScreenTabs;
   private final int[] _ob = new int[]{82, 52, 52, 52};
   public final FixedPanel animationControlsPanel;
-  private final Button<?> showChatButton;
-  private final Button<StatsScreenTab> productionTabButton;
+  private final ToggleButton<?> showChatButton;
+  private final ToggleButton<StatsScreenTab> productionTabButton;
   private final List<UIComponent<?>> components = new ArrayList<>();
-  private final Button<StatsScreenTab> fleetsTabButton;
+  private final ToggleButton<StatsScreenTab> fleetsTabButton;
   private final ArgbSprite warningSprite;
-  public Button<?> animationPlayingButton;
-  public Button<?> animationSpeedDoubledButton;
+  public ToggleButton<?> animationPlayingButton;
+  public ToggleButton<?> animationSpeedDoubledButton;
 
   private int mouseDownX;
   private int mouseDownY;
@@ -163,14 +163,14 @@ public final class GameUI {
   private UIComponent<?> clickedComponent;
 
   private FloatingPanel<?> victoryPanel;
-  private Button<?> projectsButton;
+  private ToggleButton<?> projectsButton;
   private int statsScreenOpenAmount;
-  private Button<?> victoryButton;
-  private Button<?> endTurnButton;
+  private ToggleButton<?> victoryButton;
+  private ToggleButton<?> endTurnButton;
   private FloatingPanel<ProjectsPanelState> projectsPanel;
   private String turnName;
   private int _x;
-  public Button<?> animationAutoPlayButton;
+  public ToggleButton<?> animationAutoPlayButton;
   private FixedPanel statusPanel;
   private String[] playerDiplomacyStatusMessage;
   private StatsScreenTab currentStatsScreenTab;
@@ -198,14 +198,14 @@ public final class GameUI {
   private int _jb;
   private int[][] statsGraphData;
   private boolean _ib;
-  private Button<?> productionButton;
+  private ToggleButton<?> productionButton;
   private Sprite _eb;
   private boolean[] _z;
   private int statsGraphStartTurn;
   private ClientGameSession gameSession;
   private int statsGraphTurnAdvanceAnimationCounter;
-  private Button<?> diplomacyButton;
-  private Button<?> fleetInfoButton;
+  private ToggleButton<?> diplomacyButton;
+  private ToggleButton<?> fleetInfoButton;
   private int statsGraphAlpha = 0;
 
   public GameUI(final ClientGameSession session) {
@@ -218,7 +218,7 @@ public final class GameUI {
 
     final int readyButtonX = getReadyButtonX();
     if (this.gameSession.localPlayer != null) {
-      this.endTurnButton = new Button<>(readyButtonX, 20, READY_BUTTON.width, READY_BUTTON.height, READY_BUTTON, null, 0, READY_BUTTON_DOWN, null, 0);
+      this.endTurnButton = new ToggleButton<>(readyButtonX, 20, READY_BUTTON.width, READY_BUTTON.height, READY_BUTTON, null, 0, READY_BUTTON_DOWN, null, 0);
       this.endTurnButton.tooltip = StringConstants.TOOLTIP_END_TURN;
       this.addComponent(this.endTurnButton);
     }
@@ -226,22 +226,22 @@ public final class GameUI {
     final int hudIconWidth = HUD_ICON_1.width;
     final int victoryButtonX = readyButtonX - 6 - hudIconWidth;
     if (hasVictoryPanel) {
-      this.victoryButton = new Button<>(victoryButtonX, 25, HUD_ICON_5.width, HUD_ICON_5.height, HUD_ICON_5, null, 0, HUD_ICON_RED_5, null, 0);
+      this.victoryButton = new ToggleButton<>(victoryButtonX, 25, HUD_ICON_5.width, HUD_ICON_5.height, HUD_ICON_5, null, 0, HUD_ICON_RED_5, null, 0);
       this.victoryButton.tooltip = StringConstants.TOOLTIP_VICTORY_BUTTON_SHOW;
       this.addComponent(this.victoryButton);
     }
-    this.productionButton = new Button<>(readyButtonX - 6 - (hudIconWidth / 2) - hudIconWidth, 5, HUD_ICON_2.width, HUD_ICON_2.height, HUD_ICON_2, null, 0, HUD_ICON_RED_2, null, 0);
+    this.productionButton = new ToggleButton<>(readyButtonX - 6 - (hudIconWidth / 2) - hudIconWidth, 5, HUD_ICON_2.width, HUD_ICON_2.height, HUD_ICON_2, null, 0, HUD_ICON_RED_2, null, 0);
     this.productionButton.tooltip = StringConstants.TOOLTIP_PRODUCTION_BUTTON_SHOW;
     this.addComponent(this.productionButton);
-    this.fleetInfoButton = new Button<>(victoryButtonX - 2 - hudIconWidth, 25, HUD_ICON_4.width, HUD_ICON_4.height, HUD_ICON_4, null, 0, HUD_ICON_RED_4, null, 0);
+    this.fleetInfoButton = new ToggleButton<>(victoryButtonX - 2 - hudIconWidth, 25, HUD_ICON_4.width, HUD_ICON_4.height, HUD_ICON_4, null, 0, HUD_ICON_RED_4, null, 0);
     this.fleetInfoButton.tooltip = StringConstants.TOOLTIP_FLEET_INFO_BUTTON_SHOW;
     this.addComponent(this.fleetInfoButton);
-    this.diplomacyButton = new Button<>(this.productionButton.x - 2 - hudIconWidth, 5, HUD_ICON_1.width, HUD_ICON_1.height, HUD_ICON_1, null, 0, HUD_ICON_RED_1, null, 0);
+    this.diplomacyButton = new ToggleButton<>(this.productionButton.x - 2 - hudIconWidth, 5, HUD_ICON_1.width, HUD_ICON_1.height, HUD_ICON_1, null, 0, HUD_ICON_RED_1, null, 0);
     this.diplomacyButton.tooltip = StringConstants.TOOLTIP_DIPLOMACY_BUTTON_SHOW;
     this.addComponent(this.diplomacyButton);
     final int projectsButtonX = this.fleetInfoButton.x - 2 - hudIconWidth;
     if (this.gameSession.localPlayer != null) {
-      this.projectsButton = new Button<>(projectsButtonX, 25, HUD_ICON_3.width, HUD_ICON_3.height, HUD_ICON_3, null, 0, HUD_ICON_RED_3, null, 0);
+      this.projectsButton = new ToggleButton<>(projectsButtonX, 25, HUD_ICON_3.width, HUD_ICON_3.height, HUD_ICON_3, null, 0, HUD_ICON_RED_3, null, 0);
       this.projectsButton.tooltip = StringConstants.TOOLTIP_PROJECTS_BUTTON_SHOW;
       this.addComponent(this.projectsButton);
     }
@@ -267,7 +267,7 @@ public final class GameUI {
 
     this.animationControlsPanel = new FixedPanel(ShatteredPlansClient.SCREEN_WIDTH - 50, ShatteredPlansClient.SCREEN_HEIGHT - Menu.SMALL_FONT.ascent, 60, 2 * Menu.SMALL_FONT.ascent);
     this.addComponent(this.animationControlsPanel, 0);
-    this.animationAutoPlayButton = new Button<>(this.animationControlsPanel.x + 5, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[3].height, ANIM_ICONS[3].width, ANIM_ICONS[3].height, ANIM_ICONS[3], null, 0, ANIM_ICONS[0], null, 0);
+    this.animationAutoPlayButton = new ToggleButton<>(this.animationControlsPanel.x + 5, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[3].height, ANIM_ICONS[3].width, ANIM_ICONS[3].height, ANIM_ICONS[3], null, 0, ANIM_ICONS[0], null, 0);
     if ((currentSettings & 0b100000) == 0) {
       this.animationAutoPlayButton.tooltip = StringConstants.TOOLTIP_ANIM_AUTO_PLAY_IS_OFF;
     } else {
@@ -275,9 +275,9 @@ public final class GameUI {
       this.animationAutoPlayButton.tooltip = StringConstants.TOOLTIP_ANIM_AUTO_PLAY_IS_ON;
     }
 
-    this.animationPlayingButton = new Button<>(this.animationControlsPanel.x + 20, -ANIM_ICONS[1].height + ShatteredPlansClient.SCREEN_HEIGHT, ANIM_ICONS[1].width, ANIM_ICONS[1].height, ANIM_ICONS[1], null, 0, ANIM_ICONS[4], null, 0);
+    this.animationPlayingButton = new ToggleButton<>(this.animationControlsPanel.x + 20, -ANIM_ICONS[1].height + ShatteredPlansClient.SCREEN_HEIGHT, ANIM_ICONS[1].width, ANIM_ICONS[1].height, ANIM_ICONS[1], null, 0, ANIM_ICONS[4], null, 0);
     this.animationPlayingButton.tooltip = StringConstants.TOOLTIP_ANIM_CLICK_TO_PLAY;
-    this.animationSpeedDoubledButton = new Button<>(this.animationControlsPanel.x + 35, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[5].height, ANIM_ICONS[5].width, ANIM_ICONS[5].height, ANIM_ICONS[5], null, 0, ANIM_ICONS[2], null, 0);
+    this.animationSpeedDoubledButton = new ToggleButton<>(this.animationControlsPanel.x + 35, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[5].height, ANIM_ICONS[5].width, ANIM_ICONS[5].height, ANIM_ICONS[5], null, 0, ANIM_ICONS[2], null, 0);
     if ((currentSettings & 0b1000000) == 0) {
       this.animationSpeedDoubledButton.tooltip = StringConstants.TOOLTIP_ANIM_SPEED_IS_NORMAL;
     } else {
@@ -289,7 +289,7 @@ public final class GameUI {
     this.animationControlsPanel.addChild(this.animationPlayingButton);
     this.animationControlsPanel.addChild(this.animationSpeedDoubledButton);
     this.showChatButtonPanel = new FixedPanel(3, ShatteredPlansClient.SCREEN_HEIGHT, 10 + Menu.SMALL_FONT.measureLineWidth(StringConstants.TEXT_SHOW_CHAT), 2 * Menu.SMALL_FONT.ascent);
-    this.showChatButton = new Button<>(3, ShatteredPlansClient.SCREEN_HEIGHT, this.showChatButtonPanel.width, Menu.SMALL_FONT.ascent - 4, null, StringConstants.TEXT_SHOW_CHAT, Drawing.WHITE, null, StringConstants.TEXT_HIDE_CHAT, Drawing.WHITE);
+    this.showChatButton = new ToggleButton<>(3, ShatteredPlansClient.SCREEN_HEIGHT, this.showChatButtonPanel.width, Menu.SMALL_FONT.ascent - 4, null, StringConstants.TEXT_SHOW_CHAT, Drawing.WHITE, null, StringConstants.TEXT_HIDE_CHAT, Drawing.WHITE);
     this.showChatButtonPanel.addChild(this.showChatButton);
     this.addComponent(this.showChatButtonPanel, 0);
 
@@ -333,13 +333,13 @@ public final class GameUI {
     this.statsScreenTabs.add(this.productionTabControl);
     this.statsScreenTabs.add(this.systemsTabControl);
     this.statsScreenTabs.add(this.overviewTabControl);
-    this.fleetsTabButton = new Button<>(0, 410, 128, 21, null, StringConstants.TEXT_SHIPS.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_SHIPS.toUpperCase(), 0x2ad0d6);
+    this.fleetsTabButton = new ToggleButton<>(0, 410, 128, 21, null, StringConstants.TEXT_SHIPS.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_SHIPS.toUpperCase(), 0x2ad0d6);
     this.fleetsTabControl.addChild(this.fleetsTabButton);
-    this.productionTabButton = new Button<>(0, 410, 128, 21, null, StringConstants.TEXT_PRODUCTION.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_PRODUCTION.toUpperCase(), 0x2ad0d6);
+    this.productionTabButton = new ToggleButton<>(0, 410, 128, 21, null, StringConstants.TEXT_PRODUCTION.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_PRODUCTION.toUpperCase(), 0x2ad0d6);
     this.productionTabControl.addChild(this.productionTabButton);
-    this.systemsTabButton = new Button<>(0, 410, 128, 21, null, StringConstants.TEXT_SYSTEMS.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_SYSTEMS.toUpperCase(), 0x2ad0d6);
+    this.systemsTabButton = new ToggleButton<>(0, 410, 128, 21, null, StringConstants.TEXT_SYSTEMS.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_SYSTEMS.toUpperCase(), 0x2ad0d6);
     this.systemsTabControl.addChild(this.systemsTabButton);
-    this.overviewTabButton = new Button<>(0, 410, 128, 21, null, StringConstants.TEXT_OVERVIEW.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_OVERVIEW.toUpperCase(), 0x2ad0d6);
+    this.overviewTabButton = new ToggleButton<>(0, 410, 128, 21, null, StringConstants.TEXT_OVERVIEW.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_OVERVIEW.toUpperCase(), 0x2ad0d6);
     this.overviewTabControl.addChild(this.overviewTabButton);
     this.fleetsTabButton.data = StatsScreenTab.FLEETS;
     this.productionTabButton.data = StatsScreenTab.PRODUCTION;
@@ -548,7 +548,7 @@ public final class GameUI {
 
   private static FloatingPanel<ProductionPanelState> createProductionPanel() {
     final FloatingPanel<ProductionPanelState> panel = new FloatingPanel<>(PANEL_MARGIN, STATUS_PANEL_HEIGHT + Menu.SMALL_FONT.ascent + 2 + PANEL_MARGIN * 3, 238, 300, StringConstants.TAB_NAME_PRODUCTION.toUpperCase());
-    final fe_<FloatingPanel<ProductionPanelState>> var0 = new fe_<>(panel.x - 16 + panel.width, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
+    final TextButton<FloatingPanel<ProductionPanelState>> var0 = new TextButton<>(panel.x - 16 + panel.width, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var0.data = panel;
     final ScrollBar scrollBar = new ScrollBar(panel.width - 20, panel.y + 20, 11, panel.height - 28);
     panel.addChild(var0);
@@ -570,7 +570,7 @@ public final class GameUI {
         PROJECTS_PANEL_WIDTH,
         PROJECTS_PANEL_HEIGHT,
         StringConstants.TAB_NAME_PROJECTS.toUpperCase());
-    final fe_<FloatingPanel<ProjectsPanelState>> var0 = new fe_<>(panel.x + panel.width - 16, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
+    final TextButton<FloatingPanel<ProjectsPanelState>> var0 = new TextButton<>(panel.x + panel.width - 16, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
     var0.data = panel;
     panel.addChild(var0);
     final ScrollView<?> var1 = new ScrollView<>(9 + panel.x, 20 + panel.y, 132, 158);
@@ -587,7 +587,7 @@ public final class GameUI {
         DIPLOMACY_PANEL_WIDTH,
         28 + _rga * playerCount,
         StringConstants.TAB_NAME_DIPLOMACY.toUpperCase());
-    final fe_<FloatingPanel<DiplomacyPanelState>> var2 = new fe_<>(panel.x + 200 - 16, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
+    final TextButton<FloatingPanel<DiplomacyPanelState>> var2 = new TextButton<>(panel.x + 200 - 16, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var2.data = panel;
     panel.addChild(var2);
     final ScrollView<?> var3 = new ScrollView<>(panel.x + 9, panel.y + 20, INFO_PANEL_CONTENT_WIDTH, playerCount * _rga);
@@ -600,7 +600,7 @@ public final class GameUI {
   private static FloatingPanel<PanelState> createFleetInfoPanel(final int playerCount) {
     final int height = (SHIP.offsetX + 4) * playerCount + 28;
     final FloatingPanel<PanelState> panel = new FloatingPanel<>(PANEL_MARGIN, ShatteredPlansClient.SCREEN_HEIGHT - height - 30, 200, height, StringConstants.TAB_NAME_FLEET_INFO.toUpperCase());
-    final fe_<FloatingPanel<PanelState>> var2 = new fe_<>(184 + panel.x, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
+    final TextButton<FloatingPanel<PanelState>> var2 = new TextButton<>(184 + panel.x, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var2.data = panel;
     panel.addChild(var2);
     final ScrollView<?> var3 = new ScrollView<>(9 + panel.x, 20 + panel.y, INFO_PANEL_CONTENT_WIDTH, (4 + SHIP.offsetX) * playerCount);
@@ -611,7 +611,7 @@ public final class GameUI {
 
   private static FloatingPanel<PanelState> createVictoryPanel(final int height) {
     final FloatingPanel<PanelState> panel = new FloatingPanel<>(320, 451 - height, 200, height + 28, StringConstants.TAB_NAME_VICTORY.toUpperCase());
-    final fe_<FloatingPanel<PanelState>> var1 = new fe_<>(panel.x + 184, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
+    final TextButton<FloatingPanel<PanelState>> var1 = new TextButton<>(panel.x + 184, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
     var1.data = panel;
     panel.addChild(var1);
     final ScrollView<?> var2 = new ScrollView<>(panel.x + 9, panel.y + 20, INFO_PANEL_CONTENT_WIDTH, height);
@@ -662,7 +662,7 @@ public final class GameUI {
     var0._h[var1.index >= var3.index ? var3.index + 1 : var3.index] = var5;
     final kb_ var6 = new kb_(FACTION_ICONS[var3.index].width * 3 / 4, var5.height / 2 - Menu.SMALL_FONT.ascent - 1, INFO_PANEL_CONTENT_WIDTH - FACTION_ICONS[var3.index].width * 3 / 4, var3.color1, var3.name, true);
     var5.addChild(var6);
-    final fe_<?> var7 = new fe_<>(3 * FACTION_ICONS[var3.index].width / 4, var5.height / 2 + 1, INFO_PANEL_CONTENT_WIDTH - 3 * FACTION_ICONS[var3.index].width / 4, Menu.SMALL_FONT.ascent, 8421504, i432md(), StringConstants.PACT_OFFER, 3375155);
+    final TextButton<?> var7 = new TextButton<>(3 * FACTION_ICONS[var3.index].width / 4, var5.height / 2 + 1, INFO_PANEL_CONTENT_WIDTH - 3 * FACTION_ICONS[var3.index].width / 4, Menu.SMALL_FONT.ascent, 8421504, i432md(), StringConstants.PACT_OFFER, 3375155);
     var5.addChild(var7);
     var0._i[var3.index < var1.index ? var3.index : var3.index - 1] = var7;
     var5.tooltip = var6.tooltip = var7.tooltip = Strings.format(StringConstants.TOOLTIP_OFFER_TREATY, var3.name);
@@ -815,7 +815,7 @@ public final class GameUI {
     var19.tooltip = var21.tooltip = var22.tooltip = StringConstants.TOOLTIP_TOTAL_FLEET_PRODUCTION;
     final Label var23 = new Label(54 + PRODUCTION_ICONS[0].width * 4, var7.height + var8 + PRODUCTION_ICONS[0].height, "=");
     var4.addChild(var23);
-    final Button<Force> var24 = new Button<>(4 * PRODUCTION_ICONS[0].width + 20 + 40 - (-5 - HUD_ICON_4.width), var7.height + 3, PRODUCTION_BUTTON.width, PRODUCTION_BUTTON.height, PRODUCTION_BUTTON, null, -1, PRODUCTION_BUTTON_DOWN, null, -1);
+    final ToggleButton<Force> var24 = new ToggleButton<>(4 * PRODUCTION_ICONS[0].width + 20 + 40 - (-5 - HUD_ICON_4.width), var7.height + 3, PRODUCTION_BUTTON.width, PRODUCTION_BUTTON.height, PRODUCTION_BUTTON, null, -1, PRODUCTION_BUTTON_DOWN, null, -1);
     var24.data = var1;
     var4.addChild(var24);
     final Label var17 = new Label(var24.x, 29 + var24.y, var24.width, Menu.SMALL_FONT.ascent, Integer.toString(var1.fleetsAvailableToBuild));
@@ -1287,12 +1287,12 @@ public final class GameUI {
         }
       } else {
         final boolean var11 = player.index < this.gameSession.localPlayer.index;
-        final fe_<?> var12 = var3._i[var11 ? player.index : player.index - 1];
+        final TextButton<?> var12 = var3._i[var11 ? player.index : player.index - 1];
         final Icon[] var13 = var3._f[var11 ? 1 + player.index : player.index];
         final ScrollView<?> var7 = var3._h[!var11 ? player.index : 1 + player.index];
         if (this.gameSession.gameState.isPlayerDefeated(player.index)) {
           final String var14 = (this.gameSession.gameState.didPlayerResign(player.index)) ? StringConstants.TEXT_RESIGNED : StringConstants.TEXT_DEFEATED;
-          var12.a290(0, var14);
+          var12.setText(var14, 0);
           var13[0].setSprite(a800cle(-1));
 
           for (int var15 = 1; var15 < var13.length; ++var15) {
@@ -1308,28 +1308,28 @@ public final class GameUI {
           int var8 = -1;
           if (player.allies[this.gameSession.localPlayer.index]) {
             var8 = this.gameSession.localPlayer.color1;
-            var12.a290(9386040, Strings.format(StringConstants.PACT_EXPIRES, Integer.toString(player.pactTurnsRemaining[this.gameSession.localPlayer.index])));
+            var12.setText(Strings.format(StringConstants.PACT_EXPIRES, Integer.toString(player.pactTurnsRemaining[this.gameSession.localPlayer.index])), 9386040);
             var7.tooltip = null;
 
             for (final UIComponent<?> var9 : var7.children) {
               var9.tooltip = null;
             }
           } else if (player.hasPactOfferFrom(this.gameSession.localPlayer)) {
-            var12.a290(0x338033, StringConstants.PACT_AWAITING);
+            var12.setText(StringConstants.PACT_AWAITING, 0x338033);
             var7.tooltip = Strings.format(StringConstants.TOOLTIP_WAIT_TREATY, player.name);
 
             for (final UIComponent<?> var9 : var7.children) {
               var9.tooltip = Strings.format(StringConstants.TOOLTIP_WAIT_TREATY, player.name);
             }
           } else if (this.gameSession.localPlayer.hasPactOfferFrom(player)) {
-            var12.a290(0x338033, StringConstants.PACT_ACCEPT);
+            var12.setText(StringConstants.PACT_ACCEPT, 0x338033);
             var7.tooltip = Strings.format(StringConstants.TOOLTIP_ACCEPT_TREATY, player.name);
 
             for (final UIComponent<?> var9 : var7.children) {
               var9.tooltip = Strings.format(StringConstants.TOOLTIP_ACCEPT_TREATY, player.name);
             }
           } else {
-            var12.a290(0x338033, StringConstants.PACT_OFFER);
+            var12.setText(StringConstants.PACT_OFFER, 0x338033);
             var7.tooltip = Strings.format(StringConstants.TOOLTIP_OFFER_TREATY, player.name);
 
             for (final UIComponent<?> var9 : var7.children) {
@@ -1694,7 +1694,7 @@ public final class GameUI {
       if (this.overviewTabButton.isActive()) {
         this.overviewTabButton.toggle();
       }
-      ((Button<?>) this.clickedComponent).toggle();
+      ((ToggleButton<?>) this.clickedComponent).toggle();
     }
 
     if (var9 == 4) {
