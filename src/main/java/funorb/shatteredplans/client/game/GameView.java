@@ -3072,12 +3072,10 @@ public final class GameView extends AbstractGameView {
     final int var8 = owner == null ? 0x303030 : owner.darkColor;
     final int[] var6 = a385qp(this._Qb[system.index]);
     if (var6 != null) {
-      if (this.highlightedSystems[system.index] == SystemHighlight.SOURCE) {
-        drawSystemHex(var6, ((var8 & 0xfefefe) >> 1) + 0x004000 + ((var8 & 0xfcfcfc) >> 2), 192);
-      } else if (this.highlightedSystems[system.index] == SystemHighlight.TARGET) {
-        drawSystemHex(var6, ((var8 & 0xfefefe) >> 1) + 0x404040 + ((var8 & 0xfcfcfc) >> 2), 192);
-      } else {
-        drawSystemHex(var6, (var8 & 0x8f8f8f) << 1, 128);
+      switch (this.highlightedSystems[system.index]) {
+        case NONE  -> drawSystemHex(var6, (var8 & 0x8f8f8f) << 1, 128);
+        case GRAY  -> drawSystemHex(var6, ((var8 & 0xfefefe) >> 1) + 0x404040 + ((var8 & 0xfcfcfc) >> 2), 192);
+        case GREEN -> drawSystemHex(var6, ((var8 & 0xfefefe) >> 1) + 0x004000 + ((var8 & 0xfcfcfc) >> 2), 192);
       }
 
       if (owner == this.localPlayer && this.localPlayer != null) {

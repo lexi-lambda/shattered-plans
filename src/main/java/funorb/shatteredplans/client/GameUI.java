@@ -1220,9 +1220,7 @@ public final class GameUI {
     if (this.gameSession.placementMode == PlacementMode.BUILD_FLEET && mode != PlacementMode.BUILD_FLEET) {
       this.productionPanel.state.deactivateFleetPlacement();
     }
-
     this.gameSession.placementMode = mode;
-    Arrays.fill(this.gameSession.gameView.highlightedSystems, SystemHighlight.NONE);
 
     ((StatusPanelState) this.statusPanel.state).icon.setSprite(null);
     if (this.gameSession.gameView.animationPhase == AbstractGameView.AnimationPhase.NOT_PLAYING && !this.gameSession.readyToEndTurn) {
@@ -1240,6 +1238,56 @@ public final class GameUI {
             Integer.toString(this.gameSession.selectedForce.fleetsAvailableToBuild));
       });
     }
+
+    Arrays.fill(this.gameSession.gameView.highlightedSystems, SystemHighlight.NONE);
+    switch (mode) {
+      case DEFENSIVE_NET -> {
+        for (final StarSystem system : this.gameSession.gameState.map.systems) {
+          if (system.owner == this.gameSession.localPlayer && !system.hasDefensiveNet) {
+            this.gameSession.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
+          }
+        }
+      }
+      case TERRAFORM -> this.highlightTerraformingCandidates();
+      case STELLAR_BOMB -> {
+        for (final StarSystem system : this.gameSession.gameState.map.systems) {
+          if (system.owner != this.gameSession.localPlayer && (system.owner == null || !this.gameSession.localPlayer.allies[system.owner.index])) {
+            if (Arrays.stream(system.neighbors).anyMatch(system1 -> this.gameSession.localPlayer == system1.owner)) {
+              this.gameSession.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
+            }
+          }
+        }
+      }
+      case GATE_SRC -> {
+        for (final StarSystem system : this.gameSession.gameState.map.systems) {
+          if (this.gameSession.localPlayer == system.owner) {
+            this.gameSession.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
+          }
+        }
+      }
+    }
+  }
+
+  private void highlightTerraformingCandidates() {
+    this.gameSession.gameState.streamForces(this.gameSession.localPlayer).forEach(force -> {
+      final int maxSurplus = force.surplusResources[force.surplusResourceRanks[0]];
+      force.stream().filter(system -> system.score == StarSystem.Score.NORMAL).forEach(system -> {
+        // Highlight “good candidates” in green, where a good candidate is a
+        // system that produces exactly 1 point of a resource that is currently
+        // a surplus resource.
+        int resourceProductionTotal = 0;
+        boolean isGoodCandidate = true;
+        for (final int i : GameState.RESOURCE_TYPES) {
+          if (system.resources[i] == 0) continue;
+          resourceProductionTotal += system.resources[i];
+          if (resourceProductionTotal > 1 || force.surplusResources[i] != maxSurplus) {
+            isGoodCandidate = false;
+            break;
+          }
+        }
+        this.gameSession.gameView.highlightedSystems[system.index] = isGoodCandidate ? SystemHighlight.GREEN : SystemHighlight.GRAY;
+      });
+    });
   }
 
   private void activateProject(@MagicConstant(valuesFromClass = GameState.ResourceType.class) final int which) {
@@ -1247,34 +1295,12 @@ public final class GameUI {
 
     if (which == GameState.ResourceType.METAL) {
       this.setPlacementMode(PlacementMode.DEFENSIVE_NET);
-      for (final StarSystem starSystem : this.gameSession.gameState.map.systems) {
-        if (starSystem.owner == this.gameSession.localPlayer && !starSystem.hasDefensiveNet) {
-          this.gameSession.gameView.highlightedSystems[starSystem.index] = SystemHighlight.TARGET;
-        }
-      }
     } else if (which == GameState.ResourceType.BIOMASS) {
       this.setPlacementMode(PlacementMode.TERRAFORM);
-      for (final StarSystem starSystem : this.gameSession.gameState.map.systems) {
-        if (this.gameSession.localPlayer == starSystem.owner && starSystem.score == StarSystem.Score.NORMAL) {
-          this.gameSession.gameView.highlightedSystems[starSystem.index] = SystemHighlight.TARGET;
-        }
-      }
     } else if (which == GameState.ResourceType.ENERGY) {
       this.setPlacementMode(PlacementMode.STELLAR_BOMB);
-      for (final StarSystem starSystem : this.gameSession.gameState.map.systems) {
-        if (starSystem.owner != this.gameSession.localPlayer && (starSystem.owner == null || !this.gameSession.localPlayer.allies[starSystem.owner.index])) {
-          if (Arrays.stream(starSystem.neighbors).anyMatch(system -> this.gameSession.localPlayer == system.owner)) {
-            this.gameSession.gameView.highlightedSystems[starSystem.index] = SystemHighlight.TARGET;
-          }
-        }
-      }
     } else if (which == GameState.ResourceType.EXOTICS) {
       this.setPlacementMode(PlacementMode.GATE_SRC);
-      for (final StarSystem var5 : this.gameSession.gameState.map.systems) {
-        if (this.gameSession.localPlayer == var5.owner) {
-          this.gameSession.gameView.highlightedSystems[var5.index] = SystemHighlight.TARGET;
-        }
-      }
     }
   }
 
@@ -3274,7 +3300,7 @@ public final class GameUI {
     }
 
     for (final StarSystem system : force) {
-      this.gameSession.gameView.highlightedSystems[system.index] = SystemHighlight.TARGET;
+      this.gameSession.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
     }
   }
 

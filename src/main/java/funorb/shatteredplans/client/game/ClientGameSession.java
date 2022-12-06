@@ -1302,15 +1302,15 @@ public final class ClientGameSession extends GameSession {
             Sounds.play(Sounds.SFX_SHIP_SELECTION);
             this.ui.setPlacementMode(PlacementMode.MOVE_FLEET_DEST);
 
-            this.gameView.highlightedSystems[this.selectedSystem.index] = SystemHighlight.SOURCE;
+            this.gameView.highlightedSystems[this.selectedSystem.index] = SystemHighlight.GREEN;
             for (final StarSystem neighbor : this.selectedSystem.neighbors) {
               if (neighbor.owner == null || !this.localPlayer.allies[neighbor.owner.index]) {
-                this.gameView.highlightedSystems[neighbor.index] = SystemHighlight.TARGET;
+                this.gameView.highlightedSystems[neighbor.index] = SystemHighlight.GRAY;
               }
             }
             for (final StarSystem system : this.selectedSystem.contiguousForce) {
               if (system != this.selectedSystem && this.gameState.movementInRange(this.selectedSystem, system)) {
-                this.gameView.highlightedSystems[system.index] = SystemHighlight.TARGET;
+                this.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
               }
             }
           }
@@ -1425,7 +1425,7 @@ public final class ClientGameSession extends GameSession {
 
             for (final StarSystem system : this.gameState.map.systems) {
               if (system != this.gameView.targetedSystem && !this.gameView.targetedSystem.hasNeighbor(system)) {
-                this.gameView.highlightedSystems[system.index] = SystemHighlight.TARGET;
+                this.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
               }
             }
           }
@@ -1816,7 +1816,7 @@ public final class ClientGameSession extends GameSession {
     } else {
       this.ui.setPlacementMode(PlacementMode.BUILD_FLEET);
       for (final StarSystem system : this.selectedForce) {
-        this.gameView.highlightedSystems[system.index] = SystemHighlight.TARGET;
+        this.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
       }
     }
     this.recalculateTacticalOverlay();

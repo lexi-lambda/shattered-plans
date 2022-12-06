@@ -596,6 +596,6 @@ public abstract class AbstractGameView {
   }
 
   public enum SystemHighlight {
-    NONE, SOURCE, TARGET
+    NONE, GRAY, GREEN
   }
 }
