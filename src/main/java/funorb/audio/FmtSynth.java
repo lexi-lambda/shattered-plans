@@ -4,7 +4,7 @@ import funorb.cache.ResourceLoader;
 import funorb.io.Buffer;
 
 public final class FmtSynth {
-  private final Oscillator[] oscs = new Oscillator[10];
+  private final Synth[] oscs = new Synth[10];
   private final int loopStartMs;
   private final int loopEndMs;
 
@@ -13,7 +13,7 @@ public final class FmtSynth {
       final int peekByte = data.readUByte();
       if (peekByte != 0) {
         --data.pos;
-        this.oscs[i] = new Oscillator();
+        this.oscs[i] = new Synth();
         this.oscs[i].initialize(data);
       }
     }
@@ -31,8 +31,8 @@ public final class FmtSynth {
     int totalDurMs = 0;
 
     for (int i = 0; i < 10; ++i) {
-      if (this.oscs[i] != null && totalDurMs < this.oscs[i].durMs + this.oscs[i].delayMs) {
-        totalDurMs = this.oscs[i].durMs + this.oscs[i].delayMs;
+      if (this.oscs[i] != null && totalDurMs < this.oscs[i].lengthMs + this.oscs[i].posMs) {
+        totalDurMs = this.oscs[i].lengthMs + this.oscs[i].posMs;
       }
     }
 
@@ -44,9 +44,9 @@ public final class FmtSynth {
 
     for (int i = 0; i < 10; ++i) {
       if (this.oscs[i] != null) {
-        final int durSamples = this.oscs[i].durMs * SampledAudioChannel.SAMPLES_PER_SECOND / 1000;
-        final int delaySamples = this.oscs[i].delayMs * SampledAudioChannel.SAMPLES_PER_SECOND / 1000;
-        final int[] s16buf = this.oscs[i].generateS16(durSamples, this.oscs[i].durMs);
+        final int durSamples = this.oscs[i].lengthMs * SampledAudioChannel.SAMPLES_PER_SECOND / 1000;
+        final int delaySamples = this.oscs[i].posMs * SampledAudioChannel.SAMPLES_PER_SECOND / 1000;
+        final int[] s16buf = this.oscs[i].generateS16(durSamples, this.oscs[i].lengthMs);
 
         for (int j = 0; j < durSamples; ++j) {
           int sample = dataS8[j + delaySamples] + (s16buf[j] >> 8);
