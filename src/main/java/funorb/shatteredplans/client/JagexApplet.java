@@ -2255,52 +2255,25 @@ public abstract class JagexApplet extends JagexBaseApplet {
 
     if (packetId < 64 && S2CPacket.MGS_ENABLED[packetId]) {
       switch (packetId) {
-        case S2CPacket.Type.KEEPALIVE:
-          return;
-        case S2CPacket.Type.XTEA:
-          shutdownServerConnection();
-          break;
-        case S2CPacket.Type.HISCORE:
-          handleHiscorePacket(s2cPacket);
-          break;
-        case S2CPacket.Type.ACHIEVEMENTS:
-          handleAchievementsPacket(s2cPacket);
-          break;
-        case S2CPacket.Type.LEVEL_PROGRESS:
-          handleLevelPacket();
-          break;
-        case S2CPacket.Type.PROFILE:
-          handleProfilePacket(s2cPacket);
-          break;
-        case S2CPacket.Type.RATINGS:
-          a423r();
-          break;
-        case S2CPacket.Type.SESSION_ID:
-          sessionId = s2cPacket.readNullTerminatedString();
-          break;
-        case S2CPacket.Type.REFLECT:
-          ReflectionRequest.recieve(MessagePumpThread.instance, s2cPacket);
-          break;
-        case S2CPacket.Type.CHAT:
-        case S2CPacket.Type.QUICK_CHAT:
-          a681nc(receiveChatMessage(packetId == S2CPacket.Type.QUICK_CHAT, s2cPacket));
-          break;
-        case S2CPacket.Type.SOCIAL:
-          PlayerListEntry.handleSocialPacket(s2cPacket);
-          break;
-        case S2CPacket.Type.DISPLAY_NAME:
-          setPlayerDisplayName(s2cPacket.readNullTerminatedString());
-          break;
-        case S2CPacket.Type.SHOW_DOCUMENT:
-          this.handleShowDocumentPacket();
-          break;
-        case S2CPacket.Type.DISABLE_CHAT_RESTRICTIONS:
-          handleDisableChatRestrictionsPacket();
-          break;
-        default:
+        case S2CPacket.Type.KEEPALIVE -> {}
+        case S2CPacket.Type.XTEA -> shutdownServerConnection();
+        case S2CPacket.Type.HISCORE -> handleHiscorePacket(s2cPacket);
+        case S2CPacket.Type.ACHIEVEMENTS -> handleAchievementsPacket(s2cPacket);
+        case S2CPacket.Type.LEVEL_PROGRESS -> handleLevelPacket();
+        case S2CPacket.Type.PROFILE -> handleProfilePacket(s2cPacket);
+        case S2CPacket.Type.RATINGS -> a423r();
+        case S2CPacket.Type.SESSION_ID -> sessionId = s2cPacket.readNullTerminatedString();
+        case S2CPacket.Type.REFLECT -> ReflectionRequest.recieve(MessagePumpThread.instance, s2cPacket);
+        case S2CPacket.Type.CHAT, S2CPacket.Type.QUICK_CHAT ->
+            a681nc(receiveChatMessage(packetId == S2CPacket.Type.QUICK_CHAT, s2cPacket));
+        case S2CPacket.Type.SOCIAL -> PlayerListEntry.handleSocialPacket(s2cPacket);
+        case S2CPacket.Type.DISPLAY_NAME -> setPlayerDisplayName(s2cPacket.readNullTerminatedString());
+        case S2CPacket.Type.SHOW_DOCUMENT -> this.handleShowDocumentPacket();
+        case S2CPacket.Type.DISABLE_CHAT_RESTRICTIONS -> handleDisableChatRestrictionsPacket();
+        default -> {
           clientError(null, "MGS1: " + a738w());
           shutdownServerConnection();
-          break;
+        }
       }
     } else {
       clientError(null, "MGS2: " + a738w());

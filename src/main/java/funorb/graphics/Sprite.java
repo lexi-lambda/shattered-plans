@@ -56,7 +56,7 @@ public class Sprite {
 
   private Image image;
 
-  public final Image asImage() {
+  private Image asImage() {
     if (this.image == null) {
       this.image = Drawing.createRgbBufferedImage(this.width, this.height, this.pixels);
     }
@@ -489,7 +489,7 @@ public class Sprite {
     }
   }
 
-  public void a669(int var1, int var2, final int var3, final int var4, final int var5, final int var6) {
+  protected void a669(int var1, int var2, final int var3, final int var4, final int var5, final int var6) {
     if (var6 != 0) {
       var1 -= this.x << 4;
       var2 -= this.y << 4;

@@ -85,8 +85,8 @@ public final class ShatteredPlansClient extends JagexApplet {
   public static final int ORIGINAL_SCREEN_WIDTH = 640;
   public static final int ORIGINAL_SCREEN_HEIGHT = 480;
 
-  public static final double UI_SCALE;
-  public static final double ASPECT_RATIO;
+  private static final double UI_SCALE;
+  private static final double ASPECT_RATIO;
   public static final int SCREEN_WIDTH;
   public static final int SCREEN_HEIGHT;
   static {
@@ -112,7 +112,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     SCREEN_WIDTH = (int) (ORIGINAL_SCREEN_HEIGHT * UI_SCALE * ASPECT_RATIO);
   }
 
-  public static final AffineTransform STAR_FIELD_TRANSFORM = new AffineTransform();
+  private static final AffineTransform STAR_FIELD_TRANSFORM = new AffineTransform();
   static {
     final double originalAspectRatio = 4.0 / 3.0;
     if (ASPECT_RATIO > originalAspectRatio) {

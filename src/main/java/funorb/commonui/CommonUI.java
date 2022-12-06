@@ -36,7 +36,7 @@ public final class CommonUI {
   public static Enum1 _fjs;
 
   public static String enteredUsername;
-  public static String enteredPassword;
+  private static String enteredPassword;
   public static boolean loadingFailed;
   public static CreateDisplayNameForm _sjb;
   public static int _tfn;

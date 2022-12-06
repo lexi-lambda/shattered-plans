@@ -286,65 +286,63 @@ public class TutorialAI1 implements AI {
 
   private int a986(final int var1, final Player var3) {
     final int var4 = var3.index;
-    if (this._n == var3 || this._n.allies[var4]) {
+    if (this._n == var3 || this._n.allies[var4] || this.gameState.isPlayerDefeated(var4)) {
       return 0;
-    } else if (!this.gameState.isPlayerDefeated(var4)) {
-      final Player var5 = this.gameState.players[this.gameState.playerFleetProductionRanks[this.gameState.playerCount - 1]];
-      final Player var6 = this.gameState.players[this.gameState.playerFleetProductionRanks[this.gameState.playerCount - 2]];
-      if (var5 == var3) {
-        return 1;
-      } else {
-        int var7 = 0;
-        int var8 = 0;
-        final StarSystem[] var9 = this.gameState.map.systems;
+    }
 
-        int var10;
-        for (var10 = 0; var9.length > var10; ++var10) {
-          final StarSystem var11 = var9[var10];
-          if (var11.owner == this._n) {
-            boolean var12 = false;
-            final StarSystem[] var13 = var11.neighbors;
+    final Player var5 = this.gameState.players[this.gameState.playerFleetProductionRanks[this.gameState.playerCount - 1]];
+    final Player var6 = this.gameState.players[this.gameState.playerFleetProductionRanks[this.gameState.playerCount - 2]];
+    if (var5 == var3) {
+      return 1;
+    } else {
+      int var7 = 0;
+      int var8 = 0;
+      final StarSystem[] var9 = this.gameState.map.systems;
 
-            for (final StarSystem var15 : var13) {
-              if (var15.owner == var3) {
-                var12 = true;
-                var7 += var15.garrison;
-              }
-            }
+      int var10;
+      for (var10 = 0; var9.length > var10; ++var10) {
+        final StarSystem var11 = var9[var10];
+        if (var11.owner == this._n) {
+          boolean var12 = false;
+          final StarSystem[] var13 = var11.neighbors;
 
-            if (var12) {
-              var8 += var11.garrison;
-            }
-          }
-        }
-
-        if (var7 > var8 * 2) {
-          return -1;
-        } else if (var5.allies[var4]) {
-          return 2;
-        } else if (var6 == var3) {
-          return var5 != this._n ? -2 : -3;
-        } else if (var7 < var8 && 2 * this.gameState.playerFleetProduction[this._n.index] > this.gameState.playerFleetProduction[var4] * 3) {
-          return 3;
-        } else {
-          final int[] var16 = _ffx[this._n.index];
-          var10 = var1;
-
-          for (int var17 = 0; var17 < this._o; ++var17) {
-            if (_acq[var17] && _ffx[var4][var17] <= var16[var17]) {
-              --var10;
+          for (final StarSystem var15 : var13) {
+            if (var15.owner == var3) {
+              var12 = true;
+              var7 += var15.garrison;
             }
           }
 
-          if (var10 < 5 && var10 < var1) {
-            return 4;
-          } else {
-            return -3;
+          if (var12) {
+            var8 += var11.garrison;
           }
         }
       }
-    } else {
-      return 0;
+
+      if (var7 > var8 * 2) {
+        return -1;
+      } else if (var5.allies[var4]) {
+        return 2;
+      } else if (var6 == var3) {
+        return var5 != this._n ? -2 : -3;
+      } else if (var7 < var8 && 2 * this.gameState.playerFleetProduction[this._n.index] > this.gameState.playerFleetProduction[var4] * 3) {
+        return 3;
+      } else {
+        final int[] var16 = _ffx[this._n.index];
+        var10 = var1;
+
+        for (int var17 = 0; var17 < this._o; ++var17) {
+          if (_acq[var17] && _ffx[var4][var17] <= var16[var17]) {
+            --var10;
+          }
+        }
+
+        if (var10 < 5 && var10 < var1) {
+          return 4;
+        } else {
+          return -3;
+        }
+      }
     }
   }
 

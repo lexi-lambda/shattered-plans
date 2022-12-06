@@ -501,30 +501,35 @@ public final class ClientGameSession extends GameSession {
   @SuppressWarnings("SameParameterValue")
   public boolean handlePacket(final int type, final CipheredBuffer packet, final int len) {
     switch (type) {
-      case S2CPacket.Type.VICTORY:
+      case S2CPacket.Type.VICTORY -> {
         final byte winnerId = packet.readByte();
         this.gameState.setWinner(winnerId);
         this.handleVictory();
         return true;
-      case S2CPacket.Type.DRAW_OFFERS:
+      }
+      case S2CPacket.Type.DRAW_OFFERS -> {
         this.gameState.receivePlayersOfferingDrawBitmap(packet.readUByte());
         if (playSession == this) {
           updateDrawOfferMenuItem();
         }
         return true;
-      case S2CPacket.Type.RESIGNATIONS:
+      }
+      case S2CPacket.Type.RESIGNATIONS -> {
         this.gameState.receiveResignedPlayersBitmap(packet.readUByte());
         return true;
-      case S2CPacket.Type.REMATCH_OFFERS:
+      }
+      case S2CPacket.Type.REMATCH_OFFERS -> {
         this.gameState.receivePlayersOfferingRematchBitmap(packet.readUByte());
         if (this == playSession) {
           ShatteredPlansClient.a150wp();
         }
         return true;
-      case S2CPacket.Type.PLAYERS_LEFT:
+      }
+      case S2CPacket.Type.PLAYERS_LEFT -> {
         this.leftPlayersBitmap = packet.readUByte();
         return true;
-      case S2CPacket.Type.ADVANCE_TURN: {
+      }
+      case S2CPacket.Type.ADVANCE_TURN -> {
         final int turnNumber = packet.readUByte();
         final int alliances = packet.readUShort();
         final int turnSeed = packet.readInt();
@@ -566,30 +571,34 @@ public final class ClientGameSession extends GameSession {
         this.turnTicksLeft = turnTicksLeft;
         return true;
       }
-      case S2CPacket.Type.TURN_ORDERS:
+      case S2CPacket.Type.TURN_ORDERS -> {
         this.readTurnOrders(packet, len);
         return true;
-      case S2CPacket.Type.DIPLOMATIC_PACTS:
+      }
+      case S2CPacket.Type.DIPLOMATIC_PACTS -> {
         this.readPactUpdates(packet, len);
         return true;
-      case S2CPacket.Type.PLAYERS_WAITING_ON:
+      }
+      case S2CPacket.Type.PLAYERS_WAITING_ON -> {
         this.playersWaitingOn = packet.readUByte();
         return true;
-      case S2CPacket.Type.TURN_ORDERS_AND_UPDATE:
+      }
+      case S2CPacket.Type.TURN_ORDERS_AND_UPDATE -> {
         this.readTurnOrdersAndUpdate(packet, len);
         return true;
-      case S2CPacket.Type.RESEND_ALL_TURN_ORDERS:
+      }
+      case S2CPacket.Type.RESEND_ALL_TURN_ORDERS -> {
         this.resendAllTurnOrders();
         return true;
-      case S2CPacket.Type.AI_CHAT: {
+      }
+      case S2CPacket.Type.AI_CHAT -> {
         final int senderIndex = packet.readUByte();
-        @MagicConstant(valuesFromClass = StringConstants.AIMessage.class)
-        final int which = packet.readUByte();
+        @MagicConstant(valuesFromClass = StringConstants.AIMessage.class) final int which = packet.readUByte();
         final int systemIndex = packet.readUByte();
         this.showAIChatMessage(this.gameState.players[senderIndex], this.localPlayer, which, systemIndex);
         return true;
       }
-      case 74:
+      case 74 -> {
         if (ShatteredPlansClient.debugModeEnabled) {
           final int var2 = len / 4;
           for (int i = 0; i < var2; ++i) {
@@ -603,8 +612,10 @@ public final class ClientGameSession extends GameSession {
         } else {
           return false;
         }
-      default:
+      }
+      default -> {
         return false;
+      }
     }
   }
 

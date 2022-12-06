@@ -77,8 +77,8 @@ public final class NodeList<T extends Node> extends AbstractCollection<T> {
   }
 
   public static class Node {
-    public Node next;
-    public Node prev;
+    protected Node next;
+    protected Node prev;
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public final boolean isLinked() {

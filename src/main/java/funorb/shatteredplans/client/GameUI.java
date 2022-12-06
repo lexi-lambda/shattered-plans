@@ -2321,6 +2321,7 @@ public final class GameUI {
       var10 = this.gameSession.localPlayer.index;
     }
 
+    //noinspection SuspiciousNameCombination
     final Sprite var11 = new Sprite(FACTION_ICONS_LARGE[0].height, -Menu.SMALL_FONT.ascent + 450 - (10 + FACTION_ICONS_LARGE[0].width / 2));
     Drawing.saveContext();
     var11.installForDrawing();
