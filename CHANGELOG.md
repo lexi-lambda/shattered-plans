@@ -1,3 +1,7 @@
+## 0.0.7 (not yet released)
+
+* While placing a terraforming project, resources that are currently in surplus are highlighted green.
+
 ## 0.0.6 (2022-12-04)
 
 * Added experimental support for custom UI scaling via the `funorb.shatteredplans.client.uiScale` and `funorb.shatteredplans.client.aspectRatio` JVM properties. See the README for more details.

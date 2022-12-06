@@ -18,7 +18,7 @@ import funorb.shatteredplans.client.game.ClientGameSession;
 import funorb.shatteredplans.client.game.GameView;
 import funorb.shatteredplans.client.game.PlayerStats;
 import funorb.shatteredplans.client.game.TutorialState;
-import funorb.shatteredplans.client.ui.ToggleButton;
+import funorb.shatteredplans.client.ui.Button;
 import funorb.shatteredplans.client.ui.ChatMessage;
 import funorb.shatteredplans.client.ui.DiplomacyPanelState;
 import funorb.shatteredplans.client.ui.FixedPanel;
@@ -33,8 +33,8 @@ import funorb.shatteredplans.client.ui.RoundedRect;
 import funorb.shatteredplans.client.ui.ScrollBar;
 import funorb.shatteredplans.client.ui.ScrollView;
 import funorb.shatteredplans.client.ui.StatusPanelState;
+import funorb.shatteredplans.client.ui.ToggleButton;
 import funorb.shatteredplans.client.ui.UIComponent;
-import funorb.shatteredplans.client.ui.TextButton;
 import funorb.shatteredplans.client.ui.kb_;
 import funorb.shatteredplans.client.ui.uc_;
 import funorb.shatteredplans.game.ContiguousForce;
@@ -548,7 +548,7 @@ public final class GameUI {
 
   private static FloatingPanel<ProductionPanelState> createProductionPanel() {
     final FloatingPanel<ProductionPanelState> panel = new FloatingPanel<>(PANEL_MARGIN, STATUS_PANEL_HEIGHT + Menu.SMALL_FONT.ascent + 2 + PANEL_MARGIN * 3, 238, 300, StringConstants.TAB_NAME_PRODUCTION.toUpperCase());
-    final TextButton<FloatingPanel<ProductionPanelState>> var0 = new TextButton<>(panel.x - 16 + panel.width, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
+    final Button<FloatingPanel<ProductionPanelState>> var0 = new Button<>(panel.x - 16 + panel.width, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var0.data = panel;
     final ScrollBar scrollBar = new ScrollBar(panel.width - 20, panel.y + 20, 11, panel.height - 28);
     panel.addChild(var0);
@@ -570,7 +570,7 @@ public final class GameUI {
         PROJECTS_PANEL_WIDTH,
         PROJECTS_PANEL_HEIGHT,
         StringConstants.TAB_NAME_PROJECTS.toUpperCase());
-    final TextButton<FloatingPanel<ProjectsPanelState>> var0 = new TextButton<>(panel.x + panel.width - 16, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
+    final Button<FloatingPanel<ProjectsPanelState>> var0 = new Button<>(panel.x + panel.width - 16, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
     var0.data = panel;
     panel.addChild(var0);
     final ScrollView<?> var1 = new ScrollView<>(9 + panel.x, 20 + panel.y, 132, 158);
@@ -587,7 +587,7 @@ public final class GameUI {
         DIPLOMACY_PANEL_WIDTH,
         28 + _rga * playerCount,
         StringConstants.TAB_NAME_DIPLOMACY.toUpperCase());
-    final TextButton<FloatingPanel<DiplomacyPanelState>> var2 = new TextButton<>(panel.x + 200 - 16, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
+    final Button<FloatingPanel<DiplomacyPanelState>> var2 = new Button<>(panel.x + 200 - 16, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var2.data = panel;
     panel.addChild(var2);
     final ScrollView<?> var3 = new ScrollView<>(panel.x + 9, panel.y + 20, INFO_PANEL_CONTENT_WIDTH, playerCount * _rga);
@@ -600,7 +600,7 @@ public final class GameUI {
   private static FloatingPanel<PanelState> createFleetInfoPanel(final int playerCount) {
     final int height = (SHIP.offsetX + 4) * playerCount + 28;
     final FloatingPanel<PanelState> panel = new FloatingPanel<>(PANEL_MARGIN, ShatteredPlansClient.SCREEN_HEIGHT - height - 30, 200, height, StringConstants.TAB_NAME_FLEET_INFO.toUpperCase());
-    final TextButton<FloatingPanel<PanelState>> var2 = new TextButton<>(184 + panel.x, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
+    final Button<FloatingPanel<PanelState>> var2 = new Button<>(184 + panel.x, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var2.data = panel;
     panel.addChild(var2);
     final ScrollView<?> var3 = new ScrollView<>(9 + panel.x, 20 + panel.y, INFO_PANEL_CONTENT_WIDTH, (4 + SHIP.offsetX) * playerCount);
@@ -611,7 +611,7 @@ public final class GameUI {
 
   private static FloatingPanel<PanelState> createVictoryPanel(final int height) {
     final FloatingPanel<PanelState> panel = new FloatingPanel<>(320, 451 - height, 200, height + 28, StringConstants.TAB_NAME_VICTORY.toUpperCase());
-    final TextButton<FloatingPanel<PanelState>> var1 = new TextButton<>(panel.x + 184, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
+    final Button<FloatingPanel<PanelState>> var1 = new Button<>(panel.x + 184, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
     var1.data = panel;
     panel.addChild(var1);
     final ScrollView<?> var2 = new ScrollView<>(panel.x + 9, panel.y + 20, INFO_PANEL_CONTENT_WIDTH, height);
@@ -662,7 +662,7 @@ public final class GameUI {
     var0._h[var1.index >= var3.index ? var3.index + 1 : var3.index] = var5;
     final kb_ var6 = new kb_(FACTION_ICONS[var3.index].width * 3 / 4, var5.height / 2 - Menu.SMALL_FONT.ascent - 1, INFO_PANEL_CONTENT_WIDTH - FACTION_ICONS[var3.index].width * 3 / 4, var3.color1, var3.name, true);
     var5.addChild(var6);
-    final TextButton<?> var7 = new TextButton<>(3 * FACTION_ICONS[var3.index].width / 4, var5.height / 2 + 1, INFO_PANEL_CONTENT_WIDTH - 3 * FACTION_ICONS[var3.index].width / 4, Menu.SMALL_FONT.ascent, 8421504, i432md(), StringConstants.PACT_OFFER, 3375155);
+    final Button<?> var7 = new Button<>(3 * FACTION_ICONS[var3.index].width / 4, var5.height / 2 + 1, INFO_PANEL_CONTENT_WIDTH - 3 * FACTION_ICONS[var3.index].width / 4, Menu.SMALL_FONT.ascent, 8421504, i432md(), StringConstants.PACT_OFFER, 3375155);
     var5.addChild(var7);
     var0._i[var3.index < var1.index ? var3.index : var3.index - 1] = var7;
     var5.tooltip = var6.tooltip = var7.tooltip = Strings.format(StringConstants.TOOLTIP_OFFER_TREATY, var3.name);
@@ -768,47 +768,53 @@ public final class GameUI {
     recentChatMessages[0] = message;
   }
 
-  private static ScrollView<Force> addForceToProductionPanel(final Force var1, final ProductionPanelState var2, final boolean includePlayerName) {
+  private ScrollView<Force> addForceToProductionPanel(final Force force, final ProductionPanelState state, final boolean includePlayerName) {
     final ScrollView<Force> var4 = new ScrollView<>(0, 0, 209, 70);
-    var4.data = var1;
+    var4.data = force;
     final Icon var5 = new Icon(40 - (-((5 + PRODUCTION_ICONS[0].width) * 4) - HUD_ICON_4.width) - 5, Menu.SMALL_FONT.ascent - 7, _fjr);
     var4.addChild(var5);
-    String var6 = var1.getCapital().name;
+    String var6 = force.getCapital().name;
     if (includePlayerName) {
-      var6 = var6 + " (" + var1.player.name + ")";
+      var6 = var6 + " (" + force.player.name + ")";
     }
 
-    final kb_ var7 = new kb_(0, 0, 209, var1.player.color1, var6, false);
+    final kb_ var7 = new kb_(0, 0, 209, force.player.color1, var6, false);
     var4.addChild(var7);
     final byte var8 = 7;
-    final Icon var9 = new Icon(0, var8 + var7.height, 35, 35, var1.getCapital().getSprite());
+    final Icon var9 = new Icon(0, var8 + var7.height, 35, 35, force.getCapital().getSprite());
     var4.addChild(var9);
     final RoundedRect var10 = new RoundedRect(40, var8 + var7.height + PRODUCTION_ICONS[0].height, 4 * PRODUCTION_ICONS[0].width + 15, 35 - PRODUCTION_ICONS[0].height, 2105376);
     var4.addChild(var10);
 
+    final int maxSurplus = Arrays.stream(force.surplusResources).max().orElseThrow();
     for (int i = 0; i < GameState.NUM_RESOURCES; ++i) {
       final RoundedRect var12 = new RoundedRect(i * (5 + PRODUCTION_ICONS[i].width) + 40, var7.height + var8 + PRODUCTION_ICONS[i].height / 2, PRODUCTION_ICONS[i].width, 35 - PRODUCTION_ICONS[i].height / 2, 2105376);
       var4.addChild(var12);
-      int var13 = var1.fleetProduction + var1.surplusResources[i];
-      if (var13 < 0) {
-        var13 = 0;
-      }
 
-      final Label var14 = new Label((PRODUCTION_ICONS[i].width + 5) * i + 40, PRODUCTION_ICONS[i].height + var7.height + var8, PRODUCTION_ICONS[i].width, Menu.SMALL_FONT.ascent, Integer.toString(var13));
-      var4.addChild(var14);
+      final int surplus = force.surplusResources[i];
+      final int resourceProduction = Math.max(0, force.fleetProduction + surplus);
+      final Label resourceLabel = new ResourceProductionLabel(
+          (PRODUCTION_ICONS[i].width + 5) * i + 40,
+          PRODUCTION_ICONS[i].height + var7.height + var8,
+          PRODUCTION_ICONS[i].width,
+          Menu.SMALL_FONT.ascent,
+          Integer.toString(resourceProduction),
+          force.player == this.gameSession.localPlayer && surplus == maxSurplus);
+      var4.addChild(resourceLabel);
+
       final Icon var15 = new Icon(40 + i * (5 + PRODUCTION_ICONS[i].width), var7.height + var8, PRODUCTION_ICONS[i]);
       var4.addChild(var15);
       String var16 = StringConstants.TOOLTIP_INCOME[i];
-      if (var1.surplusResources[i] == 0) {
+      if (force.surplusResources[i] == 0) {
         var16 = var16 + " " + StringConstants.TOOLTIP_INCOME_LIMITING;
       }
 
-      var12.tooltip = var14.tooltip = var15.tooltip = var16;
+      var12.tooltip = resourceLabel.tooltip = var15.tooltip = var16;
     }
 
     final RoundedRect var19 = new RoundedRect(PRODUCTION_ICONS[0].width * 4 + 60, var8 + var7.height + PRODUCTION_ICONS[0].height / 2, HUD_ICON_4.width, -(PRODUCTION_ICONS[0].height / 2) + 35, 534312);
     var4.addChild(var19);
-    final Label var21 = new Label(20 + 4 * PRODUCTION_ICONS[0].width + 40, PRODUCTION_ICONS[0].height + var7.height + var8, HUD_ICON_4.width, Menu.SMALL_FONT.ascent, Integer.toString(Math.max(var1.fleetProduction, 0)));
+    final Label var21 = new Label(20 + 4 * PRODUCTION_ICONS[0].width + 40, PRODUCTION_ICONS[0].height + var7.height + var8, HUD_ICON_4.width, Menu.SMALL_FONT.ascent, Integer.toString(Math.max(force.fleetProduction, 0)));
     var4.addChild(var21);
     final Icon var22 = new Icon(20 - (-(4 * PRODUCTION_ICONS[0].width) - 40), var8 + (var7.height - 1), HUD_ICON_4);
     var4.addChild(var22);
@@ -816,16 +822,16 @@ public final class GameUI {
     final Label var23 = new Label(54 + PRODUCTION_ICONS[0].width * 4, var7.height + var8 + PRODUCTION_ICONS[0].height, "=");
     var4.addChild(var23);
     final ToggleButton<Force> var24 = new ToggleButton<>(4 * PRODUCTION_ICONS[0].width + 20 + 40 - (-5 - HUD_ICON_4.width), var7.height + 3, PRODUCTION_BUTTON.width, PRODUCTION_BUTTON.height, PRODUCTION_BUTTON, null, -1, PRODUCTION_BUTTON_DOWN, null, -1);
-    var24.data = var1;
+    var24.data = force;
     var4.addChild(var24);
-    final Label var17 = new Label(var24.x, 29 + var24.y, var24.width, Menu.SMALL_FONT.ascent, Integer.toString(var1.fleetsAvailableToBuild));
-    var17.data = var1;
+    final Label var17 = new Label(var24.x, 29 + var24.y, var24.width, Menu.SMALL_FONT.ascent, Integer.toString(force.fleetsAvailableToBuild));
+    var17.data = force;
     var4.addChild(var17);
-    var24.tooltip = var17.tooltip = StringConstants.TOOLTIP_PLACE_FLEETS + " " + (var1.fleetsAvailableToBuild != 1 ? Strings.format(StringConstants.TOOLTIP_FLEETS_REMAINING, Integer.toString(var1.fleetsAvailableToBuild)) : StringConstants.TOOLTIP_ONE_FLEET_REMAINING);
+    var24.tooltip = var17.tooltip = StringConstants.TOOLTIP_PLACE_FLEETS + " " + (force.fleetsAvailableToBuild != 1 ? Strings.format(StringConstants.TOOLTIP_FLEETS_REMAINING, Integer.toString(force.fleetsAvailableToBuild)) : StringConstants.TOOLTIP_ONE_FLEET_REMAINING);
 
-    var2.buildFleetsButtons.add(var24);
-    var2._f.add(var4);
-    var2.buildFleetsLabels.add(var17);
+    state.buildFleetsButtons.add(var24);
+    state._f.add(var4);
+    state.buildFleetsLabels.add(var17);
 
     return var4;
   }
@@ -1287,7 +1293,7 @@ public final class GameUI {
         }
       } else {
         final boolean var11 = player.index < this.gameSession.localPlayer.index;
-        final TextButton<?> var12 = var3._i[var11 ? player.index : player.index - 1];
+        final Button<?> var12 = var3._i[var11 ? player.index : player.index - 1];
         final Icon[] var13 = var3._f[var11 ? 1 + player.index : player.index];
         final ScrollView<?> var7 = var3._h[!var11 ? player.index : 1 + player.index];
         if (this.gameSession.gameState.isPlayerDefeated(player.index)) {
@@ -1960,7 +1966,7 @@ public final class GameUI {
     this.fleetInfoPanel.a183(this.fleetInfoPanel.content.contentHeight + 28, this.fleetInfoPanel.width);
     this.fleetInfoPanel.content.a183(this.fleetInfoPanel.content.contentHeight + 10, this.fleetInfoPanel.content.width);
     this.fleetInfoPanel.translate(0, -this.fleetInfoPanel.height + var5);
-    this.f150();
+    this.refreshProductionPanel();
     this.initialize();
     final Player[] var6 = this.gameSession.gameState.players;
 
@@ -2423,7 +2429,7 @@ public final class GameUI {
   }
 
   public void updateForTurnStart() {
-    this.f150();
+    this.refreshProductionPanel();
     if (this.projectsPanel != null) {
       this.updateProjectsPanel();
     }
@@ -3106,7 +3112,7 @@ public final class GameUI {
     }
   }
 
-  private void f150() {
+  private void refreshProductionPanel() {
     this.productionPanel.content.removeChildren();
     final ProductionPanelState info = this.productionPanel.state;
     if (this.gameSession.localPlayer != null && !this.gameSession.gameState.isPlayerDefeated(this.gameSession.localPlayer.index)) {
@@ -3114,7 +3120,7 @@ public final class GameUI {
         info.buildFleetsButtons = new ArrayList<>(1);
         info._f = new ArrayList<>(1);
         info.buildFleetsLabels = new ArrayList<>(1);
-        final ScrollView<?> var3 = addForceToProductionPanel(this.gameSession.localPlayer.combinedForce, info, true);
+        final ScrollView<?> var3 = this.addForceToProductionPanel(this.gameSession.localPlayer.combinedForce, info, true);
         var3.setPosition(this.productionPanel.content.x, this.productionPanel.content.contentHeight + this.productionPanel.content.y);
         this.productionPanel.content.addChild(var3);
         if (this.gameSession.localPlayer.combinedForce.fleetsAvailableToBuild <= 0) {
@@ -3134,7 +3140,7 @@ public final class GameUI {
 
         boolean isFirst = true;
         for (final ContiguousForce force : this.gameSession.localPlayer.contiguousForces) {
-          final ScrollView<?> var5 = addForceToProductionPanel(force, info, isFirst);
+          final ScrollView<?> var5 = this.addForceToProductionPanel(force, info, isFirst);
           var5.setPosition(this.productionPanel.content.x, this.productionPanel.content.y + this.productionPanel.content.contentHeight);
           this.productionPanel.content.addChild(var5);
           if (force.fleetsAvailableToBuild > 0) {
@@ -3170,11 +3176,7 @@ public final class GameUI {
       }
     }
 
-    int var12 = 3 + this.productionPanel.content.contentHeight + 20;
-    if (var12 > 363) {
-      var12 = 363;
-    }
-
+    final int var12 = Math.min(3 + this.productionPanel.content.contentHeight + 20, 363);
     this.productionPanel.a183(var12, this.productionPanel.width);
     this.productionPanel.content.a183(var12 - 10 - 18, this.productionPanel.content.width);
     info.scrollBar.a183(var12 - 3 - 15 - 10, info.scrollBar.width);
@@ -3273,6 +3275,27 @@ public final class GameUI {
 
     for (final StarSystem system : force) {
       this.gameSession.gameView.highlightedSystems[system.index] = SystemHighlight.TARGET;
+    }
+  }
+
+  /**
+   * Like {@link Label}, but highlighted green while placing a terraforming
+   * project if the resource is a surplus resource.
+   */
+  private class ResourceProductionLabel extends Label {
+    private final boolean isSurplus;
+
+    protected ResourceProductionLabel(final int x, final int y, final int width, final int height, final String text, final boolean isSurplus) {
+      super(x, y, width, height, text);
+      this.isSurplus = isSurplus;
+    }
+
+    @Override
+    protected int getColor() {
+      if (GameUI.this.gameSession.placementMode == PlacementMode.TERRAFORM && this.isSurplus) {
+        return GameView.RESOURCE_COLORS[GameState.ResourceType.BIOMASS];
+      }
+      return super.getColor();
     }
   }
 

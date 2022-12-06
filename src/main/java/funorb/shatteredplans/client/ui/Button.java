@@ -4,13 +4,13 @@ import funorb.graphics.Drawing;
 import funorb.graphics.Sprite;
 import funorb.shatteredplans.client.Menu;
 
-public final class TextButton<T> extends UIComponent<T> {
+public final class Button<T> extends UIComponent<T> {
   private final Sprite sprite;
   private final int backgroundColor;
   private String text;
   private int textColor;
 
-  public TextButton(final int x, final int y, final int width, final int height, final int var5, final Sprite sprite, final String text, final int textColor) {
+  public Button(final int x, final int y, final int width, final int height, final int var5, final Sprite sprite, final String text, final int textColor) {
     super(x, y, width, height);
     this.backgroundColor = var5;
     this.sprite = sprite;

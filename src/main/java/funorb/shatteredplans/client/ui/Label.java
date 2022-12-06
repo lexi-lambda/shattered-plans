@@ -1,8 +1,8 @@
 package funorb.shatteredplans.client.ui;
 
 import funorb.graphics.Drawing;
-import funorb.shatteredplans.game.Force;
 import funorb.shatteredplans.client.Menu;
+import funorb.shatteredplans.game.Force;
 
 public class Label extends UIComponent<Force> {
   private final int color;
@@ -22,11 +22,15 @@ public class Label extends UIComponent<Force> {
     this.color = color;
   }
 
+  protected int getColor() {
+    return this.color;
+  }
+
   @Override
   public void draw() {
     if (this.visible) {
       if (this.text != null) {
-        Menu.SMALL_FONT.drawCentered(this.text, this.width / 2 + this.x, 3 * Menu.SMALL_FONT.ascent / 4 + this.y, this.color);
+        Menu.SMALL_FONT.drawCentered(this.text, this.width / 2 + this.x, 3 * Menu.SMALL_FONT.ascent / 4 + this.y, this.getColor());
       }
     }
   }
