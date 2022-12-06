@@ -2,7 +2,7 @@ package funorb.audio;
 
 import funorb.io.Buffer;
 
-public final class fh_ {
+public final class SynthMystery {
   public static final int[][] _e = new int[2][8];
   private static final float[][] _f = new float[2][8];
   public static int _g;
@@ -17,42 +17,45 @@ public final class fh_ {
     return var1 * 3.1415927F / 11025.0F;
   }
 
-  public void a086(final Buffer var1, final OscillatorState var2) {
-    final int var3 = var1.readUByte();
+  public void load(final Buffer buf, final SynthEnvelope env) {
+    final int var3 = buf.readUByte();
+
     this._d[0] = var3 >> 4;
     this._d[1] = var3 & 15;
+
     if (var3 == 0) {
       this._b[1] = 0;
       this._b[0] = 0;
-    } else {
-      this._b[0] = var1.readUShort();
-      this._b[1] = var1.readUShort();
-      final int var4 = var1.readUByte();
+      return;
+    }
 
-      int var5;
-      int var6;
-      for (var5 = 0; var5 < 2; ++var5) {
-        for (var6 = 0; var6 < this._d[var5]; ++var6) {
-          this._a[var5][0][var6] = var1.readUShort();
-          this._c[var5][0][var6] = var1.readUShort();
+    this._b[0] = buf.readUShort();
+    this._b[1] = buf.readUShort();
+    final int var4 = buf.readUByte();
+
+    int var5;
+    int var6;
+    for (var5 = 0; var5 < 2; ++var5) {
+      for (var6 = 0; var6 < this._d[var5]; ++var6) {
+        this._a[var5][0][var6] = buf.readUShort();
+        this._c[var5][0][var6] = buf.readUShort();
+      }
+    }
+
+    for (var5 = 0; var5 < 2; ++var5) {
+      for (var6 = 0; var6 < this._d[var5]; ++var6) {
+        if ((var4 & 1 << var5 * 4 << var6) == 0) {
+          this._a[var5][1][var6] = this._a[var5][0][var6];
+          this._c[var5][1][var6] = this._c[var5][0][var6];
+        } else {
+          this._a[var5][1][var6] = buf.readUShort();
+          this._c[var5][1][var6] = buf.readUShort();
         }
       }
+    }
 
-      for (var5 = 0; var5 < 2; ++var5) {
-        for (var6 = 0; var6 < this._d[var5]; ++var6) {
-          if ((var4 & 1 << var5 * 4 << var6) == 0) {
-            this._a[var5][1][var6] = this._a[var5][0][var6];
-            this._c[var5][1][var6] = this._c[var5][0][var6];
-          } else {
-            this._a[var5][1][var6] = var1.readUShort();
-            this._c[var5][1][var6] = var1.readUShort();
-          }
-        }
-      }
-
-      if (var4 != 0 || this._b[1] != this._b[0]) {
-        var2.read(var1);
-      }
+    if (var4 != 0 || this._b[1] != this._b[0]) {
+      env.loadPoints(buf);
     }
   }
 
