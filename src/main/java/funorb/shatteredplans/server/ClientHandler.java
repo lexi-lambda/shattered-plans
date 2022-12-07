@@ -109,6 +109,7 @@ public final class ClientHandler extends ChannelDuplexHandler {
       };
       final int newByteCount = Math.min(msg.readableBytes(), neededBytes - this.packetPayload.readableBytes());
       if (newByteCount > 0) {
+        this.packetPayload.ensureWritable(newByteCount);
         msg.readBytes(this.packetPayload, newByteCount);
       }
 

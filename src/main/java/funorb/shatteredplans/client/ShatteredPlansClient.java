@@ -367,10 +367,11 @@ public final class ShatteredPlansClient extends JagexApplet {
       STAT_DESCS[14] = StringConstants.TEXT_STAT_DESC_AGGRESSIVENESS;
       STAT_DESCS[15] = StringConstants.TEXT_STAT_DESC_SOLIDITY;
 
-      StringConstants.GAMEOPT_NAMES[0] = new String[5];
+      final int aiPlayerChoiceCount = GAMEOPT_CHOICES_COUNTS[0] = DEBUG_MODE ? 6 : 5;
+      StringConstants.GAMEOPT_NAMES[0] = new String[aiPlayerChoiceCount];
       GAMEOPT_TOOLTIPS = new String[5][];
-      GAMEOPT_TOOLTIPS[0] = new String[5];
-      for (int i = 0; i < 5; ++i) {
+      GAMEOPT_TOOLTIPS[0] = new String[aiPlayerChoiceCount];
+      for (int i = 0; i < aiPlayerChoiceCount; ++i) {
         StringConstants.GAMEOPT_NAMES[0][i] = Integer.toString(i);
         GAMEOPT_TOOLTIPS[0][i] = StringConstants.TEXT_TOTAL_PLAYERS;
       }
