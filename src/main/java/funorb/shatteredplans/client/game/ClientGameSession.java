@@ -1014,9 +1014,9 @@ public final class ClientGameSession extends GameSession {
       --len;
       if (type == 0) {
         final int offers = packet.readUByte();
+        --len;
         final int newOffers = ~this.localPlayer.incomingPactOffersBitmap & offers;
         this.localPlayer.incomingPactOffersBitmap = offers;
-        --len;
         if (newOffers == 0) {
           continue;
         }
@@ -1029,12 +1029,12 @@ public final class ClientGameSession extends GameSession {
       } else if (type == 1) {
         final int offererIndex = packet.readUByte();
         final int offereeIndex = packet.readUByte();
+        len -= 2;
         final Player offerer = this.gameState.players[offererIndex];
         final Player offeree = this.gameState.players[offereeIndex];
         JagexApplet.printDebug("RECV PACT " + offerer + " <-> " + offeree);
         Player.establishPact(offerer, offeree);
         this.handlePactAccepted(offerer, offeree);
-        len -= 3;
       }
     }
   }
