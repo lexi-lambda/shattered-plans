@@ -3,12 +3,12 @@ package funorb.audio;
 import funorb.cache.ResourceLoader;
 import funorb.io.Buffer;
 
-public final class FmtSynth {
+public final class SynthFormat {
   private final Synth[] oscs = new Synth[10];
   private final int loopStartMs;
   private final int loopEndMs;
 
-  private FmtSynth(final Buffer data) {
+  private SynthFormat(final Buffer data) {
     for (int i = 0; i < 10; ++i) {
       final int peekByte = data.readUByte();
       if (peekByte != 0) {
@@ -22,9 +22,9 @@ public final class FmtSynth {
     this.loopEndMs = data.readUShort();
   }
 
-  public static FmtSynth load(final ResourceLoader loader, final int groupId, final int itemId) {
+  public static SynthFormat load(final ResourceLoader loader, final int groupId, final int itemId) {
     final byte[] data = loader.getResource(groupId, itemId);
-    return data == null ? null : new FmtSynth(new Buffer(data));
+    return data == null ? null : new SynthFormat(new Buffer(data));
   }
 
   private byte[] toSampleDataS8() {

@@ -7,7 +7,7 @@ import java.util.Map;
 
 public final class SoundLoader {
   public static SoundLoader globalLoader;
-  private final Map<Long, FmtVorbis> cache2 = new HashMap<>();
+  private final Map<Long, VorbisFormat> cache2 = new HashMap<>();
   private final Map<Long, RawSampleS8> cache1 = new HashMap<>();
   private final ResourceLoader loader1;
   private final ResourceLoader loader2;
@@ -21,7 +21,7 @@ public final class SoundLoader {
     final int cacheKey = (itemId ^ (((groupId << 4) & 0xfff3) | (groupId >>> 12))) | (groupId << 16);
     final RawSampleS8 cachedRaw = this.cache1.get((long) cacheKey);
     if (cachedRaw == null) {
-      final FmtSynth file = FmtSynth.load(this.loader1, groupId, itemId);
+      final SynthFormat file = SynthFormat.load(this.loader1, groupId, itemId);
       if (file == null) {
         return null;
       } else {
@@ -59,9 +59,9 @@ public final class SoundLoader {
     final long cacheKey = 0x100000000L ^ (long) var5;
     RawSampleS8 raw = this.cache1.get(cacheKey);
     if (raw == null) {
-      FmtVorbis file = this.cache2.get(cacheKey);
+      VorbisFormat file = this.cache2.get(cacheKey);
       if (file == null) {
-        file = FmtVorbis.load(this.loader2, groupId, itemId);
+        file = VorbisFormat.load(this.loader2, groupId, itemId);
         if (file == null) {
           return null;
         }
