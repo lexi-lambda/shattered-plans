@@ -173,14 +173,14 @@ public final class Synth {
         final int var15 = Math.min(var13, len - var12);
 
         while (var14 < var15) {
-          int var16 = (int) ((long) buf[var14 + var12] * (long) SynthMystery._g >> 16);
+          int var16 = (int) ((long) buf[var14 + var12] * (long) SynthMystery.someAmp >> 16);
 
           for (int var17 = 0; var17 < var12; ++var17) {
-            var16 += (int) ((long) buf[var14 + var12 - 1 - var17] * (long) SynthMystery._e[0][var17] >> 16);
+            var16 += (int) ((long) buf[var14 + var12 - 1 - var17] * (long) SynthMystery.someAmps[0][var17] >> 16);
           }
 
           for (int var17 = 0; var17 < var14; ++var17) {
-            var16 -= (int) ((long) buf[var14 - 1 - var17] * (long) SynthMystery._e[1][var17] >> 16);
+            var16 -= (int) ((long) buf[var14 - 1 - var17] * (long) SynthMystery.someAmps[1][var17] >> 16);
           }
 
           buf[var14] = var16;
@@ -195,14 +195,14 @@ public final class Synth {
           }
 
           while (var14 < var15a) {
-            int var16 = (int) ((long) buf[var14 + var12] * (long) SynthMystery._g >> 16);
+            int var16 = (int) ((long) buf[var14 + var12] * (long) SynthMystery.someAmp >> 16);
 
             for (int var17 = 0; var17 < var12; ++var17) {
-              var16 += (int) ((long) buf[var14 + var12 - 1 - var17] * (long) SynthMystery._e[0][var17] >> 16);
+              var16 += (int) ((long) buf[var14 + var12 - 1 - var17] * (long) SynthMystery.someAmps[0][var17] >> 16);
             }
 
             for (int var17 = 0; var17 < var13; ++var17) {
-              var16 -= (int) ((long) buf[var14 - 1 - var17] * (long) SynthMystery._e[1][var17] >> 16);
+              var16 -= (int) ((long) buf[var14 - 1 - var17] * (long) SynthMystery.someAmps[1][var17] >> 16);
             }
 
             buf[var14] = var16;
@@ -215,11 +215,11 @@ public final class Synth {
               int var16 = 0;
 
               for (int var17 = var14 + var12 - len; var17 < var12; ++var17) {
-                var16 += (int) ((long) buf[var14 + var12 - 1 - var17] * (long) SynthMystery._e[0][var17] >> 16);
+                var16 += (int) ((long) buf[var14 + var12 - 1 - var17] * (long) SynthMystery.someAmps[0][var17] >> 16);
               }
 
               for (int var17 = 0; var17 < var13; ++var17) {
-                var16 -= (int) ((long) buf[var14 - 1 - var17] * (long) SynthMystery._e[1][var17] >> 16);
+                var16 -= (int) ((long) buf[var14 - 1 - var17] * (long) SynthMystery.someAmps[1][var17] >> 16);
               }
 
               buf[var14] = var16;

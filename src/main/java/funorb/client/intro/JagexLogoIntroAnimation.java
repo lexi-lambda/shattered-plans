@@ -1,6 +1,6 @@
 package funorb.client.intro;
 
-import funorb.audio.FmtVorbis;
+import funorb.audio.VorbisFormat;
 import funorb.cache.ResourceLoader;
 import funorb.client.JagexBaseApplet;
 import funorb.graphics.Drawing;
@@ -57,8 +57,8 @@ public final class JagexLogoIntroAnimation {
   }
 
   private static void load1(final ResourceLoader loader) {
-    FmtVorbis.b604(loader.getResource("headers.packvorbis", ""));
-    final FmtVorbis var2 = FmtVorbis.a968(loader, "jagex logo2.packvorbis", "");
+    VorbisFormat.readIdentificationAndSetup(loader.getResource("headers.packvorbis", ""));
+    final VorbisFormat var2 = VorbisFormat.loadAudio(loader, "jagex logo2.packvorbis", "");
     assert var2 != null;
     var2.b720();
   }
