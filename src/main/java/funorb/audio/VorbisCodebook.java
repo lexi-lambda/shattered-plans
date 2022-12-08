@@ -7,7 +7,7 @@ public final class VorbisCodebook {
   private final int cbSize;
   private final int[] cwLengths;
   private float[][] vectors;
-  private int[] _f;
+  private int[] tree;
 
   public VorbisCodebook() {
     VorbisFormat.readBits(24);
@@ -37,7 +37,7 @@ public final class VorbisCodebook {
       }
     }
 
-    this.b797();
+    this.initHuffmanTree();
 
     int lookupTableType = VorbisFormat.readBits(4);
     if (lookupTableType > 0) {
@@ -104,119 +104,112 @@ public final class VorbisCodebook {
 
   private static int pow(int base, int exp) {
     int res;
-
     for (res = 1; exp > 1; base *= base) {
       if ((exp & 1) != 0) {
         res *= base;
       }
       exp >>= 1;
     }
+    return exp == 1 ? res * base : res;
+  }
 
-    if (exp == 1) {
-      return res * base;
-    } else {
-      return res;
+  public float[] decodeVector() {
+    return this.vectors[this.decodeScalar()];
+  }
+
+  public int decodeScalar() {
+    int i = 0;
+    while (this.tree[i] >= 0) {
+      i = VorbisFormat.readBit() != 0 ? this.tree[i] : i + 1;
     }
+    return ~this.tree[i];
   }
 
-  public float[] c932() {
-    return this.vectors[this.a784()];
-  }
-
-  public int a784() {
-    int var1 = 0;
-    while (this._f[var1] >= 0) {
-      var1 = VorbisFormat.readBit() != 0 ? this._f[var1] : var1 + 1;
-    }
-    return ~this._f[var1];
-  }
-
-  private void b797() {
+  private void initHuffmanTree() {
     final int[] var1 = new int[this.cbSize];
     final int[] var2 = new int[33];
 
-    int var4;
     int var5;
     int var6;
-    int var7;
-    int var10;
 
     for (int i = 0; i < this.cbSize; ++i) {
-      var4 = this.cwLengths[i];
-      if (var4 != 0) {
-        var5 = 1 << 32 - var4;
-        var6 = var2[var4];
-        var1[i] = var6;
-        int var9;
-        if ((var6 & var5) == 0) {
-          var7 = var6 | var5;
+      int cwLength = this.cwLengths[i];
+      if (cwLength == 0) {
+        continue;
+      }
 
-          for (int j = var4 - 1; j >= 1; --j) {
-            var9 = var2[j];
-            if (var9 != var6) {
-              break;
-            }
+      var5 = 1 << 32 - cwLength;
+      var6 = var2[cwLength];
+      var1[i] = var6;
+      int var9;
+      int var7;
+      if ((var6 & var5) == 0) {
+        var7 = var6 | var5;
 
-            var10 = 1 << 32 - j;
-            if ((var9 & var10) != 0) {
-              var2[j] = var2[j - 1];
-              break;
-            }
-
-            var2[j] = var9 | var10;
-          }
-        } else {
-          var7 = var2[var4 - 1];
-        }
-
-        var2[var4] = var7;
-
-        for (int j = var4 + 1; j <= 32; ++j) {
+        for (int j = cwLength - 1; j >= 1; --j) {
           var9 = var2[j];
-          if (var9 == var6) {
-            var2[j] = var7;
+          if (var9 != var6) {
+            break;
           }
+
+          int var10 = 1 << 32 - j;
+          if ((var9 & var10) != 0) {
+            var2[j] = var2[j - 1];
+            break;
+          }
+
+          var2[j] = var9 | var10;
+        }
+      } else {
+        var7 = var2[cwLength - 1];
+      }
+
+      var2[cwLength] = var7;
+
+      for (int j = cwLength + 1; j <= 32; ++j) {
+        var9 = var2[j];
+        if (var9 == var6) {
+          var2[j] = var7;
         }
       }
     }
 
-    this._f = new int[8];
+    this.tree = new int[8];
     int var11 = 0;
 
     for (int i = 0; i < this.cbSize; ++i) {
-      var4 = this.cwLengths[i];
-      if (var4 != 0) {
-        var5 = var1[i];
-        var6 = 0;
+      int len = this.cwLengths[i];
+      if (len == 0) {
+        continue;
+      }
 
-        for (var7 = 0; var7 < var4; ++var7) {
-          int var8 = Integer.MIN_VALUE >>> var7;
-          if ((var5 & var8) == 0) {
-            ++var6;
-          } else {
-            if (this._f[var6] == 0) {
-              this._f[var6] = var11;
-            }
+      var5 = var1[i];
+      var6 = 0;
 
-            var6 = this._f[var6];
+      for (int j = 0; j < len; ++j) {
+        int var8 = Integer.MIN_VALUE >>> j;
+        if ((var5 & var8) == 0) {
+          ++var6;
+        } else {
+          if (this.tree[var6] == 0) {
+            this.tree[var6] = var11;
           }
 
-          if (var6 >= this._f.length) {
-            final int[] var12 = new int[this._f.length * 2];
+          var6 = this.tree[var6];
+        }
 
-            for (var10 = 0; var10 < this._f.length; ++var10) {
-              var12[var10] = this._f[var10];
-            }
-
-            this._f = var12;
+        if (var6 >= this.tree.length) {
+          final int[] newTree = new int[this.tree.length * 2];
+          for (int k = 0; k < this.tree.length; ++k) {
+            newTree[k] = this.tree[k];
           }
-
+          this.tree = newTree;
         }
+      }
 
-        this._f[var6] = ~i;
-        if (var6 >= var11) {
-          var11 = var6 + 1;
-        }
+      this.tree[var6] = ~i;
+      if (var6 >= var11) {
+        var11 = var6 + 1;
       }
     }
 

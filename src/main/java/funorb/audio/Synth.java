@@ -18,9 +18,9 @@ public final class Synth {
   private static final int[] harmFreqMin_idk;
 
   static {
-    final Random var0 = new Random(0L);
+    final Random rng = new Random(0L);
     for (int i = 0; i < 0x8000; ++i) {
-      NOISE[i] = (var0.nextInt() & 2) - 1;
+      NOISE[i] = (rng.nextInt() & 2) - 1;
     }
     for (int i = 0; i < 0x8000; ++i) {
       SINE[i] = (int) (Math.sin((double) i * Math.PI / 0x4000) * 0x4000);

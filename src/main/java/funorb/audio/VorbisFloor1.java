@@ -206,12 +206,12 @@ public final class VorbisFloor1 {
       final int cSub = (1 << cBits) - 1;
       int cVal = 0;
       if (cBits > 0) {
-        cVal = VorbisFormat.codebooks[this.classMasterbooks[cls]].a784();
+        cVal = VorbisFormat.codebooks[this.classMasterbooks[cls]].decodeScalar();
       }
       for (int i = 0; i < cDim; ++i) {
         final int book = this.subclassBooks[cls][cVal & cSub];
         cVal >>>= cBits;
-        floorY[offset++] = book >= 0 ? VorbisFormat.codebooks[book].a784() : 0;
+        floorY[offset++] = book >= 0 ? VorbisFormat.codebooks[book].decodeScalar() : 0;
       }
     }
 
