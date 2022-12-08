@@ -9,23 +9,23 @@ import java.util.stream.IntStream;
 
 public final class VorbisFormat {
   public static VorbisCodebook[] codebooks;
-  private static float[] _k;
-  private static VorbisResidues[] residues;
+  private static float[] window;
+  private static VorbisResidue[] residues;
   private static int[] modeMapping;
-  private static int[] _D;
+  private static int[] blocksize0Invbit;
   private static VorbisMapping[] mappings;
-  private static float[] _u;
-  private static float[] _C;
+  private static float[] blocksize1Tbl3;
+  private static float[] blocksize0Tbl3;
   private static boolean setupFinished_idk = false;
   private static byte[] buffer;
-  private static float[] _z;
+  private static float[] blocksize0Tbl2;
   private static boolean[] modeBlockFlag;
-  private static float[] _y;
-  private static float[] _j;
+  private static float[] blocksize1Tbl2;
+  private static float[] blocksize1Tbl1;
   private static int blocksize1;
-  private static float[] _l;
+  private static float[] blocksize0Tbl1;
   private static int curBit;
-  private static int[] _F;
+  private static int[] blocksize1Invbit;
   private static int blocksize0;
   private static VorbisFloor1[] floors;
   private static int curByte;
@@ -33,14 +33,14 @@ public final class VorbisFormat {
   private int loopEnd;
   private boolean isLooped;
   private int loopStart;
-  private int _i;
+  private int lastWindowStart;
   private int outputOffset;
-  private boolean _A;
+  private boolean lastWindowZero;
   private byte[][] packets;
-  private int _M;
+  private int lastWindowN;
   private int sampleRate;
   private byte[] sampleData;
-  private float[] prevWindow;
+  private float[] lastWindow;
   private int packet;
 
   private VorbisFormat(final byte[] data) throws IOException {
@@ -69,47 +69,45 @@ public final class VorbisFormat {
     setCurrentPacket(section);
     blocksize0 = 1 << readBits(4);
     blocksize1 = 1 << readBits(4);
-    _k = new float[blocksize1];
+    window = new float[blocksize1];
 
     for (int i = 0; i < 2; ++i) {
-      int var2 = i != 0 ? blocksize1 : blocksize0;
-      int var3 = var2 >> 1;
-      int var4 = var2 >> 2;
-      int var5 = var2 >> 3;
-      final float[] var6 = new float[var3];
+      int n = i == 0 ? blocksize0 : blocksize1;
+      int n2 = n >> 1;
+      int n4 = n >> 2;
+      int n8 = n >> 3;
 
-      for (int var7 = 0; var7 < var4; ++var7) {
-        var6[2 * var7] = (float) Math.cos((double) (4 * var7) * Math.PI / (double) var2);
-        var6[2 * var7 + 1] = -((float) Math.sin((double) (4 * var7) * Math.PI / (double) var2));
+      final float[] tbl1 = new float[n2];
+      for (int j = 0; j < n4; ++j) {
+        tbl1[2 * j] = (float) Math.cos((double) (4 * j) * Math.PI / (double) n);
+        tbl1[2 * j + 1] = -((float) Math.sin((double) (4 * j) * Math.PI / (double) n));
       }
 
-      final float[] var13 = new float[var3];
-
-      for (int var8 = 0; var8 < var4; ++var8) {
-        var13[2 * var8] = (float) Math.cos((double) (2 * var8 + 1) * Math.PI / (double) (2 * var2));
-        var13[2 * var8 + 1] = (float) Math.sin((double) (2 * var8 + 1) * Math.PI / (double) (2 * var2));
+      final float[] tbl2 = new float[n2];
+      for (int j = 0; j < n4; ++j) {
+        tbl2[2 * j] = (float) Math.cos((double) (2 * j + 1) * Math.PI / (double) (2 * n));
+        tbl2[2 * j + 1] = (float) Math.sin((double) (2 * j + 1) * Math.PI / (double) (2 * n));
       }
 
-      final float[] var14 = new float[var4];
-
-      for (int var9 = 0; var9 < var5; ++var9) {
-        var14[2 * var9] = (float) Math.cos((double) (4 * var9 + 2) * Math.PI / (double) var2);
-        var14[2 * var9 + 1] = -((float) Math.sin((double) (4 * var9 + 2) * Math.PI / (double) var2));
+      final float[] tbl3 = new float[n4];
+      for (int j = 0; j < n8; ++j) {
+        tbl3[2 * j] = (float) Math.cos((double) (4 * j + 2) * Math.PI / (double) n);
+        tbl3[2 * j + 1] = -((float) Math.sin((double) (4 * j + 2) * Math.PI / (double) n));
       }
 
-      final int var10 = BitMath.lastSet(var5 - 1);
-      final int[] var15 = IntStream.range(0, var5).map(var11 -> reverseBits(var11, var10)).toArray();
+      final int bits = BitMath.lastSet(n8 - 1);
+      final int[] invbit = IntStream.range(0, n8).map(j -> reverseBits(j, bits)).toArray();
 
       if (i == 0) {
-        _l = var6;
-        _z = var13;
-        _C = var14;
-        _D = var15;
+        blocksize0Tbl1 = tbl1;
+        blocksize0Tbl2 = tbl2;
+        blocksize0Tbl3 = tbl3;
+        blocksize0Invbit = invbit;
       } else {
-        _j = var6;
-        _y = var13;
-        _u = var14;
-        _F = var15;
+        blocksize1Tbl1 = tbl1;
+        blocksize1Tbl2 = tbl2;
+        blocksize1Tbl3 = tbl3;
+        blocksize1Invbit = invbit;
       }
     }
 
@@ -131,9 +129,9 @@ public final class VorbisFormat {
     }
 
     int numResidues = readBits(6) + 1;
-    residues = new VorbisResidues[numResidues];
+    residues = new VorbisResidue[numResidues];
     for (int i = 0; i < numResidues; ++i) {
-      residues[i] = new VorbisResidues();
+      residues[i] = new VorbisResidue();
     }
 
     int numMappings = readBits(6) + 1;
@@ -248,8 +246,8 @@ public final class VorbisFormat {
 
   public RawSampleS8 toRawSample() {
     if (this.sampleData == null) {
-      this._M = 0;
-      this.prevWindow = new float[blocksize1];
+      this.lastWindowN = 0;
+      this.lastWindow = new float[blocksize1];
       this.sampleData = new byte[this.sampleLength];
       this.outputOffset = 0;
       this.packet = 0;
@@ -274,7 +272,7 @@ public final class VorbisFormat {
       }
     }
 
-    this.prevWindow = null;
+    this.lastWindow = null;
     final byte[] sampleData = this.sampleData;
     this.sampleData = null;
     return new RawSampleS8(this.sampleRate, sampleData, this.loopStart, this.loopEnd, this.isLooped);
@@ -323,210 +321,184 @@ public final class VorbisFormat {
       rightN = n >> 1;
     }
 
+    // compute spectrum
     final VorbisMapping mapping = mappings[modeMapping[modeNumber]];
-    final boolean var15 = !floors[mapping.floor[mapping.mux]].decode();
-
+    final boolean thisWindowZero = !floors[mapping.floor[mapping.mux]].decode();
     for (int i = 0; i < mapping.submaps; ++i) {
-      final VorbisResidues residue = residues[mapping.residues[i]];
-      final float[] var19 = _k;
-      residue.a623(var19, n >> 1, var15);
+      residues[mapping.residues[i]].computeResidue(window, n >> 1, thisWindowZero);
+    }
+    if (!thisWindowZero) {
+      floors[mapping.floor[mapping.mux]].computeCurve(window, n >> 1);
     }
 
-    if (!var15) {
-      floors[mapping.floor[mapping.mux]].computeCurve(_k, n >> 1);
-    }
-
-    int var42;
-    if (var15) {
-      for (int var17 = n >> 1; var17 < n; ++var17) {
-        _k[var17] = 0.0F;
+    // mdct and windowing
+    if (thisWindowZero) {
+      for (int i = n >> 1; i < n; ++i) {
+        window[i] = 0.0F;
       }
     } else {
-      final int i = n >> 1;
-      int var41 = n >> 2;
-      var42 = n >> 3;
-      final float[] var20 = _k;
+      final int n2 = n >> 1;
+      final int n4 = n >> 2;
+      final int n8 = n >> 3;
+      final float[] v = window;
 
-      int var21;
-      for (var21 = 0; var21 < i; ++var21) {
-        var20[var21] *= 0.5F;
+      for (int i = 0; i < n2; ++i) {
+        v[i] *= 0.5F;
+      }
+      for (int i = n2; i < n; ++i) {
+        v[i] = -v[n - i - 1];
       }
 
-      for (var21 = i; var21 < n; ++var21) {
-        var20[var21] = -var20[n - var21 - 1];
+      final float[] tbl1 = isLongWindow ? blocksize1Tbl1 : blocksize0Tbl1;
+      final float[] tbl2 = isLongWindow ? blocksize1Tbl2 : blocksize0Tbl2;
+      final float[] tbl3 = isLongWindow ? blocksize1Tbl3 : blocksize0Tbl3;
+      final int[] invbit = isLongWindow ? blocksize1Invbit : blocksize0Invbit;
+
+      for (int i = 0; i < n4; ++i) {
+        final float a = v[4 * i] - v[n - 4 * i - 1];
+        final float b = v[4 * i + 2] - v[n - 4 * i - 3];
+        final float c = tbl1[2 * i];
+        final float d = tbl1[2 * i + 1];
+        v[n - 4 * i - 1] = a * c - b * d;
+        v[n - 4 * i - 3] = a * d + b * c;
       }
 
-      final float[] var46 = isLongWindow ? _j : _l;
-      final float[] var22 = isLongWindow ? _y : _z;
-      final float[] var23 = isLongWindow ? _u : _C;
-      final int[] var24 = isLongWindow ? _F : _D;
-
-      int var25;
-      float var26;
-      float var27;
-      float var28;
-      float var29;
-      for (var25 = 0; var25 < var41; ++var25) {
-        var26 = var20[4 * var25] - var20[n - 4 * var25 - 1];
-        var27 = var20[4 * var25 + 2] - var20[n - 4 * var25 - 3];
-        var28 = var46[2 * var25];
-        var29 = var46[2 * var25 + 1];
-        var20[n - 4 * var25 - 1] = var26 * var28 - var27 * var29;
-        var20[n - 4 * var25 - 3] = var26 * var29 + var27 * var28;
+      for (int i = 0; i < n8; ++i) {
+        final float a = v[n2 + 3 + 4 * i];
+        final float b = v[n2 + 1 + 4 * i];
+        final float c = v[4 * i + 3];
+        final float d = v[4 * i + 1];
+        v[n2 + 3 + 4 * i] = a + c;
+        v[n2 + 1 + 4 * i] = b + d;
+        final float e = tbl1[n2 - 4 - 4 * i];
+        final float f = tbl1[n2 - 3 - 4 * i];
+        v[4 * i + 3] = (a - c) * e - (b - d) * f;
+        v[4 * i + 1] = (b - d) * e + (a - c) * f;
       }
 
-      float var30;
-      float var31;
-      for (var25 = 0; var25 < var42; ++var25) {
-        var26 = var20[i + 3 + 4 * var25];
-        var27 = var20[i + 1 + 4 * var25];
-        var28 = var20[4 * var25 + 3];
-        var29 = var20[4 * var25 + 1];
-        var20[i + 3 + 4 * var25] = var26 + var28;
-        var20[i + 1 + 4 * var25] = var27 + var29;
-        var30 = var46[i - 4 - 4 * var25];
-        var31 = var46[i - 3 - 4 * var25];
-        var20[4 * var25 + 3] = (var26 - var28) * var30 - (var27 - var29) * var31;
-        var20[4 * var25 + 1] = (var27 - var29) * var30 + (var26 - var28) * var31;
-      }
+      int bits = BitMath.lastSet(n - 1);
 
-      var25 = BitMath.lastSet(n - 1);
+      for (int i = 0; i < bits - 3; ++i) {
+        final int nI = n >> i + 2;
+        final int coeff = 8 << i;
 
-      int var47;
-      int var48;
-      int var49;
-      int var50;
-      for (var47 = 0; var47 < var25 - 3; ++var47) {
-        var48 = n >> var47 + 2;
-        var49 = 8 << var47;
+        for (int j = 0; j < 2 << i; ++j) {
+          final int i0 = n - nI * 2 * j;
+          final int i1 = n - nI * (2 * j + 1);
 
-        for (var50 = 0; var50 < 2 << var47; ++var50) {
-          final int var51 = n - var48 * 2 * var50;
-          final int var52 = n - var48 * (2 * var50 + 1);
-
-          for (int var32 = 0; var32 < n >> var47 + 4; ++var32) {
-            final int var33 = 4 * var32;
-            final float var34 = var20[var51 - 1 - var33];
-            final float var35 = var20[var51 - 3 - var33];
-            final float var36 = var20[var52 - 1 - var33];
-            final float var37 = var20[var52 - 3 - var33];
-            var20[var51 - 1 - var33] = var34 + var36;
-            var20[var51 - 3 - var33] = var35 + var37;
-            final float var38 = var46[var32 * var49];
-            final float var39 = var46[var32 * var49 + 1];
-            var20[var52 - 1 - var33] = (var34 - var36) * var38 - (var35 - var37) * var39;
-            var20[var52 - 3 - var33] = (var35 - var37) * var38 + (var34 - var36) * var39;
+          for (int k = 0; k < n >> i + 4; ++k) {
+            final int k4 = 4 * k;
+            final float a = v[i0 - 1 - k4];
+            final float b = v[i0 - 3 - k4];
+            final float c = v[i1 - 1 - k4];
+            final float d = v[i1 - 3 - k4];
+            v[i0 - 1 - k4] = a + c;
+            v[i0 - 3 - k4] = b + d;
+            final float e = tbl1[k * coeff];
+            final float f = tbl1[k * coeff + 1];
+            v[i1 - 1 - k4] = (a - c) * e - (b - d) * f;
+            v[i1 - 3 - k4] = (b - d) * e + (a - c) * f;
           }
         }
       }
 
-      for (var47 = 1; var47 < var42 - 1; ++var47) {
-        var48 = var24[var47];
-        if (var47 < var48) {
-          var49 = 8 * var47;
-          var50 = 8 * var48;
-          var30 = var20[var49 + 1];
-          var20[var49 + 1] = var20[var50 + 1];
-          var20[var50 + 1] = var30;
-          var30 = var20[var49 + 3];
-          var20[var49 + 3] = var20[var50 + 3];
-          var20[var50 + 3] = var30;
-          var30 = var20[var49 + 5];
-          var20[var49 + 5] = var20[var50 + 5];
-          var20[var50 + 5] = var30;
-          var30 = var20[var49 + 7];
-          var20[var49 + 7] = var20[var50 + 7];
-          var20[var50 + 7] = var30;
+      for (int i = 1; i < n8 - 1; ++i) {
+        final int j = invbit[i];
+        if (i < j) {
+          final int i8 = 8 * i;
+          final int j8 = 8 * j;
+          float a;
+          a = v[i8 + 1];
+          v[i8 + 1] = v[j8 + 1];
+          v[j8 + 1] = a;
+          a = v[i8 + 3];
+          v[i8 + 3] = v[j8 + 3];
+          v[j8 + 3] = a;
+          a = v[i8 + 5];
+          v[i8 + 5] = v[j8 + 5];
+          v[j8 + 5] = a;
+          a = v[i8 + 7];
+          v[i8 + 7] = v[j8 + 7];
+          v[j8 + 7] = a;
         }
       }
 
-      for (var47 = 0; var47 < i; ++var47) {
-        var20[var47] = var20[2 * var47 + 1];
+      for (int i = 0; i < n2; ++i) {
+        v[i] = v[2 * i + 1];
       }
 
-      for (var47 = 0; var47 < var42; ++var47) {
-        var20[n - 1 - 2 * var47] = var20[4 * var47];
-        var20[n - 2 - 2 * var47] = var20[4 * var47 + 1];
-        var20[n - var41 - 1 - 2 * var47] = var20[4 * var47 + 2];
-        var20[n - var41 - 2 - 2 * var47] = var20[4 * var47 + 3];
+      for (int i = 0; i < n8; ++i) {
+        v[n - 1 - 2 * i] = v[4 * i];
+        v[n - 2 - 2 * i] = v[4 * i + 1];
+        v[n - n4 - 1 - 2 * i] = v[4 * i + 2];
+        v[n - n4 - 2 - 2 * i] = v[4 * i + 3];
       }
 
-      for (var47 = 0; var47 < var42; ++var47) {
-        var27 = var23[2 * var47];
-        var28 = var23[2 * var47 + 1];
-        var29 = var20[i + 2 * var47];
-        var30 = var20[i + 2 * var47 + 1];
-        var31 = var20[n - 2 - 2 * var47];
-        final float var53 = var20[n - 1 - 2 * var47];
-        final float var54 = var28 * (var29 - var31) + var27 * (var30 + var53);
-        var20[i + 2 * var47] = (var29 + var31 + var54) * 0.5F;
-        var20[n - 2 - 2 * var47] = (var29 + var31 - var54) * 0.5F;
-        final float v = var28 * (var30 + var53) - var27 * (var29 - var31);
-        var20[i + 2 * var47 + 1] = (var30 - var53 + v) * 0.5F;
-        var20[n - 1 - 2 * var47] = (-var30 + var53 + v) * 0.5F;
+      for (int i = 0; i < n8; ++i) {
+        final float a = tbl3[2 * i];
+        final float b = tbl3[2 * i + 1];
+        final float c = v[n2 + 2 * i];
+        final float d = v[n2 + 2 * i + 1];
+        final float e = v[n - 2 - 2 * i];
+        final float f = v[n - 1 - 2 * i];
+        final float g = b * (c - e) + a * (d + f);
+        v[n2 + 2 * i] = (c + e + g) * 0.5F;
+        v[n - 2 - 2 * i] = (c + e - g) * 0.5F;
+        final float h = b * (d + f) - a * (c - e);
+        v[n2 + 2 * i + 1] = (d - f + h) * 0.5F;
+        v[n - 1 - 2 * i] = (-d + f + h) * 0.5F;
       }
 
-      for (var47 = 0; var47 < var41; ++var47) {
-        var20[var47] = var20[2 * var47 + i] * var22[2 * var47] + var20[2 * var47 + 1 + i] * var22[2 * var47 + 1];
-        var20[i - 1 - var47] = var20[2 * var47 + i] * var22[2 * var47 + 1] - var20[2 * var47 + 1 + i] * var22[2 * var47];
+      for (int i = 0; i < n4; ++i) {
+        v[i] = v[2 * i + n2] * tbl2[2 * i] + v[2 * i + 1 + n2] * tbl2[2 * i + 1];
+        v[n2 - 1 - i] = v[2 * i + n2] * tbl2[2 * i + 1] - v[2 * i + 1 + n2] * tbl2[2 * i];
+      }
+      for (int i = 0; i < n4; ++i) {
+        v[n - n4 + i] = -v[i];
+      }
+      for (int i = 0; i < n4; ++i) {
+        v[i] = v[n4 + i];
+      }
+      for (int i = 0; i < n4; ++i) {
+        v[n4 + i] = -v[n4 - i - 1];
+      }
+      for (int i = 0; i < n4; ++i) {
+        v[n2 + i] = v[n - i - 1];
       }
 
-      for (var47 = 0; var47 < var41; ++var47) {
-        var20[n - var41 + var47] = -var20[var47];
+      for (int i = leftWindowStart; i < leftWindowEnd; ++i) {
+        final float a = (float) Math.sin(((double) (i - leftWindowStart) + 0.5D) / (double) leftN * 0.5D * Math.PI);
+        window[i] *= (float) Math.sin(1.5707963267948966D * (double) a * (double) a);
       }
 
-      for (var47 = 0; var47 < var41; ++var47) {
-        var20[var47] = var20[var41 + var47];
-      }
-
-      for (var47 = 0; var47 < var41; ++var47) {
-        var20[var41 + var47] = -var20[var41 - var47 - 1];
-      }
-
-      for (var47 = 0; var47 < var41; ++var47) {
-        var20[i + var47] = var20[n - var47 - 1];
-      }
-
-      float[] var10000;
-      for (var47 = leftWindowStart; var47 < leftWindowEnd; ++var47) {
-        var27 = (float) Math.sin(((double) (var47 - leftWindowStart) + 0.5D) / (double) leftN * 0.5D * Math.PI);
-        var10000 = _k;
-        var10000[var47] *= (float) Math.sin(1.5707963267948966D * (double) var27 * (double) var27);
-      }
-
-      for (var47 = rightWindowStart; var47 < rightWindowEnd; ++var47) {
-        var27 = (float) Math.sin(((double) (var47 - rightWindowStart) + 0.5D) / (double) rightN * 0.5D * Math.PI + (Math.PI / 2));
-        var10000 = _k;
-        var10000[var47] *= (float) Math.sin(1.5707963267948966D * (double) var27 * (double) var27);
+      for (int i = rightWindowStart; i < rightWindowEnd; ++i) {
+        final float a = (float) Math.sin(((double) (i - rightWindowStart) + 0.5D) / (double) rightN * 0.5D * Math.PI + (Math.PI / 2));
+        window[i] *= (float) Math.sin(1.5707963267948966D * (double) a * (double) a);
       }
     }
 
-    float[] var43 = null;
-    if (this._M > 0) {
-      var43 = new float[this._M + n >> 2];
-      int var45;
-      if (!this._A) {
-        for (var42 = 0; var42 < this._i; ++var42) {
-          var45 = (this._M >> 1) + var42;
-          var43[var42] += this.prevWindow[var45];
+    // lapping
+    float[] output = null;
+    if (this.lastWindowN > 0) {
+      output = new float[this.lastWindowN + n >> 2];
+      if (!this.lastWindowZero) {
+        for (int i = 0; i < this.lastWindowStart; ++i) {
+          output[i] += this.lastWindow[(this.lastWindowN >> 1) + i];
         }
       }
-
-      if (!var15) {
-        for (var42 = leftWindowStart; var42 < n >> 1; ++var42) {
-          var45 = var43.length - (n >> 1) + var42;
-          var43[var45] += _k[var42];
+      if (!thisWindowZero) {
+        for (int i = leftWindowStart; i < n >> 1; ++i) {
+          output[output.length - (n >> 1) + i] += window[i];
         }
       }
     }
 
-    final float[] var44 = this.prevWindow;
-    this.prevWindow = _k;
-    _k = var44;
-    this._M = n;
-    this._i = rightWindowEnd - (n >> 1);
-    this._A = var15;
-    return var43;
+    this.lastWindow = window;
+    this.lastWindowN = n;
+    this.lastWindowStart = rightWindowEnd - (n >> 1);
+    this.lastWindowZero = thisWindowZero;
+
+    return output;
   }
 
   private void load(final byte[] data) throws IOException {
@@ -560,8 +532,8 @@ public final class VorbisFormat {
   }
 
   public void b720() {
-    this._M = 0;
-    this.prevWindow = new float[blocksize1];
+    this.lastWindowN = 0;
+    this.lastWindow = new float[blocksize1];
     for (int i = 0; i < this.packets.length; ++i) {
       this.decodeAudioPacket(i);
     }
