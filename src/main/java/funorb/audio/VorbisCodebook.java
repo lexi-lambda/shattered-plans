@@ -129,22 +129,19 @@ public final class VorbisCodebook {
     final int[] var1 = new int[this.cbSize];
     final int[] var2 = new int[33];
 
-    int var5;
-    int var6;
-
-    for (int i = 0; i < this.cbSize; ++i) {
-      int cwLength = this.cwLengths[i];
+    for (int entry = 0; entry < this.cbSize; ++entry) {
+      final int cwLength = this.cwLengths[entry];
       if (cwLength == 0) {
         continue;
       }
 
-      var5 = 1 << 32 - cwLength;
-      var6 = var2[cwLength];
-      var1[i] = var6;
+      final int bitMask = 1 << 32 - cwLength;
+      final int var6 = var2[cwLength];
+      var1[entry] = var6;
       int var9;
       int var7;
-      if ((var6 & var5) == 0) {
-        var7 = var6 | var5;
+      if ((var6 & bitMask) == 0) {
+        var7 = var6 | bitMask;
 
         for (int j = cwLength - 1; j >= 1; --j) {
           var9 = var2[j];
@@ -166,10 +163,10 @@ public final class VorbisCodebook {
 
       var2[cwLength] = var7;
 
-      for (int j = cwLength + 1; j <= 32; ++j) {
-        var9 = var2[j];
+      for (int bit = cwLength + 1; bit <= 32; ++bit) {
+        var9 = var2[bit];
         if (var9 == var6) {
-          var2[j] = var7;
+          var2[bit] = var7;
         }
       }
     }
@@ -177,17 +174,17 @@ public final class VorbisCodebook {
     this.tree = new int[8];
     int var11 = 0;
 
-    for (int i = 0; i < this.cbSize; ++i) {
-      int len = this.cwLengths[i];
-      if (len == 0) {
+    for (int entry = 0; entry < this.cbSize; ++entry) {
+      int cwLength = this.cwLengths[entry];
+      if (cwLength == 0) {
         continue;
       }
 
-      var5 = var1[i];
-      var6 = 0;
+      int var5 = var1[entry];
+      int var6 = 0;
 
-      for (int j = 0; j < len; ++j) {
-        int var8 = Integer.MIN_VALUE >>> j;
+      for (int bit = 0; bit < cwLength; ++bit) {
+        int var8 = Integer.MIN_VALUE >>> bit;
         if ((var5 & var8) == 0) {
           ++var6;
         } else {
@@ -207,7 +204,7 @@ public final class VorbisCodebook {
         }
       }
 
-      this.tree[var6] = ~i;
+      this.tree[var6] = ~entry;
       if (var6 >= var11) {
         var11 = var6 + 1;
       }

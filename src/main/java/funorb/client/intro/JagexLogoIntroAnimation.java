@@ -55,9 +55,9 @@ public final class JagexLogoIntroAnimation {
 
   private static void load1(final ResourceLoader loader) {
     VorbisFormat.readIdentificationAndSetup(loader.getResource("headers.packvorbis", ""));
-    final VorbisFormat var2 = VorbisFormat.loadAudio(loader, "jagex logo2.packvorbis", "");
-    assert var2 != null;
-    var2.b720();
+    final VorbisFormat logo2 = VorbisFormat.loadAudio(loader, "jagex logo2.packvorbis", "");
+    assert logo2 != null;
+    logo2.decodeAllAudioPackets();
   }
 
   private static void load2(final ResourceLoader loader) {

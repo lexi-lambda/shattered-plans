@@ -531,7 +531,7 @@ public final class VorbisFormat {
     }
   }
 
-  public void b720() {
+  public void decodeAllAudioPackets() {
     this.lastWindowN = 0;
     this.lastWindow = new float[blocksize1];
     for (int i = 0; i < this.packets.length; ++i) {
