@@ -2,13 +2,13 @@ package funorb.shatteredplans.client;
 
 import funorb.audio.SongData;
 import funorb.audio.PlayingSound;
-import funorb.audio.SampledAudioChannel;
+import funorb.audio.SampledAudioChannelS16;
 import funorb.audio.SoundEffect;
 import funorb.audio.SoundLoader;
-import funorb.audio.AudioSamplePlayback_idk;
-import funorb.audio.h_;
+import funorb.audio.RawSamplePlayer;
+import funorb.audio.MusicManager;
 import funorb.audio.RawSampleS8;
-import funorb.audio.AudioSourceSum_idk;
+import funorb.audio.SoundManager;
 import funorb.cache.ResourceLoader;
 
 import java.util.ArrayList;
@@ -34,10 +34,10 @@ public final class Sounds {
   public static int musicVolume = 256;
 
   public static final List<PlayingSound> playingSounds = new ArrayList<>();
-  public static AudioSourceSum_idk soundsTn;
-  public static h_ musicTn;
-  static SampledAudioChannel soundsChannel;
-  static SampledAudioChannel musicChannel;
+  public static SoundManager soundsTn;
+  public static MusicManager musicTn;
+  static SampledAudioChannelS16 soundsChannel;
+  static SampledAudioChannelS16 musicChannel;
 
   public static void loadSoundEffects(final ResourceLoader loader1, final ResourceLoader loader2) {
     SoundLoader.globalLoader = new SoundLoader(loader1, loader2);
@@ -76,7 +76,7 @@ public final class Sounds {
   }
 
   private static PlayingSound play(final RawSampleS8 var1, final int volume) {
-    final AudioSamplePlayback_idk var01 = AudioSamplePlayback_idk.a638(var1, volume);
+    final RawSamplePlayer var01 = RawSamplePlayer.a638(var1, volume);
     assert var01 != null;
     final PlayingSound sound = new PlayingSound(var01);
     playingSounds.add(sound);

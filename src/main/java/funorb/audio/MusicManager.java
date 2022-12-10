@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 
-public final class h_ extends AudioSource_idk {
+public final class MusicManager extends AudioSource {
   public final MidiPlayer midiPlayer1;
   public final MidiPlayer midiPlayer2;
   private int[] midiBuffer2;
@@ -18,7 +18,7 @@ public final class h_ extends AudioSource_idk {
   private int volume = 256;
   private boolean _C;
 
-  public h_() {
+  public MusicManager() {
     final MidiPlayer midiPlayer = new MidiPlayer();
     this.midiPlayer2 = midiPlayer;
     this.midiPlayer1 = new MidiPlayer(midiPlayer);
@@ -29,7 +29,7 @@ public final class h_ extends AudioSource_idk {
   }
 
   @Override
-  public void processAndWrite(final int[] dest, final int offset, final int len) {
+  public void processAndWrite(final int[] dataS16P8, final int offset, final int len) {
     if (this.volume <= 0) {
       this.processAndDiscard(len);
     } else {
@@ -75,9 +75,9 @@ public final class h_ extends AudioSource_idk {
       final int lenSamples = len << 1;
       if (this.song2 != null || this.song1 != null) {
         if (midiAmp2 == 256) {
-          this.midiPlayer2.processAndWrite(dest, offset, len);
+          this.midiPlayer2.processAndWrite(dataS16P8, offset, len);
         } else if (midiAmp1 == 256) {
-          this.midiPlayer1.processAndWrite(dest, offset, len);
+          this.midiPlayer1.processAndWrite(dataS16P8, offset, len);
         } else {
           if (this.midiBuffer2 != null && this.midiBuffer2.length >= lenSamples) {
             Arrays.fill(this.midiBuffer2, 0, lenSamples, 0);
@@ -92,7 +92,7 @@ public final class h_ extends AudioSource_idk {
           final int offsetSamples = offset << 1;
 
           for (int i = 0; i < lenSamples; ++i) {
-            dest[offsetSamples + i] += this.midiBuffer1[i] * midiAmp1 + this.midiBuffer2[i] * midiAmp2 >> 8;
+            dataS16P8[offsetSamples + i] += this.midiBuffer1[i] * midiAmp1 + this.midiBuffer2[i] * midiAmp2 >> 8;
           }
         }
       }
@@ -159,12 +159,12 @@ public final class h_ extends AudioSource_idk {
   }
 
   @Override
-  public synchronized int a784() {
+  public synchronized int returns_0_1_or_2() {
     return 2;
   }
 
   @Override
-  public @NotNull Iterator<AudioSource_idk> iterator() {
+  public @NotNull Iterator<AudioSource> iterator() {
     return Collections.emptyIterator();
   }
 

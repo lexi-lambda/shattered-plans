@@ -7,7 +7,7 @@ public final class AudioThread implements Runnable {
   public static final int NUM_CHANNELS = 2;
   public static AudioThread instance;
 
-  public final SampledAudioChannel[] channels = new SampledAudioChannel[NUM_CHANNELS];
+  public final SampledAudioChannelS16[] channels = new SampledAudioChannelS16[NUM_CHANNELS];
   private final MessagePumpThread messagePumpThread;
   public volatile boolean shutdownRequested = false;
   public volatile boolean isRunning = false;
@@ -22,7 +22,7 @@ public final class AudioThread implements Runnable {
     try {
       while (!this.shutdownRequested) {
         for (int i = 0; i < NUM_CHANNELS; ++i) {
-          final SampledAudioChannel channel = this.channels[i];
+          final SampledAudioChannelS16 channel = this.channels[i];
           if (channel != null) {
             channel.doSomethingThatSeemsRelatedToAudio();
           }
