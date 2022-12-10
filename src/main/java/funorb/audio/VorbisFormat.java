@@ -493,7 +493,10 @@ public final class VorbisFormat {
       }
     }
 
+    float[] tmp = this.lastWindow;
     this.lastWindow = window;
+    window = tmp;
+
     this.lastWindowN = n;
     this.lastWindowStart = rightWindowEnd - (n >> 1);
     this.lastWindowZero = thisWindowZero;
