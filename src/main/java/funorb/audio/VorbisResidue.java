@@ -52,7 +52,8 @@ public final class VorbisResidue {
     final int[] classes = new int[partitionCount];
 
     for (int pass = 0; pass < 8; ++pass) {
-      for (int part = 0; part < partitionCount; ++part) {
+      int part = 0;
+      while (part < partitionCount) {
         if (pass == 0) {
           int value = VorbisFormat.codebooks[this.classbook].decodeScalar();
           for (int j = cbDim - 1; j >= 0; --j) {
@@ -66,30 +67,34 @@ public final class VorbisResidue {
         for (int dim = 0; dim < cbDim; ++dim) {
           int cls = classes[part];
           final int bookIndex = this.books[cls * 8 + pass];
-          if (bookIndex < 0) {
-            continue;
+
+          if (bookIndex >= 0) {
+            final int offset = this.begin + part * this.partitionSize;
+            final VorbisCodebook book = VorbisFormat.codebooks[bookIndex];
+
+            if (this.type == 0) {
+              int step = this.partitionSize / book.cbDim;
+              for (int i = 0; i < step; ++i) {
+                final float[] vector = book.decodeVector();
+                for (int j = 0; j < book.cbDim; ++j) {
+                  window[offset + i + j * step] += vector[j];
+                }
+              }
+            } else {
+              int i = 0;
+              while (i < this.partitionSize) {
+                final float[] vector = book.decodeVector();
+                for (int j = 0; j < book.cbDim; ++j) {
+                  window[offset + i] += vector[j];
+                  ++i;
+                }
+              }
+            }
           }
 
-          final int offset = this.begin + part * this.partitionSize;
-          final VorbisCodebook book = VorbisFormat.codebooks[bookIndex];
-
-          if (this.type == 0) {
-            int step = this.partitionSize / book.cbDim;
-            for (int i = 0; i < step; ++i) {
-              final float[] vector = book.decodeVector();
-              for (int j = 0; j < book.cbDim; ++j) {
-                window[offset + i + j * step] += vector[j];
-              }
-            }
-          } else {
-            int i = 0;
-            while (i < this.partitionSize) {
-              final float[] vector = book.decodeVector();
-              for (int j = 0; j < book.cbDim; ++j) {
-                window[offset + i] += vector[j];
-                ++i;
-              }
-            }
+          ++part;
+          if (part >= partitionCount) {
+            break;
           }
         }
       }
