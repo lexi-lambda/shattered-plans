@@ -6,9 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.Objects;
 
-public final class MidiPlayerNoteSet_idk extends AudioSource_idk {
+public final class MidiPlayerNoteSet_idk extends AudioSource {
   public final NodeList<MidiPlayerNoteState_idk> notes = new NodeList<>();
-  public final AudioSourceSum_idk sum = new AudioSourceSum_idk();
+  public final SoundManager sum = new SoundManager();
   private final MidiPlayer midiPlayer;
 
   public MidiPlayerNoteSet_idk(final MidiPlayer midiPlayer) {
@@ -16,12 +16,12 @@ public final class MidiPlayerNoteSet_idk extends AudioSource_idk {
   }
 
   @Override
-  public @NotNull Iterator<AudioSource_idk> iterator() {
-    return this.notes.stream().<AudioSource_idk>map(var1 -> var1.playback).filter(Objects::nonNull).iterator();
+  public @NotNull Iterator<AudioSource> iterator() {
+    return this.notes.stream().<AudioSource>map(var1 -> var1.playback).filter(Objects::nonNull).iterator();
   }
 
   @Override
-  public int a784() {
+  public int returns_0_1_or_2() {
     return 0;
   }
 
@@ -49,8 +49,8 @@ public final class MidiPlayerNoteSet_idk extends AudioSource_idk {
   }
 
   @Override
-  public void processAndWrite(final int[] dest, final int offset, final int len) {
-    this.sum.processAndWrite(dest, offset, len);
+  public void processAndWrite(final int[] dataS16P8, final int offset, final int len) {
+    this.sum.processAndWrite(dataS16P8, offset, len);
 
     for (final MidiPlayerNoteState_idk note : this.notes) {
       if (!this.midiPlayer.a258(note)) {
@@ -59,15 +59,15 @@ public final class MidiPlayerNoteSet_idk extends AudioSource_idk {
 
         do {
           if (note._p >= var5) {
-            this.a829(dest, var4, note, var5, var4 + var5);
+            this.a829(dataS16P8, var4, note, var5, var4 + var5);
             note._p -= var5;
             break;
           }
 
-          this.a829(dest, var4, note, note._p, var4 + var5);
+          this.a829(dataS16P8, var4, note, note._p, var4 + var5);
           var5 -= note._p;
           var4 += note._p;
-        } while (!this.midiPlayer.a543(var4, dest, note, var5));
+        } while (!this.midiPlayer.a543(var4, dataS16P8, note, var5));
       }
     }
 
@@ -75,14 +75,14 @@ public final class MidiPlayerNoteSet_idk extends AudioSource_idk {
 
   private void a222(final MidiPlayerNoteState_idk note, int totalLen) {
     if ((MidiPlayer.FLAG_GENERAL_6 & this.midiPlayer.chFlags[note.channel]) != 0 && note.notePlaying_idfk < 0) {
-      final int var4 = this.midiPlayer._u[note.channel] / SampledAudioChannel.SAMPLES_PER_SECOND;
+      final int var4 = this.midiPlayer._u[note.channel] / SampledAudioChannelS16.SAMPLE_RATE;
       final int var5 = (1048575 + var4 - note._j) / var4;
       note._j = 1048575 & note._j + totalLen * var4;
       if (var5 <= totalLen) {
         if (this.midiPlayer.chGeneral1[note.channel] == 0) {
-          note.playback = AudioSamplePlayback_idk.start(note.sampleData, note.playback.getPitchX(), note.playback.getVolX(), note.playback.getPanX());
+          note.playback = RawSamplePlayer.start(note.sampleData, note.playback.getPitchX(), note.playback.getVol_p14(), note.playback.getPan_p14());
         } else {
-          note.playback = AudioSamplePlayback_idk.start(note.sampleData, note.playback.getPitchX(), 0, note.playback.getPanX());
+          note.playback = RawSamplePlayer.start(note.sampleData, note.playback.getPitchX(), 0, note.playback.getPan_p14());
           this.midiPlayer.a559(note, note.instrument.noteTuning_idk[note.note] < 0);
         }
 
@@ -101,7 +101,7 @@ public final class MidiPlayerNoteSet_idk extends AudioSource_idk {
 
   private void a829(final int[] dest, int offset, final MidiPlayerNoteState_idk note, int totalLen, final int var6) {
     if ((MidiPlayer.FLAG_GENERAL_6 & this.midiPlayer.chFlags[note.channel]) != 0 && note.notePlaying_idfk < 0) {
-      final int var7 = this.midiPlayer._u[note.channel] / SampledAudioChannel.SAMPLES_PER_SECOND;
+      final int var7 = this.midiPlayer._u[note.channel] / SampledAudioChannelS16.SAMPLE_RATE;
 
       while (true) {
         final int len = (-note._j + 0xfffff + var7) / var7;
@@ -114,19 +114,19 @@ public final class MidiPlayerNoteSet_idk extends AudioSource_idk {
         note._j += len * var7 - 0x100000;
         offset += len;
         totalLen -= len;
-        int var9 = SampledAudioChannel.SAMPLES_PER_SECOND / 100;
+        int var9 = SampledAudioChannelS16.SAMPLE_RATE / 100;
         final int var10 = 0x40000 / var7;
         if (var10 < var9) {
           var9 = var10;
         }
 
-        final AudioSamplePlayback_idk playback = note.playback;
+        final RawSamplePlayer playback = note.playback;
         if (this.midiPlayer.chGeneral1[note.channel] == 0) {
-          note.playback = AudioSamplePlayback_idk.start(note.sampleData, playback.getPitchX(), playback.getVolX(), playback.getPanX());
+          note.playback = RawSamplePlayer.start(note.sampleData, playback.getPitchX(), playback.getVol_p14(), playback.getPan_p14());
         } else {
-          note.playback = AudioSamplePlayback_idk.start(note.sampleData, playback.getPitchX(), 0, playback.getPanX());
+          note.playback = RawSamplePlayer.start(note.sampleData, playback.getPitchX(), 0, playback.getPan_p14());
           this.midiPlayer.a559(note, note.instrument.noteTuning_idk[note.note] < 0);
-          note.playback.a093(var9, playback.getVolX());
+          note.playback.a093(var9, playback.getVol_p14());
         }
 
         if (note.instrument.noteTuning_idk[note.note] < 0) {

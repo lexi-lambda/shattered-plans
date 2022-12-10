@@ -39,13 +39,13 @@ public final class SynthFormat {
     if (totalDurMs == 0) {
       return new byte[0];
     }
-    final int len = SampledAudioChannel.SAMPLES_PER_SECOND * totalDurMs / 1000;
+    final int len = SampledAudioChannelS16.SAMPLE_RATE * totalDurMs / 1000;
     final byte[] dataS8 = new byte[len];
 
     for (int i = 0; i < 10; ++i) {
       if (this.oscs[i] != null) {
-        final int durSamples = this.oscs[i].lengthMs * SampledAudioChannel.SAMPLES_PER_SECOND / 1000;
-        final int delaySamples = this.oscs[i].posMs * SampledAudioChannel.SAMPLES_PER_SECOND / 1000;
+        final int durSamples = this.oscs[i].lengthMs * SampledAudioChannelS16.SAMPLE_RATE / 1000;
+        final int delaySamples = this.oscs[i].posMs * SampledAudioChannelS16.SAMPLE_RATE / 1000;
         final int[] s16buf = this.oscs[i].generateS16(durSamples, this.oscs[i].lengthMs);
 
         for (int j = 0; j < durSamples; ++j) {
@@ -66,8 +66,8 @@ public final class SynthFormat {
     final byte[] sampleData = this.toSampleDataS8();
     return new RawSampleS8(
       sampleData,
-      SampledAudioChannel.SAMPLES_PER_SECOND * this.loopStartMs / 1000,
-      SampledAudioChannel.SAMPLES_PER_SECOND * this.loopEndMs / 1000
+      SampledAudioChannelS16.SAMPLE_RATE * this.loopStartMs / 1000,
+      SampledAudioChannelS16.SAMPLE_RATE * this.loopEndMs / 1000
     );
   }
 }

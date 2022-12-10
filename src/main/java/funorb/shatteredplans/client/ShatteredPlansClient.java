@@ -3,9 +3,9 @@ package funorb.shatteredplans.client;
 import funorb.Strings;
 import funorb.audio.AudioThread;
 import funorb.audio.SongData;
-import funorb.audio.SampledAudioChannel;
-import funorb.audio.h_;
-import funorb.audio.AudioSourceSum_idk;
+import funorb.audio.SampledAudioChannelS16;
+import funorb.audio.MusicManager;
+import funorb.audio.SoundManager;
 import funorb.awt.FullScreenCanvas;
 import funorb.awt.KeyState;
 import funorb.awt.MouseState;
@@ -2219,7 +2219,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     cannotStartGameUntil = 0L;
   }
 
-  private static SampledAudioChannel createAudioChannel(final int i, int var3) {
+  private static SampledAudioChannelS16 createAudioChannel(final int i, int var3) {
     if (i < 0 || i >= 2) {
       throw new IllegalArgumentException();
     }
@@ -2229,15 +2229,15 @@ public final class ShatteredPlansClient extends JagexApplet {
     }
 
     try {
-      final SampledAudioChannel channel = new SampledAudioChannel();
-      channel.data = new int[512];
+      final SampledAudioChannelS16 channel = new SampledAudioChannelS16();
+      channel.dataS16P8 = new int[512];
       channel._b = var3;
-      channel._g = (var3 & 0xfffffc00) + 0x400;
-      if (channel._g > 0x4000) {
-        channel._g = 0x4000;
+      channel.lineSize = (var3 & 0xfffffc00) + 0x400;
+      if (channel.lineSize > 0x4000) {
+        channel.lineSize = 0x4000;
       }
 
-      channel.open(channel._g);
+      channel.openLine(channel.lineSize);
       if (AudioThread.instance == null) {
         AudioThread.instance = new AudioThread(MessagePumpThread.instance);
         MessagePumpThread.instance.sendSpawnThreadMessage(AudioThread.instance, 10);
@@ -4256,16 +4256,16 @@ public final class ShatteredPlansClient extends JagexApplet {
   public void initialize() {
     super.initialize();
 
-    final h_ musicTn = new h_();
+    final MusicManager musicTn = new MusicManager();
     musicTn.midiPlayer2.initialize();
     musicTn.midiPlayer1.initialize();
     musicTn.midiPlayer2.setVolume(Sounds.MAX_VOLUME);
     musicTn.midiPlayer1.setVolume(Sounds.MAX_VOLUME);
 
-    Sounds.musicChannel = createAudioChannel(0, SampledAudioChannel.SAMPLES_PER_SECOND);
+    Sounds.musicChannel = createAudioChannel(0, SampledAudioChannelS16.SAMPLE_RATE);
     Sounds.soundsChannel = createAudioChannel(1, 1102);
 
-    Sounds.soundsTn = new AudioSourceSum_idk();
+    Sounds.soundsTn = new SoundManager();
     Sounds.soundsChannel.setSource(Sounds.soundsTn);
     Sounds.musicTn = musicTn;
     Sounds.musicTn.setVolume(Sounds.musicVolume);
