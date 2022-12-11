@@ -33,8 +33,8 @@ import funorb.shatteredplans.client.ui.RoundedRect;
 import funorb.shatteredplans.client.ui.ScrollBar;
 import funorb.shatteredplans.client.ui.ScrollView;
 import funorb.shatteredplans.client.ui.StatusPanelState;
+import funorb.shatteredplans.client.ui.ToggleButton;
 import funorb.shatteredplans.client.ui.UIComponent;
-import funorb.shatteredplans.client.ui.fe_;
 import funorb.shatteredplans.client.ui.kb_;
 import funorb.shatteredplans.client.ui.uc_;
 import funorb.shatteredplans.game.ContiguousForce;
@@ -67,7 +67,7 @@ public final class GameUI {
   public static final int VICTORY_PANEL_ROW_HEIGHT = 56;
   private static final int STATS_SCREEN_HEIGHT = 360;
   private static final int STATS_SCREEN_Y = 80;
-  public static final int[] _hs = new int[]{-14671840, -12566464, -10461088, -8355712, -6250336, -4144960, -2039584, -1};
+  public static final int[] SYSTEM_SCORE_ORB_GRADIENT = new int[]{-14671840, -12566464, -10461088, -8355712, -6250336, -4144960, -2039584, -1};
   public static final int[] PLAYER_COLORS_1 = new int[]{0x950e00, 0x00954d, 0x002a95, 0x820095, 0xa99700, 0x007b95, 0x7f3f3f, 0x3f7f3f, 0x3f3f7f};
   public static final int[] PLAYER_COLORS_2 = new int[]{0xff4444, 0x44ff44, 0x7777ff, 0x7f007f, 0xffff00, 0x00ffff, 0xffff00, 0x7fff7f, 0x7f7fff};
   public static final int[] PLAYER_COLORS_DARK = new int[]{0x1f0000, 0x001f00, 0x00001f, 0x1f001f, 0x1f1f00, 0x001f1f, 0x1f0f0f, 0x0f1f0f, 0x0f0f1f};
@@ -78,10 +78,15 @@ public final class GameUI {
   private static final int STATS_GRAPH_HEIGHT = 220;
   private static final int _rga = 56;
   private static final int ADD_CHAT_MESSAGE_TIMER_MAX = 18;
-  public static final int CHAT_PANEL_OPEN_AMOUNT_MAX = 20;
-  public static final int CHAT_PANEL_OPEN_AMOUNT_MAX_SQ = CHAT_PANEL_OPEN_AMOUNT_MAX * CHAT_PANEL_OPEN_AMOUNT_MAX;
+  private static final int CHAT_PANEL_OPEN_AMOUNT_MAX = 20;
+  private static final int CHAT_PANEL_OPEN_AMOUNT_MAX_SQ = CHAT_PANEL_OPEN_AMOUNT_MAX * CHAT_PANEL_OPEN_AMOUNT_MAX;
   public static final int CHAT_PANEL_HEIGHT = 120;
-  public static final int TOOLTIP_HEIGHT = 13;
+  private static final int TOOLTIP_HEIGHT = 13;
+  private static final int PANEL_MARGIN = 5;
+  private static final int STATUS_PANEL_HEIGHT = 45;
+  private static final int DIPLOMACY_PANEL_WIDTH = 200;
+  private static final int PROJECTS_PANEL_HEIGHT = 186;
+  private static final int PROJECTS_PANEL_WIDTH = 150;
   public static int chatPanelOpenAmount;
 
   private static ArgbSprite _kbw;
@@ -128,24 +133,24 @@ public final class GameUI {
   private static Sprite _ncd;
   public static Sprite _R;
 
-  private final Button<StatsScreenTab> systemsTabButton;
+  private final ToggleButton<StatsScreenTab> systemsTabButton;
   private final FixedPanel fleetsTabControl;
   private final FixedPanel overviewTabControl;
   private final FixedPanel showChatButtonPanel;
-  private final Button<StatsScreenTab> overviewTabButton;
+  private final ToggleButton<StatsScreenTab> overviewTabButton;
   private final FixedPanel systemsTabControl;
   private final FixedPanel productionTabControl;
   private final int[] _p = new int[]{32, 0, 0, 0};
   private final List<UIComponent<?>> statsScreenTabs;
   private final int[] _ob = new int[]{82, 52, 52, 52};
   public final FixedPanel animationControlsPanel;
-  private final Button<?> showChatButton;
-  private final Button<StatsScreenTab> productionTabButton;
+  private final ToggleButton<?> showChatButton;
+  private final ToggleButton<StatsScreenTab> productionTabButton;
   private final List<UIComponent<?>> components = new ArrayList<>();
-  private final Button<StatsScreenTab> fleetsTabButton;
+  private final ToggleButton<StatsScreenTab> fleetsTabButton;
   private final ArgbSprite warningSprite;
-  public Button<?> animationPlayingButton;
-  public Button<?> animationSpeedDoubledButton;
+  public ToggleButton<?> animationPlayingButton;
+  public ToggleButton<?> animationSpeedDoubledButton;
 
   private int mouseDownX;
   private int mouseDownY;
@@ -158,14 +163,14 @@ public final class GameUI {
   private UIComponent<?> clickedComponent;
 
   private FloatingPanel<?> victoryPanel;
-  private Button<?> projectsButton;
+  private ToggleButton<?> projectsButton;
   private int statsScreenOpenAmount;
-  private Button<?> victoryButton;
-  private Button<?> endTurnButton;
+  private ToggleButton<?> victoryButton;
+  private ToggleButton<?> endTurnButton;
   private FloatingPanel<ProjectsPanelState> projectsPanel;
   private String turnName;
   private int _x;
-  public Button<?> animationAutoPlayButton;
+  public ToggleButton<?> animationAutoPlayButton;
   private FixedPanel statusPanel;
   private String[] playerDiplomacyStatusMessage;
   private StatsScreenTab currentStatsScreenTab;
@@ -193,64 +198,50 @@ public final class GameUI {
   private int _jb;
   private int[][] statsGraphData;
   private boolean _ib;
-  private Button<?> productionButton;
+  private ToggleButton<?> productionButton;
   private Sprite _eb;
   private boolean[] _z;
   private int statsGraphStartTurn;
   private ClientGameSession gameSession;
   private int statsGraphTurnAdvanceAnimationCounter;
-  private Button<?> diplomacyButton;
-  private Button<?> fleetInfoButton;
+  private ToggleButton<?> diplomacyButton;
+  private ToggleButton<?> fleetInfoButton;
   private int statsGraphAlpha = 0;
 
   public GameUI(final ClientGameSession session) {
     _fjr = new Sprite(20 + PRODUCTION_BUTTON.offsetX, PRODUCTION_BUTTON.offsetY + 20);
     _kbw = new ArgbSprite(READY_BUTTON.offsetX + 20, READY_BUTTON.offsetY + 20);
     this.gameSession = session;
-    this.productionPanel = createProductionPanel();
-    this.addComponent(this.productionPanel);
-    if (this.gameSession.localPlayer != null) {
-      this.projectsPanel = createProjectsPanel();
-      this.addComponent(this.projectsPanel);
-    }
 
-    this.diplomacyPanel = createDiplomacyPanel(this.gameSession.gameState.playerCount);
-    this.initialize();
-    this.addComponent(this.diplomacyPanel);
-    this.fleetInfoPanel = createFleetInfoPanel(this.gameSession.gameState.playerCount);
-    this.addComponent(this.fleetInfoPanel);
     final int victoryPanelHeight = this.gameSession.gameState.victoryChecker.victoryPanelHeight();
-    if (victoryPanelHeight > 0) {
-      this.victoryPanel = createVictoryPanel(victoryPanelHeight);
-      this.addComponent(this.victoryPanel);
-    }
+    final boolean hasVictoryPanel = victoryPanelHeight > 0;
 
     final int readyButtonX = getReadyButtonX();
     if (this.gameSession.localPlayer != null) {
-      this.endTurnButton = new Button<>(readyButtonX, 20, READY_BUTTON.width, READY_BUTTON.height, READY_BUTTON, null, 0, READY_BUTTON_DOWN, null, 0);
+      this.endTurnButton = new ToggleButton<>(readyButtonX, 20, READY_BUTTON.width, READY_BUTTON.height, READY_BUTTON, null, 0, READY_BUTTON_DOWN, null, 0);
       this.endTurnButton.tooltip = StringConstants.TOOLTIP_END_TURN;
       this.addComponent(this.endTurnButton);
     }
 
     final int hudIconWidth = HUD_ICON_1.width;
     final int victoryButtonX = readyButtonX - 6 - hudIconWidth;
-    if (this.victoryPanel != null) {
-      this.victoryButton = new Button<>(victoryButtonX, 25, HUD_ICON_5.width, HUD_ICON_5.height, HUD_ICON_5, null, 0, HUD_ICON_RED_5, null, 0);
+    if (hasVictoryPanel) {
+      this.victoryButton = new ToggleButton<>(victoryButtonX, 25, HUD_ICON_5.width, HUD_ICON_5.height, HUD_ICON_5, null, 0, HUD_ICON_RED_5, null, 0);
       this.victoryButton.tooltip = StringConstants.TOOLTIP_VICTORY_BUTTON_SHOW;
       this.addComponent(this.victoryButton);
     }
-    this.productionButton = new Button<>(readyButtonX - 6 - (hudIconWidth / 2) - hudIconWidth, 5, HUD_ICON_2.width, HUD_ICON_2.height, HUD_ICON_2, null, 0, HUD_ICON_RED_2, null, 0);
+    this.productionButton = new ToggleButton<>(readyButtonX - 6 - (hudIconWidth / 2) - hudIconWidth, 5, HUD_ICON_2.width, HUD_ICON_2.height, HUD_ICON_2, null, 0, HUD_ICON_RED_2, null, 0);
     this.productionButton.tooltip = StringConstants.TOOLTIP_PRODUCTION_BUTTON_SHOW;
     this.addComponent(this.productionButton);
-    this.fleetInfoButton = new Button<>(victoryButtonX - 2 - hudIconWidth, 25, HUD_ICON_4.width, HUD_ICON_4.height, HUD_ICON_4, null, 0, HUD_ICON_RED_4, null, 0);
+    this.fleetInfoButton = new ToggleButton<>(victoryButtonX - 2 - hudIconWidth, 25, HUD_ICON_4.width, HUD_ICON_4.height, HUD_ICON_4, null, 0, HUD_ICON_RED_4, null, 0);
     this.fleetInfoButton.tooltip = StringConstants.TOOLTIP_FLEET_INFO_BUTTON_SHOW;
     this.addComponent(this.fleetInfoButton);
-    this.diplomacyButton = new Button<>(this.productionButton.x - 2 - hudIconWidth, 5, HUD_ICON_1.width, HUD_ICON_1.height, HUD_ICON_1, null, 0, HUD_ICON_RED_1, null, 0);
+    this.diplomacyButton = new ToggleButton<>(this.productionButton.x - 2 - hudIconWidth, 5, HUD_ICON_1.width, HUD_ICON_1.height, HUD_ICON_1, null, 0, HUD_ICON_RED_1, null, 0);
     this.diplomacyButton.tooltip = StringConstants.TOOLTIP_DIPLOMACY_BUTTON_SHOW;
     this.addComponent(this.diplomacyButton);
     final int projectsButtonX = this.fleetInfoButton.x - 2 - hudIconWidth;
     if (this.gameSession.localPlayer != null) {
-      this.projectsButton = new Button<>(projectsButtonX, 25, HUD_ICON_3.width, HUD_ICON_3.height, HUD_ICON_3, null, 0, HUD_ICON_RED_3, null, 0);
+      this.projectsButton = new ToggleButton<>(projectsButtonX, 25, HUD_ICON_3.width, HUD_ICON_3.height, HUD_ICON_3, null, 0, HUD_ICON_RED_3, null, 0);
       this.projectsButton.tooltip = StringConstants.TOOLTIP_PROJECTS_BUTTON_SHOW;
       this.addComponent(this.projectsButton);
     }
@@ -258,9 +249,25 @@ public final class GameUI {
     this.statusPanel = createStatusPanel(projectsButtonX);
     this.addComponent(this.statusPanel);
 
+    this.productionPanel = createProductionPanel();
+    this.addComponent(this.productionPanel);
+    if (this.gameSession.localPlayer != null) {
+      this.projectsPanel = createProjectsPanel();
+      this.addComponent(this.projectsPanel);
+    }
+    this.diplomacyPanel = createDiplomacyPanel(this.gameSession.gameState.playerCount);
+    this.initialize();
+    this.addComponent(this.diplomacyPanel);
+    this.fleetInfoPanel = createFleetInfoPanel(this.gameSession.gameState.playerCount);
+    this.addComponent(this.fleetInfoPanel);
+    if (hasVictoryPanel) {
+      this.victoryPanel = createVictoryPanel(victoryPanelHeight);
+      this.addComponent(this.victoryPanel);
+    }
+
     this.animationControlsPanel = new FixedPanel(ShatteredPlansClient.SCREEN_WIDTH - 50, ShatteredPlansClient.SCREEN_HEIGHT - Menu.SMALL_FONT.ascent, 60, 2 * Menu.SMALL_FONT.ascent);
     this.addComponent(this.animationControlsPanel, 0);
-    this.animationAutoPlayButton = new Button<>(this.animationControlsPanel.x + 5, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[3].height, ANIM_ICONS[3].width, ANIM_ICONS[3].height, ANIM_ICONS[3], null, 0, ANIM_ICONS[0], null, 0);
+    this.animationAutoPlayButton = new ToggleButton<>(this.animationControlsPanel.x + 5, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[3].height, ANIM_ICONS[3].width, ANIM_ICONS[3].height, ANIM_ICONS[3], null, 0, ANIM_ICONS[0], null, 0);
     if ((currentSettings & 0b100000) == 0) {
       this.animationAutoPlayButton.tooltip = StringConstants.TOOLTIP_ANIM_AUTO_PLAY_IS_OFF;
     } else {
@@ -268,9 +275,9 @@ public final class GameUI {
       this.animationAutoPlayButton.tooltip = StringConstants.TOOLTIP_ANIM_AUTO_PLAY_IS_ON;
     }
 
-    this.animationPlayingButton = new Button<>(this.animationControlsPanel.x + 20, -ANIM_ICONS[1].height + ShatteredPlansClient.SCREEN_HEIGHT, ANIM_ICONS[1].width, ANIM_ICONS[1].height, ANIM_ICONS[1], null, 0, ANIM_ICONS[4], null, 0);
+    this.animationPlayingButton = new ToggleButton<>(this.animationControlsPanel.x + 20, -ANIM_ICONS[1].height + ShatteredPlansClient.SCREEN_HEIGHT, ANIM_ICONS[1].width, ANIM_ICONS[1].height, ANIM_ICONS[1], null, 0, ANIM_ICONS[4], null, 0);
     this.animationPlayingButton.tooltip = StringConstants.TOOLTIP_ANIM_CLICK_TO_PLAY;
-    this.animationSpeedDoubledButton = new Button<>(this.animationControlsPanel.x + 35, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[5].height, ANIM_ICONS[5].width, ANIM_ICONS[5].height, ANIM_ICONS[5], null, 0, ANIM_ICONS[2], null, 0);
+    this.animationSpeedDoubledButton = new ToggleButton<>(this.animationControlsPanel.x + 35, ShatteredPlansClient.SCREEN_HEIGHT - ANIM_ICONS[5].height, ANIM_ICONS[5].width, ANIM_ICONS[5].height, ANIM_ICONS[5], null, 0, ANIM_ICONS[2], null, 0);
     if ((currentSettings & 0b1000000) == 0) {
       this.animationSpeedDoubledButton.tooltip = StringConstants.TOOLTIP_ANIM_SPEED_IS_NORMAL;
     } else {
@@ -282,7 +289,7 @@ public final class GameUI {
     this.animationControlsPanel.addChild(this.animationPlayingButton);
     this.animationControlsPanel.addChild(this.animationSpeedDoubledButton);
     this.showChatButtonPanel = new FixedPanel(3, ShatteredPlansClient.SCREEN_HEIGHT, 10 + Menu.SMALL_FONT.measureLineWidth(StringConstants.TEXT_SHOW_CHAT), 2 * Menu.SMALL_FONT.ascent);
-    this.showChatButton = new Button<>(3, ShatteredPlansClient.SCREEN_HEIGHT, this.showChatButtonPanel.width, Menu.SMALL_FONT.ascent - 4, null, StringConstants.TEXT_SHOW_CHAT, Drawing.WHITE, null, StringConstants.TEXT_HIDE_CHAT, Drawing.WHITE);
+    this.showChatButton = new ToggleButton<>(3, ShatteredPlansClient.SCREEN_HEIGHT, this.showChatButtonPanel.width, Menu.SMALL_FONT.ascent - 4, null, StringConstants.TEXT_SHOW_CHAT, Drawing.WHITE, null, StringConstants.TEXT_HIDE_CHAT, Drawing.WHITE);
     this.showChatButtonPanel.addChild(this.showChatButton);
     this.addComponent(this.showChatButtonPanel, 0);
 
@@ -302,8 +309,8 @@ public final class GameUI {
       final Component<Component<?>> var6 = new Component<>(null);
       var6.children = new ArrayList<>();
       this.chatScrollPaneSinglePlayer = new ScrollPane<>(var6, Component.LABEL_DARK_2, Component.SCROLL_BAR);
-      final Component<Component<?>> var4 = new Component<>(Component._mpa);
-      this.chatPanelSinglePlayer = new Component<>(Component._cna);
+      final Component<Component<?>> var4 = new Component<>(Component.CHAT_MESSAGES_PANEL);
+      this.chatPanelSinglePlayer = new Component<>(Component.CHAT_PANEL);
       this.chatPanelSinglePlayer.setBounds(0, ShatteredPlansClient.SCREEN_HEIGHT, ShatteredPlansClient.SCREEN_WIDTH, CHAT_PANEL_HEIGHT);
       var4.setBounds(3, 3, ShatteredPlansClient.SCREEN_WIDTH - 6, this.chatPanelSinglePlayer.height - 6);
       this.chatPanelSinglePlayer.addChild(var4);
@@ -326,13 +333,13 @@ public final class GameUI {
     this.statsScreenTabs.add(this.productionTabControl);
     this.statsScreenTabs.add(this.systemsTabControl);
     this.statsScreenTabs.add(this.overviewTabControl);
-    this.fleetsTabButton = new Button<>(0, 410, 128, 21, null, StringConstants.TEXT_SHIPS.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_SHIPS.toUpperCase(), 0x2ad0d6);
+    this.fleetsTabButton = new ToggleButton<>(0, 410, 128, 21, null, StringConstants.TEXT_SHIPS.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_SHIPS.toUpperCase(), 0x2ad0d6);
     this.fleetsTabControl.addChild(this.fleetsTabButton);
-    this.productionTabButton = new Button<>(0, 410, 128, 21, null, StringConstants.TEXT_PRODUCTION.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_PRODUCTION.toUpperCase(), 0x2ad0d6);
+    this.productionTabButton = new ToggleButton<>(0, 410, 128, 21, null, StringConstants.TEXT_PRODUCTION.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_PRODUCTION.toUpperCase(), 0x2ad0d6);
     this.productionTabControl.addChild(this.productionTabButton);
-    this.systemsTabButton = new Button<>(0, 410, 128, 21, null, StringConstants.TEXT_SYSTEMS.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_SYSTEMS.toUpperCase(), 0x2ad0d6);
+    this.systemsTabButton = new ToggleButton<>(0, 410, 128, 21, null, StringConstants.TEXT_SYSTEMS.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_SYSTEMS.toUpperCase(), 0x2ad0d6);
     this.systemsTabControl.addChild(this.systemsTabButton);
-    this.overviewTabButton = new Button<>(0, 410, 128, 21, null, StringConstants.TEXT_OVERVIEW.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_OVERVIEW.toUpperCase(), 0x2ad0d6);
+    this.overviewTabButton = new ToggleButton<>(0, 410, 128, 21, null, StringConstants.TEXT_OVERVIEW.toUpperCase(), Drawing.WHITE, null, StringConstants.TEXT_OVERVIEW.toUpperCase(), 0x2ad0d6);
     this.overviewTabControl.addChild(this.overviewTabButton);
     this.fleetsTabButton.data = StatsScreenTab.FLEETS;
     this.productionTabButton.data = StatsScreenTab.PRODUCTION;
@@ -355,7 +362,7 @@ public final class GameUI {
       TutorialState.a018jr("continuekey", StringConstants.TUTORIAL_CONTINUE_KEY);
       TutorialState.a018jr("captureAll", StringConstants.TUTORIAL_CAPTURE_ALL);
       TutorialState.a018jr("exit", StringConstants.TUTORIAL_EXIT);
-      TutorialState._hod = this.gameSession.localPlayer;
+      TutorialState.localPlayer = this.gameSession.localPlayer;
 
       for (int i = 0; i < this.gameSession.gameState.playerCount; ++i) {
         final Player var7 = this.gameSession.gameState.players[i];
@@ -540,8 +547,8 @@ public final class GameUI {
   }
 
   private static FloatingPanel<ProductionPanelState> createProductionPanel() {
-    final FloatingPanel<ProductionPanelState> panel = new FloatingPanel<>(0, 60, 238, 300, StringConstants.TAB_NAME_PRODUCTION.toUpperCase());
-    final fe_<FloatingPanel<ProductionPanelState>> var0 = new fe_<>(panel.x - 16 + panel.width, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
+    final FloatingPanel<ProductionPanelState> panel = new FloatingPanel<>(PANEL_MARGIN, STATUS_PANEL_HEIGHT + Menu.SMALL_FONT.ascent + 2 + PANEL_MARGIN * 3, 238, 300, StringConstants.TAB_NAME_PRODUCTION.toUpperCase());
+    final Button<FloatingPanel<ProductionPanelState>> var0 = new Button<>(panel.x - 16 + panel.width, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var0.data = panel;
     final ScrollBar scrollBar = new ScrollBar(panel.width - 20, panel.y + 20, 11, panel.height - 28);
     panel.addChild(var0);
@@ -557,8 +564,13 @@ public final class GameUI {
   }
 
   private static FloatingPanel<ProjectsPanelState> createProjectsPanel() {
-    final FloatingPanel<ProjectsPanelState> panel = new FloatingPanel<>(250, 60, 150, 186, StringConstants.TAB_NAME_PROJECTS.toUpperCase());
-    final fe_<FloatingPanel<ProjectsPanelState>> var0 = new fe_<>(panel.x + panel.width - 16, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
+    final FloatingPanel<ProjectsPanelState> panel = new FloatingPanel<>(
+        ShatteredPlansClient.SCREEN_WIDTH - PROJECTS_PANEL_WIDTH - PANEL_MARGIN,
+        ShatteredPlansClient.SCREEN_HEIGHT - PROJECTS_PANEL_HEIGHT - 30,
+        PROJECTS_PANEL_WIDTH,
+        PROJECTS_PANEL_HEIGHT,
+        StringConstants.TAB_NAME_PROJECTS.toUpperCase());
+    final Button<FloatingPanel<ProjectsPanelState>> var0 = new Button<>(panel.x + panel.width - 16, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
     var0.data = panel;
     panel.addChild(var0);
     final ScrollView<?> var1 = new ScrollView<>(9 + panel.x, 20 + panel.y, 132, 158);
@@ -569,8 +581,13 @@ public final class GameUI {
   }
 
   private static FloatingPanel<DiplomacyPanelState> createDiplomacyPanel(final int playerCount) {
-    final FloatingPanel<DiplomacyPanelState> panel = new FloatingPanel<>(420, 60, 200, 28 + _rga * playerCount, StringConstants.TAB_NAME_DIPLOMACY.toUpperCase());
-    final fe_<FloatingPanel<DiplomacyPanelState>> var2 = new fe_<>(panel.x + 200 - 16, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
+    final FloatingPanel<DiplomacyPanelState> panel = new FloatingPanel<>(
+        ShatteredPlansClient.SCREEN_WIDTH - DIPLOMACY_PANEL_WIDTH - PANEL_MARGIN,
+        STATUS_PANEL_HEIGHT + PANEL_MARGIN * 2,
+        DIPLOMACY_PANEL_WIDTH,
+        28 + _rga * playerCount,
+        StringConstants.TAB_NAME_DIPLOMACY.toUpperCase());
+    final Button<FloatingPanel<DiplomacyPanelState>> var2 = new Button<>(panel.x + 200 - 16, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var2.data = panel;
     panel.addChild(var2);
     final ScrollView<?> var3 = new ScrollView<>(panel.x + 9, panel.y + 20, INFO_PANEL_CONTENT_WIDTH, playerCount * _rga);
@@ -581,8 +598,9 @@ public final class GameUI {
   }
 
   private static FloatingPanel<PanelState> createFleetInfoPanel(final int playerCount) {
-    final FloatingPanel<PanelState> panel = new FloatingPanel<>(0, -((4 + SHIP.offsetX) * playerCount) + 479 - 28, 200, (SHIP.offsetX + 4) * playerCount + 28, StringConstants.TAB_NAME_FLEET_INFO.toUpperCase());
-    final fe_<FloatingPanel<PanelState>> var2 = new fe_<>(184 + panel.x, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
+    final int height = (SHIP.offsetX + 4) * playerCount + 28;
+    final FloatingPanel<PanelState> panel = new FloatingPanel<>(PANEL_MARGIN, ShatteredPlansClient.SCREEN_HEIGHT - height - 30, 200, height, StringConstants.TAB_NAME_FLEET_INFO.toUpperCase());
+    final Button<FloatingPanel<PanelState>> var2 = new Button<>(184 + panel.x, 2 + panel.y, 11, 11, -1, null, "X", Drawing.RED);
     var2.data = panel;
     panel.addChild(var2);
     final ScrollView<?> var3 = new ScrollView<>(9 + panel.x, 20 + panel.y, INFO_PANEL_CONTENT_WIDTH, (4 + SHIP.offsetX) * playerCount);
@@ -593,7 +611,7 @@ public final class GameUI {
 
   private static FloatingPanel<PanelState> createVictoryPanel(final int height) {
     final FloatingPanel<PanelState> panel = new FloatingPanel<>(320, 451 - height, 200, height + 28, StringConstants.TAB_NAME_VICTORY.toUpperCase());
-    final fe_<FloatingPanel<PanelState>> var1 = new fe_<>(panel.x + 184, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
+    final Button<FloatingPanel<PanelState>> var1 = new Button<>(panel.x + 184, panel.y + 2, 11, 11, -1, null, "X", Drawing.RED);
     var1.data = panel;
     panel.addChild(var1);
     final ScrollView<?> var2 = new ScrollView<>(panel.x + 9, panel.y + 20, INFO_PANEL_CONTENT_WIDTH, height);
@@ -603,7 +621,7 @@ public final class GameUI {
   }
 
   private static FixedPanel createStatusPanel(final int width) {
-    final FixedPanel _goE = new FixedPanel(5, 5, width - 10, 45);
+    final FixedPanel _goE = new FixedPanel(PANEL_MARGIN, PANEL_MARGIN, width - (PANEL_MARGIN * 2), STATUS_PANEL_HEIGHT);
     final StatusPanelState var1 = new StatusPanelState();
     _goE.state = var1;
     final Icon var2 = new Icon(15, 10, 36, 36, null);
@@ -619,15 +637,14 @@ public final class GameUI {
 
   public static void a893(final boolean var1) {
     if (ShatteredPlansClient.lobbyBrowserTransitionCounter > 0 && ShatteredPlansClient.showYouHaveBeenKickedDialog) {
-      Drawing.h115(0, 0, Drawing.width, Component._tgc.y2);
-      Component.YOU_HAVE_BEEN_KICKED_DIALOG.b540(var1);
+      Drawing.h115(0, 0, Drawing.width, Component.lobbyChatPanel.y2);
+      Component.YOU_HAVE_BEEN_KICKED_DIALOG.draw(var1);
     }
 
     if ((ShatteredPlansClient.ratedLobbyRoomTransitionCounter > 0 || ShatteredPlansClient.unratedLobbyRoomTransitionCounter > 0) && ShatteredPlansClient.invitePlayersDialogOpen) {
-      Drawing.h115(0, 0, Drawing.width, Component._tgc.y2);
-      ShatteredPlansClient.invitePlayersDialog.b540(var1);
+      Drawing.h115(0, 0, Drawing.width, Component.lobbyChatPanel.y2);
+      ShatteredPlansClient.invitePlayersDialog.draw(var1);
     }
-
   }
 
   private static Sprite a800cle(final int var0) {
@@ -645,7 +662,7 @@ public final class GameUI {
     var0._h[var1.index >= var3.index ? var3.index + 1 : var3.index] = var5;
     final kb_ var6 = new kb_(FACTION_ICONS[var3.index].width * 3 / 4, var5.height / 2 - Menu.SMALL_FONT.ascent - 1, INFO_PANEL_CONTENT_WIDTH - FACTION_ICONS[var3.index].width * 3 / 4, var3.color1, var3.name, true);
     var5.addChild(var6);
-    final fe_<?> var7 = new fe_<>(3 * FACTION_ICONS[var3.index].width / 4, var5.height / 2 + 1, INFO_PANEL_CONTENT_WIDTH - 3 * FACTION_ICONS[var3.index].width / 4, Menu.SMALL_FONT.ascent, 8421504, i432md(), StringConstants.PACT_OFFER, 3375155);
+    final Button<?> var7 = new Button<>(3 * FACTION_ICONS[var3.index].width / 4, var5.height / 2 + 1, INFO_PANEL_CONTENT_WIDTH - 3 * FACTION_ICONS[var3.index].width / 4, Menu.SMALL_FONT.ascent, 8421504, i432md(), StringConstants.PACT_OFFER, 3375155);
     var5.addChild(var7);
     var0._i[var3.index < var1.index ? var3.index : var3.index - 1] = var7;
     var5.tooltip = var6.tooltip = var7.tooltip = Strings.format(StringConstants.TOOLTIP_OFFER_TREATY, var3.name);
@@ -751,64 +768,70 @@ public final class GameUI {
     recentChatMessages[0] = message;
   }
 
-  private static ScrollView<Force> addForceToProductionPanel(final Force var1, final ProductionPanelState var2, final boolean includePlayerName) {
+  private ScrollView<Force> addForceToProductionPanel(final Force force, final ProductionPanelState state, final boolean includePlayerName) {
     final ScrollView<Force> var4 = new ScrollView<>(0, 0, 209, 70);
-    var4.data = var1;
+    var4.data = force;
     final Icon var5 = new Icon(40 - (-((5 + PRODUCTION_ICONS[0].width) * 4) - HUD_ICON_4.width) - 5, Menu.SMALL_FONT.ascent - 7, _fjr);
     var4.addChild(var5);
-    String var6 = var1.getCapital().name;
+    String var6 = force.getCapital().name;
     if (includePlayerName) {
-      var6 = var6 + " (" + var1.player.name + ")";
+      var6 = var6 + " (" + force.player.name + ")";
     }
 
-    final kb_ var7 = new kb_(0, 0, 209, var1.player.color1, var6, false);
+    final kb_ var7 = new kb_(0, 0, 209, force.player.color1, var6, false);
     var4.addChild(var7);
     final byte var8 = 7;
-    final Icon var9 = new Icon(0, var8 + var7.height, 35, 35, var1.getCapital().getSprite());
+    final Icon var9 = new Icon(0, var8 + var7.height, 35, 35, force.getCapital().getSprite());
     var4.addChild(var9);
     final RoundedRect var10 = new RoundedRect(40, var8 + var7.height + PRODUCTION_ICONS[0].height, 4 * PRODUCTION_ICONS[0].width + 15, 35 - PRODUCTION_ICONS[0].height, 2105376);
     var4.addChild(var10);
 
+    final int maxSurplus = Arrays.stream(force.surplusResources).max().orElseThrow();
     for (int i = 0; i < GameState.NUM_RESOURCES; ++i) {
       final RoundedRect var12 = new RoundedRect(i * (5 + PRODUCTION_ICONS[i].width) + 40, var7.height + var8 + PRODUCTION_ICONS[i].height / 2, PRODUCTION_ICONS[i].width, 35 - PRODUCTION_ICONS[i].height / 2, 2105376);
       var4.addChild(var12);
-      int var13 = var1.fleetProduction + var1.surplusResources[i];
-      if (var13 < 0) {
-        var13 = 0;
-      }
 
-      final Label var14 = new Label((PRODUCTION_ICONS[i].width + 5) * i + 40, PRODUCTION_ICONS[i].height + var7.height + var8, PRODUCTION_ICONS[i].width, Menu.SMALL_FONT.ascent, Integer.toString(var13));
-      var4.addChild(var14);
+      final int surplus = force.surplusResources[i];
+      final int resourceProduction = Math.max(0, force.fleetProduction + surplus);
+      final Label resourceLabel = new ResourceProductionLabel(
+          (PRODUCTION_ICONS[i].width + 5) * i + 40,
+          PRODUCTION_ICONS[i].height + var7.height + var8,
+          PRODUCTION_ICONS[i].width,
+          Menu.SMALL_FONT.ascent,
+          Integer.toString(resourceProduction),
+          force.player == this.gameSession.localPlayer && surplus == maxSurplus);
+      var4.addChild(resourceLabel);
+
       final Icon var15 = new Icon(40 + i * (5 + PRODUCTION_ICONS[i].width), var7.height + var8, PRODUCTION_ICONS[i]);
       var4.addChild(var15);
       String var16 = StringConstants.TOOLTIP_INCOME[i];
-      if (var1.surplusResources[i] == 0) {
+      if (force.surplusResources[i] == 0) {
         var16 = var16 + " " + StringConstants.TOOLTIP_INCOME_LIMITING;
       }
 
-      var12.tooltip = var14.tooltip = var15.tooltip = var16;
+      var12.tooltip = resourceLabel.tooltip = var15.tooltip = var16;
     }
 
     final RoundedRect var19 = new RoundedRect(PRODUCTION_ICONS[0].width * 4 + 60, var8 + var7.height + PRODUCTION_ICONS[0].height / 2, HUD_ICON_4.width, -(PRODUCTION_ICONS[0].height / 2) + 35, 534312);
     var4.addChild(var19);
-    final Label var21 = new Label(20 + 4 * PRODUCTION_ICONS[0].width + 40, PRODUCTION_ICONS[0].height + var7.height + var8, HUD_ICON_4.width, Menu.SMALL_FONT.ascent, Integer.toString(Math.max(var1.fleetProduction, 0)));
+    final Label var21 = new Label(20 + 4 * PRODUCTION_ICONS[0].width + 40, PRODUCTION_ICONS[0].height + var7.height + var8, HUD_ICON_4.width, Menu.SMALL_FONT.ascent, Integer.toString(Math.max(force.fleetProduction, 0)));
     var4.addChild(var21);
     final Icon var22 = new Icon(20 - (-(4 * PRODUCTION_ICONS[0].width) - 40), var8 + (var7.height - 1), HUD_ICON_4);
     var4.addChild(var22);
     var19.tooltip = var21.tooltip = var22.tooltip = StringConstants.TOOLTIP_TOTAL_FLEET_PRODUCTION;
     final Label var23 = new Label(54 + PRODUCTION_ICONS[0].width * 4, var7.height + var8 + PRODUCTION_ICONS[0].height, "=");
     var4.addChild(var23);
-    final Button<Force> var24 = new Button<>(4 * PRODUCTION_ICONS[0].width + 20 + 40 - (-5 - HUD_ICON_4.width), var7.height + 3, PRODUCTION_BUTTON.width, PRODUCTION_BUTTON.height, PRODUCTION_BUTTON, null, -1, PRODUCTION_BUTTON_DOWN, null, -1);
-    var24.data = var1;
+    final ToggleButton<Force> var24 = new ToggleButton<>(4 * PRODUCTION_ICONS[0].width + 20 + 40 - (-5 - HUD_ICON_4.width), var7.height + 3, PRODUCTION_BUTTON.width, PRODUCTION_BUTTON.height, PRODUCTION_BUTTON, null, -1, PRODUCTION_BUTTON_DOWN, null, -1);
+    var24.data = force;
     var4.addChild(var24);
-    final Label var17 = new Label(var24.x, 29 + var24.y, var24.width, Menu.SMALL_FONT.ascent, Integer.toString(var1.fleetsAvailableToBuild));
-    var17.data = var1;
+    final Label var17 = new Label(var24.x, 29 + var24.y, var24.width, Menu.SMALL_FONT.ascent, Integer.toString(force.fleetsAvailableToBuild));
+    var17.data = force;
     var4.addChild(var17);
-    var24.tooltip = var17.tooltip = StringConstants.TOOLTIP_PLACE_FLEETS + " " + (var1.fleetsAvailableToBuild != 1 ? Strings.format(StringConstants.TOOLTIP_FLEETS_REMAINING, Integer.toString(var1.fleetsAvailableToBuild)) : StringConstants.TOOLTIP_ONE_FLEET_REMAINING);
+    var24.tooltip = var17.tooltip = StringConstants.TOOLTIP_PLACE_FLEETS + " " + (force.fleetsAvailableToBuild != 1 ? Strings.format(StringConstants.TOOLTIP_FLEETS_REMAINING, Integer.toString(force.fleetsAvailableToBuild)) : StringConstants.TOOLTIP_ONE_FLEET_REMAINING);
 
-    var2.buildFleetsButtons.add(var24);
-    var2._f.add(var4);
-    var2.buildFleetsLabels.add(var17);
+    state.buildFleetsButtons.add(var24);
+    state._f.add(var4);
+    state.buildFleetsLabels.add(var17);
 
     return var4;
   }
@@ -1197,9 +1220,7 @@ public final class GameUI {
     if (this.gameSession.placementMode == PlacementMode.BUILD_FLEET && mode != PlacementMode.BUILD_FLEET) {
       this.productionPanel.state.deactivateFleetPlacement();
     }
-
     this.gameSession.placementMode = mode;
-    Arrays.fill(this.gameSession.gameView.highlightedSystems, SystemHighlight.NONE);
 
     ((StatusPanelState) this.statusPanel.state).icon.setSprite(null);
     if (this.gameSession.gameView.animationPhase == AbstractGameView.AnimationPhase.NOT_PLAYING && !this.gameSession.readyToEndTurn) {
@@ -1217,6 +1238,56 @@ public final class GameUI {
             Integer.toString(this.gameSession.selectedForce.fleetsAvailableToBuild));
       });
     }
+
+    Arrays.fill(this.gameSession.gameView.highlightedSystems, SystemHighlight.NONE);
+    switch (mode) {
+      case DEFENSIVE_NET -> {
+        for (final StarSystem system : this.gameSession.gameState.map.systems) {
+          if (system.owner == this.gameSession.localPlayer && !system.hasDefensiveNet) {
+            this.gameSession.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
+          }
+        }
+      }
+      case TERRAFORM -> this.highlightTerraformingCandidates();
+      case STELLAR_BOMB -> {
+        for (final StarSystem system : this.gameSession.gameState.map.systems) {
+          if (system.owner != this.gameSession.localPlayer && (system.owner == null || !this.gameSession.localPlayer.allies[system.owner.index])) {
+            if (Arrays.stream(system.neighbors).anyMatch(system1 -> this.gameSession.localPlayer == system1.owner)) {
+              this.gameSession.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
+            }
+          }
+        }
+      }
+      case GATE_SRC -> {
+        for (final StarSystem system : this.gameSession.gameState.map.systems) {
+          if (this.gameSession.localPlayer == system.owner) {
+            this.gameSession.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
+          }
+        }
+      }
+    }
+  }
+
+  private void highlightTerraformingCandidates() {
+    this.gameSession.gameState.streamForces(this.gameSession.localPlayer).forEach(force -> {
+      final int maxSurplus = force.surplusResources[force.surplusResourceRanks[0]];
+      force.stream().filter(system -> system.score == StarSystem.Score.NORMAL).forEach(system -> {
+        // Highlight “good candidates” in green, where a good candidate is a
+        // system that produces exactly 1 point of a resource that is currently
+        // a surplus resource.
+        int resourceProductionTotal = 0;
+        boolean isGoodCandidate = true;
+        for (final int i : GameState.RESOURCE_TYPES) {
+          if (system.resources[i] == 0) continue;
+          resourceProductionTotal += system.resources[i];
+          if (resourceProductionTotal > 1 || force.surplusResources[i] != maxSurplus) {
+            isGoodCandidate = false;
+            break;
+          }
+        }
+        this.gameSession.gameView.highlightedSystems[system.index] = isGoodCandidate ? SystemHighlight.GREEN : SystemHighlight.GRAY;
+      });
+    });
   }
 
   private void activateProject(@MagicConstant(valuesFromClass = GameState.ResourceType.class) final int which) {
@@ -1224,34 +1295,12 @@ public final class GameUI {
 
     if (which == GameState.ResourceType.METAL) {
       this.setPlacementMode(PlacementMode.DEFENSIVE_NET);
-      for (final StarSystem starSystem : this.gameSession.gameState.map.systems) {
-        if (starSystem.owner == this.gameSession.localPlayer && !starSystem.hasDefensiveNet) {
-          this.gameSession.gameView.highlightedSystems[starSystem.index] = SystemHighlight.TARGET;
-        }
-      }
     } else if (which == GameState.ResourceType.BIOMASS) {
       this.setPlacementMode(PlacementMode.TERRAFORM);
-      for (final StarSystem starSystem : this.gameSession.gameState.map.systems) {
-        if (this.gameSession.localPlayer == starSystem.owner && starSystem.score == StarSystem.Score.NORMAL) {
-          this.gameSession.gameView.highlightedSystems[starSystem.index] = SystemHighlight.TARGET;
-        }
-      }
     } else if (which == GameState.ResourceType.ENERGY) {
       this.setPlacementMode(PlacementMode.STELLAR_BOMB);
-      for (final StarSystem starSystem : this.gameSession.gameState.map.systems) {
-        if (starSystem.owner != this.gameSession.localPlayer && (starSystem.owner == null || !this.gameSession.localPlayer.allies[starSystem.owner.index])) {
-          if (Arrays.stream(starSystem.neighbors).anyMatch(system -> this.gameSession.localPlayer == system.owner)) {
-            this.gameSession.gameView.highlightedSystems[starSystem.index] = SystemHighlight.TARGET;
-          }
-        }
-      }
     } else if (which == GameState.ResourceType.EXOTICS) {
       this.setPlacementMode(PlacementMode.GATE_SRC);
-      for (final StarSystem var5 : this.gameSession.gameState.map.systems) {
-        if (this.gameSession.localPlayer == var5.owner) {
-          this.gameSession.gameView.highlightedSystems[var5.index] = SystemHighlight.TARGET;
-        }
-      }
     }
   }
 
@@ -1270,12 +1319,12 @@ public final class GameUI {
         }
       } else {
         final boolean var11 = player.index < this.gameSession.localPlayer.index;
-        final fe_<?> var12 = var3._i[var11 ? player.index : player.index - 1];
+        final Button<?> var12 = var3._i[var11 ? player.index : player.index - 1];
         final Icon[] var13 = var3._f[var11 ? 1 + player.index : player.index];
         final ScrollView<?> var7 = var3._h[!var11 ? player.index : 1 + player.index];
         if (this.gameSession.gameState.isPlayerDefeated(player.index)) {
           final String var14 = (this.gameSession.gameState.didPlayerResign(player.index)) ? StringConstants.TEXT_RESIGNED : StringConstants.TEXT_DEFEATED;
-          var12.a290(0, var14);
+          var12.setText(var14, 0);
           var13[0].setSprite(a800cle(-1));
 
           for (int var15 = 1; var15 < var13.length; ++var15) {
@@ -1291,28 +1340,28 @@ public final class GameUI {
           int var8 = -1;
           if (player.allies[this.gameSession.localPlayer.index]) {
             var8 = this.gameSession.localPlayer.color1;
-            var12.a290(9386040, Strings.format(StringConstants.PACT_EXPIRES, Integer.toString(player.pactTurnsRemaining[this.gameSession.localPlayer.index])));
+            var12.setText(Strings.format(StringConstants.PACT_EXPIRES, Integer.toString(player.pactTurnsRemaining[this.gameSession.localPlayer.index])), 9386040);
             var7.tooltip = null;
 
             for (final UIComponent<?> var9 : var7.children) {
               var9.tooltip = null;
             }
           } else if (player.hasPactOfferFrom(this.gameSession.localPlayer)) {
-            var12.a290(0x338033, StringConstants.PACT_AWAITING);
+            var12.setText(StringConstants.PACT_AWAITING, 0x338033);
             var7.tooltip = Strings.format(StringConstants.TOOLTIP_WAIT_TREATY, player.name);
 
             for (final UIComponent<?> var9 : var7.children) {
               var9.tooltip = Strings.format(StringConstants.TOOLTIP_WAIT_TREATY, player.name);
             }
           } else if (this.gameSession.localPlayer.hasPactOfferFrom(player)) {
-            var12.a290(0x338033, StringConstants.PACT_ACCEPT);
+            var12.setText(StringConstants.PACT_ACCEPT, 0x338033);
             var7.tooltip = Strings.format(StringConstants.TOOLTIP_ACCEPT_TREATY, player.name);
 
             for (final UIComponent<?> var9 : var7.children) {
               var9.tooltip = Strings.format(StringConstants.TOOLTIP_ACCEPT_TREATY, player.name);
             }
           } else {
-            var12.a290(0x338033, StringConstants.PACT_OFFER);
+            var12.setText(StringConstants.PACT_OFFER, 0x338033);
             var7.tooltip = Strings.format(StringConstants.TOOLTIP_OFFER_TREATY, player.name);
 
             for (final UIComponent<?> var9 : var7.children) {
@@ -1393,7 +1442,7 @@ public final class GameUI {
       }
     }
 
-    Menu.drawShine(statsX, STATS_SCREEN_Y, width, STATS_SCREEN_HEIGHT);
+    Menu.drawPanel(statsX, STATS_SCREEN_Y, width, STATS_SCREEN_HEIGHT);
     final int[] bounds = new int[4];
     Drawing.saveBoundsTo(bounds);
     Drawing.setBounds(statsX, STATS_SCREEN_Y, statsX + width, STATS_SCREEN_Y + STATS_SCREEN_HEIGHT);
@@ -1582,7 +1631,7 @@ public final class GameUI {
 
     final int var9 = this._ob[var1];
 
-    Menu.drawShine(var3, var2, 190, var9);
+    Menu.drawPanel(var3, var2, 190, var9);
     Menu.SMALL_FONT.draw(ShatteredPlansClient.STAT_NAMES[var5], 10 + var3, var2 + Menu.SMALL_FONT.ascent, Drawing.WHITE);
     final short var10 = 210;
     final int var11 = var10 / (6 + var6);
@@ -1677,7 +1726,7 @@ public final class GameUI {
       if (this.overviewTabButton.isActive()) {
         this.overviewTabButton.toggle();
       }
-      ((Button<?>) this.clickedComponent).toggle();
+      ((ToggleButton<?>) this.clickedComponent).toggle();
     }
 
     if (var9 == 4) {
@@ -1754,20 +1803,20 @@ public final class GameUI {
     final int var8 = FACTION_RING.width + Menu.SMALL_FONT.measureLineWidth("= " + Strings.format(StringConstants.TURN_POINTS, Integer.toString(3)));
     FACTION_RING_CENTER.draw((-FACTION_RING_CENTER.width + FACTION_RING.width) / 2 + (var1 - var8) / 2 + var4, var7);
     FACTION_RING.draw((-var8 + var1) / 2 + var4, var7 - 9);
-    Drawing.drawCircleGradientAdd(Menu._emc[0] + (var4 + (FACTION_RING.width + (var1 - var8)) / 2 << 4), Menu._pmDb[0] + (var7 + FACTION_RING_CENTER.height / 2 << 4), 50, 7, _hs);
-    Drawing.drawCircleGradientAdd((var4 + (FACTION_RING.width + var1 - var8) / 2 << 4) + Menu._emc[2], (FACTION_RING_CENTER.height / 2 + var7 << 4) + Menu._pmDb[2], 50, 7, _hs);
-    Drawing.drawCircleGradientAdd(Menu._emc[3] + ((FACTION_RING.width - var8 + var1) / 2 + var4 << 4), (FACTION_RING_CENTER.height / 2 + var7 << 4) + Menu._pmDb[3], 50, 7, _hs);
+    Drawing.drawCircleGradientAdd(GameView.systemScoreOrbXOffsets[0] + (var4 + (FACTION_RING.width + (var1 - var8)) / 2 << 4), GameView.systemScoreOrbYOffsets[0] + (var7 + FACTION_RING_CENTER.height / 2 << 4), 50, 7, SYSTEM_SCORE_ORB_GRADIENT);
+    Drawing.drawCircleGradientAdd((var4 + (FACTION_RING.width + var1 - var8) / 2 << 4) + GameView.systemScoreOrbXOffsets[2], (FACTION_RING_CENTER.height / 2 + var7 << 4) + GameView.systemScoreOrbYOffsets[2], 50, 7, SYSTEM_SCORE_ORB_GRADIENT);
+    Drawing.drawCircleGradientAdd(GameView.systemScoreOrbXOffsets[3] + ((FACTION_RING.width - var8 + var1) / 2 + var4 << 4), (FACTION_RING_CENTER.height / 2 + var7 << 4) + GameView.systemScoreOrbYOffsets[3], 50, 7, SYSTEM_SCORE_ORB_GRADIENT);
     Menu.SMALL_FONT.draw("= " + Strings.format(StringConstants.TURN_POINTS, Integer.toString(3)), FACTION_RING.width + var4 + (-var8 + var1) / 2 + 5, FACTION_RING.height / 2 + var7 - 4, Drawing.WHITE);
     var7 += FACTION_RING.height;
     FACTION_RING_CENTER.draw(var4 + (-var8 + var1) / 2 + (-FACTION_RING_CENTER.width + FACTION_RING.width) / 2, var7);
     FACTION_RING.draw((var1 - var8) / 2 + var4, var7 - 9);
-    Drawing.drawCircleGradientAdd((var4 + (FACTION_RING.width - var8 + var1) / 2 << 4) + Menu._emc[0], Menu._pmDb[0] + (FACTION_RING_CENTER.height / 2 + var7 << 4), 50, 7, _hs);
-    Drawing.drawCircleGradientAdd(((FACTION_RING.width - var8 + var1) / 2 + var4 << 4) + Menu._emc[1], Menu._pmDb[1] + (FACTION_RING_CENTER.height / 2 + var7 << 4), 50, 7, _hs);
+    Drawing.drawCircleGradientAdd((var4 + (FACTION_RING.width - var8 + var1) / 2 << 4) + GameView.systemScoreOrbXOffsets[0], GameView.systemScoreOrbYOffsets[0] + (FACTION_RING_CENTER.height / 2 + var7 << 4), 50, 7, SYSTEM_SCORE_ORB_GRADIENT);
+    Drawing.drawCircleGradientAdd(((FACTION_RING.width - var8 + var1) / 2 + var4 << 4) + GameView.systemScoreOrbXOffsets[1], GameView.systemScoreOrbYOffsets[1] + (FACTION_RING_CENTER.height / 2 + var7 << 4), 50, 7, SYSTEM_SCORE_ORB_GRADIENT);
     Menu.SMALL_FONT.draw("= " + Strings.format(StringConstants.TURN_POINTS, Integer.toString(2)), 5 + FACTION_RING.width + (var1 - var8) / 2 + var4, var7 + FACTION_RING.height / 2 - 4, Drawing.WHITE);
     var7 += FACTION_RING.height;
     FACTION_RING_CENTER.draw(var4 + (-var6 + var1) / 2 + (-FACTION_RING_CENTER.width + FACTION_RING.width) / 2 - 5, var7);
     FACTION_RING.draw((-var6 + var1) / 2 + var4 - 5, var7 - 9);
-    Drawing.drawCircleGradientAdd(Menu._emc[0] + ((FACTION_RING.width + (var1 - var6)) / 2 + var4 - 5 << 4), Menu._pmDb[0] + (var7 + FACTION_RING_CENTER.height / 2 << 4), 50, 7, _hs);
+    Drawing.drawCircleGradientAdd(GameView.systemScoreOrbXOffsets[0] + ((FACTION_RING.width + (var1 - var6)) / 2 + var4 - 5 << 4), GameView.systemScoreOrbYOffsets[0] + (var7 + FACTION_RING_CENTER.height / 2 << 4), 50, 7, SYSTEM_SCORE_ORB_GRADIENT);
     FACTION_RING_CENTER.draw(FACTION_RING.width + (-var6 + var1) / 2 + var4 - 5 + (-FACTION_RING_CENTER.width + FACTION_RING.width) / 2, var7);
     FACTION_RING.draw(var4 + (-var6 + var1) / 2 + (FACTION_RING.width - 5), var7 - 9);
     Menu.SMALL_FONT.draw("= " + StringConstants.TURN_ONE_POINT, 2 * FACTION_RING.width + (-var6 + var1) / 2 + var4, FACTION_RING.height / 2 + (var7 - 4), Drawing.WHITE);
@@ -1943,7 +1992,7 @@ public final class GameUI {
     this.fleetInfoPanel.a183(this.fleetInfoPanel.content.contentHeight + 28, this.fleetInfoPanel.width);
     this.fleetInfoPanel.content.a183(this.fleetInfoPanel.content.contentHeight + 10, this.fleetInfoPanel.content.width);
     this.fleetInfoPanel.translate(0, -this.fleetInfoPanel.height + var5);
-    this.f150();
+    this.refreshProductionPanel();
     this.initialize();
     final Player[] var6 = this.gameSession.gameState.players;
 
@@ -1973,9 +2022,9 @@ public final class GameUI {
     }
   }
 
-  public void render() {
+  public void draw() {
     if (this.gameSession.isTutorial) {
-      TutorialState.a423mq();
+      TutorialState.draw();
     }
 
     if (this.gameSession.isMultiplayer && !this.gameSession.gameState.hasEnded) {
@@ -2010,12 +2059,12 @@ public final class GameUI {
 
     d150vn();
     if (this.chatPanelSinglePlayer != null) {
-      this.chatPanelSinglePlayer.b540(false);
+      this.chatPanelSinglePlayer.draw(false);
     }
 
     if (this._U != -1) {
       final int var4 = this._x;
-      final int var5 = 5 + this.statusPanel.height + this.statusPanel.y;
+      final int var5 = this.statusPanel.y + this.statusPanel.height + 5;
       Drawing.fillRoundedRect(this.statusPanel.x + 1, var5, this._T.width + 10, Menu.SMALL_FONT.ascent, 5, 0);
       Drawing.f669(this.statusPanel.x, var5 - 1, 12 + this._T.width, Menu.SMALL_FONT.ascent + 2, 6, 2052949);
       TutorialState.a833sa(var4 * 5, this.statusPanel.x + 6, 32, this._T, var5 - 4);
@@ -2093,19 +2142,19 @@ public final class GameUI {
     }
 
     if (var8 != null) {
-      Menu.FONT.drawCentered(var8, 320, 240, var10, GameView.uiPulseCounter);
-      int var11 = Menu.SMALL_FONT.ascent + 245;
+      Menu.FONT.drawCentered(var8, ShatteredPlansClient.SCREEN_CENTER_X, ShatteredPlansClient.SCREEN_CENTER_Y, var10, GameView.uiPulseCounter);
+      int var11 = Menu.SMALL_FONT.ascent + ShatteredPlansClient.SCREEN_CENTER_Y + 5;
       //noinspection StringEquality
       if (var8 == StringConstants.TEXT_PEACE) {
         final String s = this.gameSession.gameState.anyPlayersDefeated() ? StringConstants.TEXT_PEACE_3 : StringConstants.TEXT_PEACE_2;
-        Menu.SMALL_FONT.drawCentered(s, 320, var11, var10, GameView.uiPulseCounter);
+        Menu.SMALL_FONT.drawCentered(s, ShatteredPlansClient.SCREEN_CENTER_X, var11, var10, GameView.uiPulseCounter);
         var11 += 3 + Menu.SMALL_FONT.ascent;
       }
 
-      Menu.SMALL_FONT.drawCentered(StringConstants.TEXT_TOGGLE_STATS, 320, var11, var10, GameView.uiPulseCounter);
+      Menu.SMALL_FONT.drawCentered(StringConstants.TEXT_TOGGLE_STATS, ShatteredPlansClient.SCREEN_CENTER_X, var11, var10, GameView.uiPulseCounter);
       if (var9) {
         var11 += Menu.SMALL_FONT.ascent + 3;
-        Menu.SMALL_FONT.drawCentered(StringConstants.TEXT_TOGGLE_STATS_2, 320, var11, var10, GameView.uiPulseCounter);
+        Menu.SMALL_FONT.drawCentered(StringConstants.TEXT_TOGGLE_STATS_2, ShatteredPlansClient.SCREEN_CENTER_X, var11, var10, GameView.uiPulseCounter);
       }
     }
 
@@ -2241,9 +2290,9 @@ public final class GameUI {
 
   public int getHeight() {
     if (this.gameSession.isTutorial) {
-      return JagexApplet.gameHeight;
+      return ShatteredPlansClient.SCREEN_HEIGHT;
     } else {
-      return this.gameSession.isMultiplayer ? Component._tgc.y : this.chatPanelSinglePlayer.y;
+      return this.gameSession.isMultiplayer ? Component.lobbyChatPanel.y : this.chatPanelSinglePlayer.y;
     }
   }
 
@@ -2274,7 +2323,7 @@ public final class GameUI {
     final int var4 = (ShatteredPlansClient.SCREEN_WIDTH - var3) / 2;
     final byte var5 = 80;
     final short var6 = 250;
-    Menu.drawShine(var4, var5, var3, var6, 3974311, true);
+    Menu.drawPanel(var4, var5, var3, var6, 3974311, true);
     final int[] var7 = new int[4];
     Drawing.saveBoundsTo(var7);
     Drawing.setBounds(var4 + Menu.SMALL_FONT.ascent / 2, var5, -(Menu.SMALL_FONT.ascent / 2) + var4 + var3, 330);
@@ -2298,12 +2347,13 @@ public final class GameUI {
     }
 
     Menu.SMALL_FONT.draw(var8.toUpperCase(), 10 + var4, Menu.SMALL_FONT.ascent + var5, Drawing.WHITE);
-    Menu.drawShine(var4 + Menu.SMALL_FONT.ascent / 2, Menu.SMALL_FONT.ascent + var5 + 5, -Menu.SMALL_FONT.ascent + 450 + 1, 10 + FACTION_ICONS_LARGE[0].height, 0);
+    Menu.drawPanel(var4 + Menu.SMALL_FONT.ascent / 2, Menu.SMALL_FONT.ascent + var5 + 5, -Menu.SMALL_FONT.ascent + 450 + 1, 10 + FACTION_ICONS_LARGE[0].height, 0);
     int var10 = 0;
     if (this.gameSession.localPlayer != null) {
       var10 = this.gameSession.localPlayer.index;
     }
 
+    //noinspection SuspiciousNameCombination
     final Sprite var11 = new Sprite(FACTION_ICONS_LARGE[0].height, -Menu.SMALL_FONT.ascent + 450 - (10 + FACTION_ICONS_LARGE[0].width / 2));
     Drawing.saveContext();
     var11.installForDrawing();
@@ -2405,7 +2455,7 @@ public final class GameUI {
   }
 
   public void updateForTurnStart() {
-    this.f150();
+    this.refreshProductionPanel();
     if (this.projectsPanel != null) {
       this.updateProjectsPanel();
     }
@@ -2459,7 +2509,7 @@ public final class GameUI {
   }
 
   private boolean processInputHud(final boolean var1) {
-    final boolean var3 = this.hoveredComponent != null || Component._tgc.y <= JagexApplet.mouseY || this.chatPanelSinglePlayer != null && this.chatPanelSinglePlayer.y <= JagexApplet.mouseY;
+    final boolean var3 = this.hoveredComponent != null || Component.lobbyChatPanel.y <= JagexApplet.mouseY || this.chatPanelSinglePlayer != null && this.chatPanelSinglePlayer.y <= JagexApplet.mouseY;
     this.processMouseInput(this.components);
     if (this.mouseDownComponent != null) {
       for (final UIComponent<?> var4 : this.components) {
@@ -3088,7 +3138,7 @@ public final class GameUI {
     }
   }
 
-  private void f150() {
+  private void refreshProductionPanel() {
     this.productionPanel.content.removeChildren();
     final ProductionPanelState info = this.productionPanel.state;
     if (this.gameSession.localPlayer != null && !this.gameSession.gameState.isPlayerDefeated(this.gameSession.localPlayer.index)) {
@@ -3096,7 +3146,7 @@ public final class GameUI {
         info.buildFleetsButtons = new ArrayList<>(1);
         info._f = new ArrayList<>(1);
         info.buildFleetsLabels = new ArrayList<>(1);
-        final ScrollView<?> var3 = addForceToProductionPanel(this.gameSession.localPlayer.combinedForce, info, true);
+        final ScrollView<?> var3 = this.addForceToProductionPanel(this.gameSession.localPlayer.combinedForce, info, true);
         var3.setPosition(this.productionPanel.content.x, this.productionPanel.content.contentHeight + this.productionPanel.content.y);
         this.productionPanel.content.addChild(var3);
         if (this.gameSession.localPlayer.combinedForce.fleetsAvailableToBuild <= 0) {
@@ -3116,7 +3166,7 @@ public final class GameUI {
 
         boolean isFirst = true;
         for (final ContiguousForce force : this.gameSession.localPlayer.contiguousForces) {
-          final ScrollView<?> var5 = addForceToProductionPanel(force, info, isFirst);
+          final ScrollView<?> var5 = this.addForceToProductionPanel(force, info, isFirst);
           var5.setPosition(this.productionPanel.content.x, this.productionPanel.content.y + this.productionPanel.content.contentHeight);
           this.productionPanel.content.addChild(var5);
           if (force.fleetsAvailableToBuild > 0) {
@@ -3152,11 +3202,7 @@ public final class GameUI {
       }
     }
 
-    int var12 = 3 + this.productionPanel.content.contentHeight + 20;
-    if (var12 > 363) {
-      var12 = 363;
-    }
-
+    final int var12 = Math.min(3 + this.productionPanel.content.contentHeight + 20, 363);
     this.productionPanel.a183(var12, this.productionPanel.width);
     this.productionPanel.content.a183(var12 - 10 - 18, this.productionPanel.content.width);
     info.scrollBar.a183(var12 - 3 - 15 - 10, info.scrollBar.width);
@@ -3254,7 +3300,28 @@ public final class GameUI {
     }
 
     for (final StarSystem system : force) {
-      this.gameSession.gameView.highlightedSystems[system.index] = SystemHighlight.TARGET;
+      this.gameSession.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
+    }
+  }
+
+  /**
+   * Like {@link Label}, but highlighted green while placing a terraforming
+   * project if the resource is a surplus resource.
+   */
+  private class ResourceProductionLabel extends Label {
+    private final boolean isSurplus;
+
+    protected ResourceProductionLabel(final int x, final int y, final int width, final int height, final String text, final boolean isSurplus) {
+      super(x, y, width, height, text);
+      this.isSurplus = isSurplus;
+    }
+
+    @Override
+    protected int getColor() {
+      if (GameUI.this.gameSession.placementMode == PlacementMode.TERRAFORM && this.isSurplus) {
+        return GameView.RESOURCE_COLORS[GameState.ResourceType.BIOMASS];
+      }
+      return super.getColor();
     }
   }
 

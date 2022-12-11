@@ -43,6 +43,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class GameState {
   public static final int NUM_RESOURCES = 4;
@@ -172,6 +173,14 @@ public final class GameState {
     final int systemsPerPlayer = this.map.systems.length / this.playerCount;
     return GalaxySize.lookup(systemsPerPlayer)
         .orElseThrow(() -> new IllegalStateException("no known galaxy size corresponding to " + systemsPerPlayer + " systems per player"));
+  }
+
+  public @NotNull Stream<? extends Force> streamForces(final Player player) {
+    if (this.gameOptions.unifiedTerritories) {
+      return Stream.of(player.combinedForce);
+    } else {
+      return player.contiguousForces.stream();
+    }
   }
 
   public static void recalculateFleetsRemaining(final Force force) {

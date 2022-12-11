@@ -11,6 +11,7 @@ import funorb.shatteredplans.game.GameState.GalaxySize;
 import funorb.shatteredplans.game.GameState.GameType;
 import funorb.client.lobby.LobbyPlayer;
 import funorb.shatteredplans.S2CPacket;
+import funorb.util.MathUtil;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Set;
 
 public final class LobbyRoom {
+  private static final int MAX_PLAYER_COUNT = 6;
+
   private final @NotNull LobbyState lobby;
 
   public final int id;
@@ -32,7 +35,7 @@ public final class LobbyRoom {
   @SuppressWarnings({"FieldCanBeLocal"})
   private final boolean isRated = false;
   private int maxHumanPlayerCount = 4;
-  private int maxAiPlayerCount = 4;
+  private int maxAiPlayerCount = 0;
   private int turnLengthIndex = 0;
   private @NotNull WhoCanJoin whoCanJoin = WhoCanJoin.INVITE_ONLY;
   private @NotNull GalaxySize galaxySize = GalaxySize.MEDIUM;
@@ -312,11 +315,11 @@ public final class LobbyRoom {
   }
 
   public void receiveOptions(final @NotNull Packet packet) {
-    this.maxHumanPlayerCount = Math.max(2, Math.min(packet.readUByte(), 6));
+    this.maxHumanPlayerCount = MathUtil.clamp(packet.readUByte(), 2, MAX_PLAYER_COUNT);
     final int b = packet.readUByte();
     this.spectatingAllowed = (b >>> 6) == 2;
     this.whoCanJoin = WhoCanJoin.values()[Math.min(b & 0x3f, WhoCanJoin.values().length - 1)];
-    this.maxAiPlayerCount = Math.min(packet.readUByte(), 6);
+    this.maxAiPlayerCount = Math.min(packet.readUByte(), MAX_PLAYER_COUNT);
     this.turnLengthIndex = Math.min(packet.readUByte(), GameSession.TURN_DURATIONS.length - 1);
     this.gameType = GameState.GameType.decode(packet.readUByte());
     this.galaxySize = GalaxySize.values()[Math.min(packet.readUByte(), GalaxySize.values().length - 1)];
@@ -346,7 +349,7 @@ public final class LobbyRoom {
         this.classicRuleset ? GameOptions.CLASSIC_GAME_OPTIONS : GameOptions.STREAMLINED_GAME_OPTIONS,
         this.turnLengthIndex,
         this.clients,
-        Math.max(this.clients.size() == 1 ? 1 : 0, this.maxAiPlayerCount - this.clients.size()));
+        MathUtil.clamp(this.maxAiPlayerCount, this.clients.size() == 1 ? 1 : 0, MAX_PLAYER_COUNT - this.clients.size()));
     this.startedAt = System.currentTimeMillis();
     this.clients.forEach(this.session::sendInitialState);
     this.lobby.broadcastRoomUpdate(this);

@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class TutorialState {
+  private static final int PANEL_ANIMATION_TICK_MAX = 32;
   public static int stage;
   public static boolean _jau;
   public static boolean _tdL;
@@ -37,16 +38,16 @@ public final class TutorialState {
   public static boolean _phg;
   public static boolean _vcj;
   public static boolean _sek;
-  public static Player _hod;
+  public static Player localPlayer;
 
   private static ClientGameSession session;
   private static Sprite[][] _spm;
   private static TutorialMessage _hmq;
-  private static int _eie;
+  private static int panelRight;
   private static TutorialMessage _olg;
-  private static int _ef;
-  private static int _fkk;
-  private static int _klo;
+  private static int panelLeft;
+  private static int panelTop;
+  private static int panelBottom;
   private static TemplateDictionary templateDictionary;
   private static List<TutorialMessageId> _aja;
   private static List<TutorialMessageId> _qih;
@@ -54,20 +55,20 @@ public final class TutorialState {
   private static int _gei;
   private static TutorialMessage[] _jsb;
   private static TutorialMapGenerator mapGenerator;
-  private static int _beh;
-  private static int _feB;
+  private static int panelTopStart;
+  private static int panelLeftEnd;
   private static int[] _rgf;
-  private static int _dmgq;
-  private static int _oia;
+  private static int panelBottomStart;
+  private static int panelTopEnd;
   private static Sprite[][] _oii;
   private static Sprite[] _ehL;
   private static int _tec;
-  private static int _tpb;
-  private static int _kpj;
-  private static int _jcr;
-  private static int _jbd;
+  private static int panelBottomEnd;
+  private static int panelRightStart;
+  private static int panelLeftStart;
+  private static int panelRightEnd;
   private static StarSystem _idd;
-  private static int _ejm;
+  private static int panelAnimationTick;
   private static StarSystem _dd;
 
   private TutorialState() {}
@@ -78,11 +79,11 @@ public final class TutorialState {
     mapGenerator = new TutorialMapGenerator();
     stage = 1;
     _hmq = null;
-    _eie = -1;
+    panelRight = -1;
     _olg = null;
-    _ef = -1;
-    _fkk = -1;
-    _klo = -1;
+    panelLeft = -1;
+    panelTop = -1;
+    panelBottom = -1;
     _aja = new ArrayList<>();
     _qih = new ArrayList<>();
     _isb = false;
@@ -100,9 +101,9 @@ public final class TutorialState {
     if (!_isb) {
       _hmq = var1;
       if (var1 == null) {
-        _tpb = _dmgq;
-        _feB = _jbd = _kpj + _jcr >> 1;
-        _oia = _beh;
+        panelBottomEnd = panelBottomStart;
+        panelLeftEnd = panelRightEnd = panelRightStart + panelLeftStart >> 1;
+        panelTopEnd = panelTopStart;
         a195qj(null);
       } else {
         a150sj();
@@ -127,19 +128,19 @@ public final class TutorialState {
           }
         }
 
-        if ((1 & var1.anchor) == 0) {
+        if ((var1.anchor & 1) == 0) {
           var2 += 3;
         } else {
-          var2 = 637 - var2;
+          var2 = ShatteredPlansClient.SCREEN_WIDTH - 3 - var2;
         }
 
         if ((var1.anchor & 2) == 0) {
           var3 += 55;
         } else {
-          var3 = 477 - var3;
+          var3 = ShatteredPlansClient.SCREEN_HEIGHT - 3 - var3;
         }
 
-        if ((2 & var1.anchor) != 0) {
+        if ((var1.anchor & 2) != 0) {
           var3 -= var5;
         }
 
@@ -147,19 +148,19 @@ public final class TutorialState {
           var2 -= var4;
         }
 
-        _jbd = var4 + var2;
-        _tpb = var3 + var5;
-        _oia = var3;
-        _feB = var2;
+        panelRightEnd = var4 + var2;
+        panelBottomEnd = var3 + var5;
+        panelTopEnd = var3;
+        panelLeftEnd = var2;
         a195qj(var1);
         if (var1.body.contains("<%tabresizehint>")) {
           templateDictionary.put("tabresizehint", "");
         }
 
         if (_olg == null) {
-          _dmgq = _tpb;
-          _beh = _oia;
-          _jcr = _kpj = _jbd + _feB >> 1;
+          panelBottomStart = panelBottomEnd;
+          panelTopStart = panelTopEnd;
+          panelLeftStart = panelRightStart = panelRightEnd + panelLeftEnd >> 1;
         }
 
       }
@@ -249,9 +250,9 @@ public final class TutorialState {
       a093no(var5);
       session.recalculateSystemState();
     } else if (var0.equalsIgnoreCase("zoomtohome")) {
-      session.gameView.a021(39, _hod.combinedForce.getCapital(), 200.0F);
+      session.gameView.a021(39, localPlayer.combinedForce.getCapital(), 200.0F);
     } else if (var0.equalsIgnoreCase("closetohome")) {
-      session.gameView.a815(_hod.combinedForce.getCapital());
+      session.gameView.a815(localPlayer.combinedForce.getCapital());
     } else {
       final StarSystem[] var2;
       int var3;
@@ -261,7 +262,7 @@ public final class TutorialState {
 
         for (var3 = 0; var2.length > var3; ++var3) {
           var4 = var2[var3];
-          if (var4.owner == _hod && !session.systemsWillOwn[var4.index]) {
+          if (var4.owner == localPlayer && !session.systemsWillOwn[var4.index]) {
             session.gameView.a021(92, var4, 300.0F);
             return;
           }
@@ -363,7 +364,7 @@ public final class TutorialState {
 
   public static void tick() {
     if (_hmq != _olg) {
-      if (++_ejm >= 32) {
+      if (++panelAnimationTick >= 32) {
         a423js();
       }
     } else if (_olg != null) {
@@ -389,15 +390,15 @@ public final class TutorialState {
 
     _aja.clear();
     if (_olg == _hmq) {
-      _eie = _kpj;
-      _ef = _jcr;
-      _fkk = _beh;
-      _klo = _dmgq;
+      panelRight = panelRightStart;
+      panelLeft = panelLeftStart;
+      panelTop = panelTopStart;
+      panelBottom = panelBottomStart;
     } else {
-      _ef = MathUtil.ease(_ejm, 32, _jcr, _feB);
-      _fkk = MathUtil.ease(_ejm, 32, _beh, _oia);
-      _eie = MathUtil.ease(_ejm, 32, _kpj, _jbd);
-      _klo = MathUtil.ease(_ejm, 32, _dmgq, _tpb);
+      panelLeft = MathUtil.ease(panelAnimationTick, PANEL_ANIMATION_TICK_MAX, panelLeftStart, panelLeftEnd);
+      panelTop = MathUtil.ease(panelAnimationTick, PANEL_ANIMATION_TICK_MAX, panelTopStart, panelTopEnd);
+      panelRight = MathUtil.ease(panelAnimationTick, PANEL_ANIMATION_TICK_MAX, panelRightStart, panelRightEnd);
+      panelBottom = MathUtil.ease(panelAnimationTick, PANEL_ANIMATION_TICK_MAX, panelBottomStart, panelBottomEnd);
     }
 
     if (_oii != null) {
@@ -464,18 +465,18 @@ public final class TutorialState {
   }
 
   private static void a423js() {
-    _beh = _oia;
-    _kpj = _jbd;
+    panelTopStart = panelTopEnd;
+    panelRightStart = panelRightEnd;
     _phg = false;
     _erg = false;
-    _dmgq = _tpb;
+    panelBottomStart = panelBottomEnd;
     _olg = _hmq;
-    _jcr = _feB;
+    panelLeftStart = panelLeftEnd;
     _vcj = false;
     _tdL = false;
     _sek = false;
     _jau = false;
-    _ejm = 0;
+    panelAnimationTick = 0;
     if (_olg._m != null) {
       final String[] var1 = _olg._m;
 
@@ -494,11 +495,11 @@ public final class TutorialState {
     if (var0.equalsIgnoreCase("openProduction")) {
       return session.ui.isProductionWindowOpen();
     } else if (var0.equalsIgnoreCase("placeAllFleets")) {
-      return _hod.combinedForce.fleetsAvailableToBuild == 0;
+      return localPlayer.combinedForce.fleetsAvailableToBuild == 0;
     } else if (var0.equalsIgnoreCase("homeworldEmpty")) {
-      return _hod.combinedForce.getCapital().remainingGarrison == 0;
+      return localPlayer.combinedForce.getCapital().remainingGarrison == 0;
     } else if (var0.equalsIgnoreCase("homeworldOne")) {
-      return _hod.combinedForce.getCapital().remainingGarrison == 1;
+      return localPlayer.combinedForce.getCapital().remainingGarrison == 1;
     } else {
       final StarSystem[] var2;
       int var3;
@@ -508,7 +509,7 @@ public final class TutorialState {
 
         for (var3 = 0; var2.length > var3; ++var3) {
           var4 = var2[var3];
-          if (_hod != var4.owner) {
+          if (localPlayer != var4.owner) {
             return false;
           }
         }
@@ -529,7 +530,7 @@ public final class TutorialState {
         return session.gameState.projectOrders.stream()
             .anyMatch(var6 -> var6.type == GameState.ResourceType.EXOTICS && session.gameState.map.systems[12] == var6.source);
       } else if (var0.equalsIgnoreCase("fleetmove")) {
-        return session.gameState.moveOrders.stream().anyMatch(var5 -> _hod == var5.player);
+        return session.gameState.moveOrders.stream().anyMatch(var5 -> localPlayer == var5.player);
       } else {
         return a988sr(var0);
       }
@@ -731,7 +732,7 @@ public final class TutorialState {
   public static void k150pe() {
     a984fl("endturn");
     if (session.gameState.map.systems.length == 2) {
-      if (_hod == session.gameState.map.systems[1].owner) {
+      if (localPlayer == session.gameState.map.systems[1].owner) {
         if (a896qc("combatSuccess")) {
           a529ac(TutorialMessages.get("combatSuccess"));
         }
@@ -750,7 +751,7 @@ public final class TutorialState {
       templateDictionary.put("garrison1", Integer.toString(session.gameState.map.systems[1].garrison));
     }
 
-    if (session.gameState.hasEnded && session.gameState.winnerIndex != _hod.index) {
+    if (session.gameState.hasEnded && session.gameState.winnerIndex != localPlayer.index) {
       a529ac(TutorialMessages.get("lose"));
     }
 
@@ -770,7 +771,7 @@ public final class TutorialState {
             final Player[] var4 = var3.players;
 
             for (final Player var6 : var4) {
-              if (var6 == _hod) {
+              if (var6 == localPlayer) {
                 return var3;
               }
             }
@@ -789,7 +790,7 @@ public final class TutorialState {
     int var2 = 0;
 
     for (final CombatLogEvent var3 : var0.events) {
-      if (_hod == var3.player) {
+      if (localPlayer == var3.player) {
         if (var3.fleetsRetreated != 0 && var3.source != null) {
           ++var2;
         }
@@ -808,7 +809,7 @@ public final class TutorialState {
         var5[0] = var4;
 
         for (final CombatLogEvent var3 : var0.events) {
-          if (var3.player == _hod && var3.fleetsRetreated != 0 && var3.source != null) {
+          if (var3.player == localPlayer && var3.fleetsRetreated != 0 && var3.source != null) {
             final String var6;
             if (var3.fleetsRetreated == 1) {
               var6 = Strings.format(StringConstants.FLEET_HAS_RETREATED_TO, a865pa(var3.source, -110));
@@ -848,15 +849,15 @@ public final class TutorialState {
     }
   }
 
-  public static void a423mq() {
+  public static void draw() {
     if (_olg != null || _hmq != null) {
-      if (-_ef + _eie > 20 && -_fkk + _klo > 20) {
-        Menu.drawShine(_ef, _fkk, -_ef + _eie, -_fkk + _klo, Drawing.alphaOver(0, 3974311, 128), true);
+      if (panelRight - panelLeft > 20 && panelBottom - panelTop > 20) {
+        Menu.drawPanel(panelLeft, panelTop, panelRight - panelLeft, panelBottom - panelTop, Drawing.alphaOver(0, 3974311, 128), true);
       }
 
       if (_olg == _hmq) {
-        final int var1 = _ef + 13;
-        int var2 = 6 + _fkk;
+        final int var1 = panelLeft + 13;
+        int var2 = 6 + panelTop;
         int var3 = _tec;
         int var4;
         if (_ehL != null) {
@@ -965,7 +966,7 @@ public final class TutorialState {
   }
 
   public static boolean a881ks(final boolean var0) {
-    if ((_olg != null || _hmq != null) && JagexApplet.mouseX >= _ef && JagexApplet.mouseX < _eie && _fkk <= JagexApplet.mouseY && _klo > JagexApplet.mouseY) {
+    if ((_olg != null || _hmq != null) && JagexApplet.mouseX >= panelLeft && JagexApplet.mouseX < panelRight && panelTop <= JagexApplet.mouseY && panelBottom > JagexApplet.mouseY) {
       if (JagexApplet.mouseButtonJustClicked != MouseState.Button.NONE && var0) {
         if (_olg != _hmq) {
           a423js();
@@ -984,7 +985,7 @@ public final class TutorialState {
 
   public static Rect b520b() {
     final Rect var2 = new Rect(0, 50, ShatteredPlansClient.SCREEN_WIDTH, 430);
-    final Rect var4 = new Rect(_ef, _fkk, _eie, _klo);
+    final Rect var4 = new Rect(panelLeft, panelTop, panelRight, panelBottom);
     final List<Rect> var5 = new ArrayList<>();
     if (var2.x1 < var4.x1) {
       var5.add(new Rect(var2.x1, var2.y1, Math.min(var4.x1, var2.x2), var2.y2));
@@ -1020,7 +1021,7 @@ public final class TutorialState {
 
   @SuppressWarnings("StringConcatenationInLoop")
   private static void a150sj() {
-    final Player var1 = _hod;
+    final Player var1 = localPlayer;
     final CombinedForce var2 = var1.combinedForce;
 
     if (var2 != null) {

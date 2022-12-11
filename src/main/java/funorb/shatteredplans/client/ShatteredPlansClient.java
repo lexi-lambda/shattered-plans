@@ -66,6 +66,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.sound.sampled.LineUnavailableException;
 import java.awt.Canvas;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -81,8 +82,49 @@ import java.util.Random;
 import static funorb.shatteredplans.S2CPacket.Type;
 
 public final class ShatteredPlansClient extends JagexApplet {
-  public static final int SCREEN_WIDTH = 640;
-  public static final int SCREEN_HEIGHT = 480;
+  public static final int ORIGINAL_SCREEN_WIDTH = 640;
+  public static final int ORIGINAL_SCREEN_HEIGHT = 480;
+
+  private static final double UI_SCALE;
+  private static final double ASPECT_RATIO;
+  public static final int SCREEN_WIDTH;
+  public static final int SCREEN_HEIGHT;
+  static {
+    final String uiScaleStr = System.getProperty("funorb.shatteredplans.client.uiScale", "1.0");
+    try {
+      UI_SCALE = Double.parseDouble(uiScaleStr);
+    } catch (final NumberFormatException e) {
+      throw new RuntimeException("non-numeric value for property ‘funorb.shatteredplans.client.uiScale’: " + uiScaleStr, e);
+    }
+
+    final String aspectRatioStr = System.getProperty("funorb.shatteredplans.client.aspectRatio", "4:3");
+    final String[] aspectRatioStrs = aspectRatioStr.split(":");
+    if (aspectRatioStrs.length != 2) {
+      throw new RuntimeException("value for property ‘funorb.shatteredplans.client.aspectRatio’ is not in the form ‘N:M’: " + aspectRatioStr);
+    }
+    try {
+      ASPECT_RATIO = (double) Integer.parseInt(aspectRatioStrs[0]) / Integer.parseInt(aspectRatioStrs[1]);
+    } catch (final NumberFormatException e) {
+      throw new RuntimeException("value for property ‘funorb.shatteredplans.client.aspectRatio’ is not in the form ‘N:M’: " + aspectRatioStr, e);
+    }
+
+    SCREEN_HEIGHT = (int) (ORIGINAL_SCREEN_HEIGHT * UI_SCALE);
+    SCREEN_WIDTH = (int) (ORIGINAL_SCREEN_HEIGHT * UI_SCALE * ASPECT_RATIO);
+  }
+
+  private static final AffineTransform STAR_FIELD_TRANSFORM = new AffineTransform();
+  static {
+    final double originalAspectRatio = 4.0 / 3.0;
+    if (ASPECT_RATIO > originalAspectRatio) {
+      final double scale = UI_SCALE * ASPECT_RATIO;
+      STAR_FIELD_TRANSFORM.scale(scale, scale);
+      STAR_FIELD_TRANSFORM.translate(0.0, ORIGINAL_SCREEN_HEIGHT * (1.0/originalAspectRatio - 1.0/ASPECT_RATIO) * -0.5);
+    } else {
+      STAR_FIELD_TRANSFORM.scale(UI_SCALE, UI_SCALE);
+      STAR_FIELD_TRANSFORM.translate(ORIGINAL_SCREEN_WIDTH * (ASPECT_RATIO - originalAspectRatio) * -0.5, 0.0);
+    }
+  }
+
   public static final int[] NUM_PLAYERS_OPTION_VALUES = {2, 3, 4, 5, 6};
   public static final int[] GAMEOPT_CHOICES_COUNTS = {5, 7, 4, 5, 2};
   public static final Random globalRandom = new Random();
@@ -108,13 +150,13 @@ public final class ShatteredPlansClient extends JagexApplet {
   private static Component<?> _erj;
   private static boolean areAchievementsInitialized;
   public static AchievementRequest achievementRequest;
-  private static Component<Component<?>> _faX;
+  private static Component<Component<?>> tabChatPopupPanel;
   private static int _pgJ;
   private static String playerWhoKickedYou;
   private static long cannotStartGameUntil;
   private static int joinRequestCount;
   private static boolean findOpponentsButtonClicked;
-  private static int _tmh = 0;
+  private static int lobbyChatPanelX = 0;
   private static Component<?> HIDE_CHAT_TEMPORARILY_LABEL;
   private static Component<Component<?>> invitePlayersDialogContents;
   public static String currentServerName;
@@ -128,7 +170,6 @@ public final class ShatteredPlansClient extends JagexApplet {
   public static ClientLobbyRoom unratedLobbyRoom;
   private static byte[] playerSeatsFilledBitmap;
   private static boolean justRecievedRoomDetailsFromServer;
-  private static int[] _cfa;
   private static int _dmgm = SCREEN_HEIGHT;
   public static final String[] STAT_NAMES = new String[16];
   public static final String[] STAT_DESCS = new String[16];
@@ -326,10 +367,11 @@ public final class ShatteredPlansClient extends JagexApplet {
       STAT_DESCS[14] = StringConstants.TEXT_STAT_DESC_AGGRESSIVENESS;
       STAT_DESCS[15] = StringConstants.TEXT_STAT_DESC_SOLIDITY;
 
-      StringConstants.GAMEOPT_NAMES[0] = new String[5];
+      final int aiPlayerChoiceCount = GAMEOPT_CHOICES_COUNTS[0] = DEBUG_MODE ? 6 : 5;
+      StringConstants.GAMEOPT_NAMES[0] = new String[aiPlayerChoiceCount];
       GAMEOPT_TOOLTIPS = new String[5][];
-      GAMEOPT_TOOLTIPS[0] = new String[5];
-      for (int i = 0; i < 5; ++i) {
+      GAMEOPT_TOOLTIPS[0] = new String[aiPlayerChoiceCount];
+      for (int i = 0; i < aiPlayerChoiceCount; ++i) {
         StringConstants.GAMEOPT_NAMES[0][i] = Integer.toString(i);
         GAMEOPT_TOOLTIPS[0][i] = StringConstants.TEXT_TOTAL_PLAYERS;
       }
@@ -475,43 +517,43 @@ public final class ShatteredPlansClient extends JagexApplet {
 
     GameUI.ANIM_ICONS = SpriteResource.loadSprites(spriteLoader, "", "anim_icons");
 
-    GameView._cos = new ArgbSprite(6, 6);
-    GameView._cos.pixels[ 0] = 0;
-    GameView._cos.pixels[ 1] = 0;
-    GameView._cos.pixels[ 2] = 0x33ffffff;
-    GameView._cos.pixels[ 3] = 0x22ffffff;
-    GameView._cos.pixels[ 4] = 0;
-    GameView._cos.pixels[ 5] = 0;
-    GameView._cos.pixels[ 6] = 0;
-    GameView._cos.pixels[ 7] = 0xffa2a2a2;
-    GameView._cos.pixels[ 8] = 0xffc7c7c7;
-    GameView._cos.pixels[ 9] = 0xffaeaeae;
-    GameView._cos.pixels[10] = 0xff545454;
-    GameView._cos.pixels[11] = 0;
-    GameView._cos.pixels[12] = 0x10000000;
-    GameView._cos.pixels[13] = 0xffa9a9a9;
-    GameView._cos.pixels[14] = 0xffc5c5c5;
-    GameView._cos.pixels[15] = 0xffb2b2b2;
-    GameView._cos.pixels[16] = 0xff5d5d5d;
-    GameView._cos.pixels[17] = 0x44000000;
-    GameView._cos.pixels[18] = 0x20000000;
-    GameView._cos.pixels[19] = 0xff707070;
-    GameView._cos.pixels[20] = 0xff909090;
-    GameView._cos.pixels[21] = 0xff666666;
-    GameView._cos.pixels[22] = 0xff2a2a2a;
-    GameView._cos.pixels[23] = 0x48000000;
-    GameView._cos.pixels[24] = 0;
-    GameView._cos.pixels[25] = 0xff323232;
-    GameView._cos.pixels[26] = 0xff2b2b2b;
-    GameView._cos.pixels[27] = 0xff1d1d1d;
-    GameView._cos.pixels[28] = 0xff202020;
-    GameView._cos.pixels[29] = 0;
-    GameView._cos.pixels[30] = 0;
-    GameView._cos.pixels[31] = 0;
-    GameView._cos.pixels[32] = 503316480;
-    GameView._cos.pixels[33] = 0x1bffffff;
-    GameView._cos.pixels[34] = 0;
-    GameView._cos.pixels[35] = 0;
+    GameView.PROJECT_LAMP = new ArgbSprite(6, 6);
+    GameView.PROJECT_LAMP.pixels[ 0] = 0;
+    GameView.PROJECT_LAMP.pixels[ 1] = 0;
+    GameView.PROJECT_LAMP.pixels[ 2] = 0x33ffffff;
+    GameView.PROJECT_LAMP.pixels[ 3] = 0x22ffffff;
+    GameView.PROJECT_LAMP.pixels[ 4] = 0;
+    GameView.PROJECT_LAMP.pixels[ 5] = 0;
+    GameView.PROJECT_LAMP.pixels[ 6] = 0;
+    GameView.PROJECT_LAMP.pixels[ 7] = 0xffa2a2a2;
+    GameView.PROJECT_LAMP.pixels[ 8] = 0xffc7c7c7;
+    GameView.PROJECT_LAMP.pixels[ 9] = 0xffaeaeae;
+    GameView.PROJECT_LAMP.pixels[10] = 0xff545454;
+    GameView.PROJECT_LAMP.pixels[11] = 0;
+    GameView.PROJECT_LAMP.pixels[12] = 0x10000000;
+    GameView.PROJECT_LAMP.pixels[13] = 0xffa9a9a9;
+    GameView.PROJECT_LAMP.pixels[14] = 0xffc5c5c5;
+    GameView.PROJECT_LAMP.pixels[15] = 0xffb2b2b2;
+    GameView.PROJECT_LAMP.pixels[16] = 0xff5d5d5d;
+    GameView.PROJECT_LAMP.pixels[17] = 0x44000000;
+    GameView.PROJECT_LAMP.pixels[18] = 0x20000000;
+    GameView.PROJECT_LAMP.pixels[19] = 0xff707070;
+    GameView.PROJECT_LAMP.pixels[20] = 0xff909090;
+    GameView.PROJECT_LAMP.pixels[21] = 0xff666666;
+    GameView.PROJECT_LAMP.pixels[22] = 0xff2a2a2a;
+    GameView.PROJECT_LAMP.pixels[23] = 0x48000000;
+    GameView.PROJECT_LAMP.pixels[24] = 0;
+    GameView.PROJECT_LAMP.pixels[25] = 0xff323232;
+    GameView.PROJECT_LAMP.pixels[26] = 0xff2b2b2b;
+    GameView.PROJECT_LAMP.pixels[27] = 0xff1d1d1d;
+    GameView.PROJECT_LAMP.pixels[28] = 0xff202020;
+    GameView.PROJECT_LAMP.pixels[29] = 0;
+    GameView.PROJECT_LAMP.pixels[30] = 0;
+    GameView.PROJECT_LAMP.pixels[31] = 0;
+    GameView.PROJECT_LAMP.pixels[32] = 503316480;
+    GameView.PROJECT_LAMP.pixels[33] = 0x1bffffff;
+    GameView.PROJECT_LAMP.pixels[34] = 0;
+    GameView.PROJECT_LAMP.pixels[35] = 0;
 
     GameView.RES_SIDES = new ArgbSprite[6];
     GameView.RES_LOWS = new ArgbSprite[6];
@@ -663,7 +705,7 @@ public final class ShatteredPlansClient extends JagexApplet {
       chatMessageLabel.mouseOverTextColor = -(8355711 & _hoc >> 1) + _hoc + ((Component.UNSELECTED_LABEL.mouseOverTextColor & 16711422) >> 1);
       _erj = Component._cgC;
       chatMessageLabel._qb = -(_hoc >> 1 & 8355711) + _hoc + (Component.UNSELECTED_LABEL._qb >> 1 & 8355711);
-      _faX = new Component<>(null);
+      tabChatPopupPanel = new Component<>(null);
       _mbn = new Component<>(var2);
       _few = new Component<>(null);
       _abAb = new Component<>(null);
@@ -674,8 +716,8 @@ public final class ShatteredPlansClient extends JagexApplet {
       _abAb.addChild(Component._cgC);
       HIDE_CHAT_TEMPORARILY_LABEL = new Component<>(Component.UNSELECTED_LABEL, StringConstants.TAB_HIDE_CHAT_TEMPORARILY);
       _cbl = new Component<>(Component.UNSELECTED_LABEL);
-      _faX.addChild(_mbn);
-      _faX.addChild(_few);
+      tabChatPopupPanel.addChild(_mbn);
+      tabChatPopupPanel.addChild(_few);
       _few.addChild(_abAb);
       _few.addChild(HIDE_CHAT_TEMPORARILY_LABEL);
       _few.addChild(_cbl);
@@ -757,16 +799,16 @@ public final class ShatteredPlansClient extends JagexApplet {
 
   private static void a430u(final boolean var1) {
     if (ClientGameSession.playSession != null) {
-      ClientGameSession.playSession.render();
+      ClientGameSession.playSession.draw();
     }
 
     if (ClientGameSession.spectateSession != null) {
-      ClientGameSession.spectateSession.render();
+      ClientGameSession.spectateSession.draw();
     }
 
     if (_cjx && _tli) {
       final boolean var2 = playingGame && isChatboxSelected;
-      a813qr(var1 && !var2 && a154vc());
+      drawLobby(var1 && !var2 && a154vc());
       if (playingGame && isChatboxSelected) {
         a877rad(var1 && a154vc());
       }
@@ -780,13 +822,13 @@ public final class ShatteredPlansClient extends JagexApplet {
     chatMessageCount = 0;
   }
 
-  private static void a985no(final Canvas canvas) {
+  private static void drawLoading(final Canvas canvas) {
     if (JagexApplet.loadStage < LoadStage.REQUEST_GAME_STRINGS) {
       final boolean var3 = JagexBaseApplet._oqe;
       if (JagexBaseApplet._oqe) {
         JagexBaseApplet._oqe = false;
       }
-      drawLoadingScreen(loadingScreenMessage(), loadingScreenPercent(), var3);
+      drawLoadingScreen(loadingScreenPercent(), loadingScreenMessage(), var3);
     } else if (!JagexLogoIntroAnimation.isFinished()) {
       Drawing.clear();
       JagexLogoIntroAnimation.draw();
@@ -893,9 +935,9 @@ public final class ShatteredPlansClient extends JagexApplet {
     }
 
     if (inGame) {
-      _tmh = _gnt;
+      lobbyChatPanelX = _gnt;
     } else {
-      _tmh = (Component.lastLayoutWidth - SCREEN_WIDTH) / 2;
+      lobbyChatPanelX = (Component.lastLayoutWidth - SCREEN_WIDTH) / 2;
     }
 
     tickLobbyTransitionCounters(inGame);
@@ -1318,7 +1360,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     final int var0 = 400;
     final int var1 = var0 - _pgJ * _pgJ;
     final int var3 = _flf + var1 * (_dmgm - _flf) / var0;
-    Component._tgc.setBounds(_tmh, var3, SCREEN_WIDTH, 120);
+    Component.lobbyChatPanel.setBounds(lobbyChatPanelX, var3, SCREEN_WIDTH, 120);
     a370qc(_dmgm - 24, _tga, ClientLobbyRoom._qob);
   }
 
@@ -1360,8 +1402,8 @@ public final class ShatteredPlansClient extends JagexApplet {
     LOSE_SPRITE = loadJpgSprite(loader, "lose");
   }
 
-  private static void a813qr(final boolean var0) {
-    a540ta(var0);
+  private static void drawLobby(final boolean var0) {
+    drawLobbyPanels(var0);
     a877im(var0);
     a430mj(var0);
   }
@@ -1409,7 +1451,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   private static void a500er(final String var2, final boolean var4, final int var6) {
-    if (Component._taio.clickButton != MouseState.Button.NONE && !cannotChat) {
+    if (Component.lobbyChatMessageLabelPanel.clickButton != MouseState.Button.NONE && !cannotChat) {
       if (JagexApplet.canOnlyQuickChat) {
         ContextMenu.sendChannelMessageQC();
       } else {
@@ -1418,8 +1460,8 @@ public final class ShatteredPlansClient extends JagexApplet {
     }
 
     if (isChatboxSelected) {
-      a411ca(var2, var6);
-      _faX.rootProcessMouseEvents(var4);
+      layoutTabChatPopupPanel(var2, var6);
+      tabChatPopupPanel.rootProcessMouseEvents(var4);
       if (var4) {
         if (HIDE_CHAT_TEMPORARILY_LABEL.clickButton != MouseState.Button.NONE) {
           isChatboxSelected = false;
@@ -1434,7 +1476,7 @@ public final class ShatteredPlansClient extends JagexApplet {
 
   }
 
-  private static void a411ca(final String var3, final int var4) {
+  private static void layoutTabChatPopupPanel(final String var3, final int var4) {
     _mbn.label = var3;
     if (currentChatChannel == Channel.PRIVATE) {
       _cbl.label = ReportAbuseDialog._Kb;
@@ -1442,8 +1484,8 @@ public final class ShatteredPlansClient extends JagexApplet {
       _cbl.label = StringConstants.ESC_CANCEL_THIS_LINE;
     }
 
-    final short var9 = 495;
-    final byte var10 = 5;
+    final int tabChatPopupWidth = 495;
+    final int var10 = 5;
     _abAb.setBounds(5, var10, 485, Component.LABEL_HEIGHT);
     chatMessageLabel.setBounds(0, 0, -Component._cgC.width + _abAb.width, Component.LABEL_HEIGHT);
     Component._cgC.setBounds(chatMessageLabel.width, 0, Component._cgC.width, Component.LABEL_HEIGHT);
@@ -1452,11 +1494,11 @@ public final class ShatteredPlansClient extends JagexApplet {
     final int var11 = _cbl.e474();
     _cbl.setBounds(-var11 + (490), var13, var11, Component.LABEL_HEIGHT);
     int var12 = 5 + var13 + Component.LABEL_HEIGHT;
-    _mbn.setBounds(0, 0, var9, 20);
-    _few.setBounds(0, 20, var9, var12);
+    _mbn.setBounds(0, 0, tabChatPopupWidth, 20);
+    _few.setBounds(0, 20, tabChatPopupWidth, var12);
     _few.nineSliceSprites = Component.createGradientOutlineSprites(_few.height, 11579568, 8421504, 2105376);
     var12 += 20;
-    _faX.setBounds(73, -(var12 / 2) + 180, var9, var12);
+    tabChatPopupPanel.setBounds((SCREEN_WIDTH - tabChatPopupWidth) / 2, (SCREEN_HEIGHT * 3 / 8) - (var12 / 2), tabChatPopupWidth, var12);
   }
 
   private static void a111ph() {
@@ -1640,10 +1682,10 @@ public final class ShatteredPlansClient extends JagexApplet {
 
     if (_pgJ > 0) {
       a150bq();
-      Component._tgc.rootProcessMouseEvents(mouseNotYetHandled);
+      Component.lobbyChatPanel.rootProcessMouseEvents(mouseNotYetHandled);
       if (DobToEnableChatForm.instance != null) {
         if (cannotChat) {
-          DobToEnableChatForm.instance.tickRoot(Component._tgc.x2, Component._tgc.y2, mouseNotYetHandled);
+          DobToEnableChatForm.instance.tickRoot(Component.lobbyChatPanel.x2, Component.lobbyChatPanel.y2, mouseNotYetHandled);
         } else {
           DobToEnableChatForm.instance = null;
         }
@@ -1663,8 +1705,8 @@ public final class ShatteredPlansClient extends JagexApplet {
         }
       }
 
-      if (Component._a.clickButton != MouseState.Button.NONE) {
-        ReportAbuseDialog.openInstance = new ReportAbuseDialog(Component._a.x2, Component._a.y2, Component._a.width, Component._a.height, Component.TAB_ACTIVE, Component.CLOSE_BUTTON, Component.LABEL, Component.CHECKBOX, Component.UNSELECTED_LABEL, null, 0L);
+      if (Component.lobbyChatReportAbuseButton.clickButton != MouseState.Button.NONE) {
+        ReportAbuseDialog.openInstance = new ReportAbuseDialog(Component.lobbyChatReportAbuseButton.x2, Component.lobbyChatReportAbuseButton.y2, Component.lobbyChatReportAbuseButton.width, Component.lobbyChatReportAbuseButton.height, Component.TAB_ACTIVE, Component.CLOSE_BUTTON, Component.LABEL, Component.CHECKBOX, Component.UNSELECTED_LABEL, null, 0L);
       }
 
       final ChatMessage var7 = a249chmr(mouseWheelRotation, _tga);
@@ -1699,7 +1741,7 @@ public final class ShatteredPlansClient extends JagexApplet {
       }
     }
 
-    if (var1 == null && !_K && _faX == null) {
+    if (var1 == null && !_K && tabChatPopupPanel == null) {
       var1 = StringConstants.CHAT_VIEW_SCROLLED_UP;
     }
 
@@ -1921,7 +1963,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   private static boolean processChatKeyboardInput() {
-    final boolean var3 = (_K || _faX != null)
+    final boolean var3 = (_K || tabChatPopupPanel != null)
         && !(currentChatChannel == Channel.LOBBY && ratedLobbyRoom != null)
         && !(currentChatChannel == Channel.PRIVATE && !a788(ContextMenu.recipientPlayerId, ContextMenu.normalizedRecipientPlayerName));
 
@@ -2012,7 +2054,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   private static void b150nj() {
-    _faX = null;
+    tabChatPopupPanel = null;
     if (_cka != null) {
       Component._cgC = _erj;
       chatMessageLabel = _cka;
@@ -2270,7 +2312,7 @@ public final class ShatteredPlansClient extends JagexApplet {
 
   private static ChatMessage a249chmr(final int mouseWheelRotation, final int var2) {
     ChatMessage var4 = null;
-    Component._jiI.content.children.clear();
+    Component.lobbyChatMessagesScrollPane.content.children.clear();
     int var5 = 0;
     int var6 = 0;
 
@@ -2311,7 +2353,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     for (var13 = 0; chatMessageCount > var13; ++var13) {
       final ChatMessage var14 = chatMessages[var13];
       if (var14.component != null) {
-        Component._jiI.content.addChild(var14.component);
+        Component.lobbyChatMessagesScrollPane.content.addChild(var14.component);
         var14.component.setBounds(var2, var7, var14.component.e474(), Component.LABEL_HEIGHT);
         if (var14.component.clickButton != MouseState.Button.NONE) {
           var4 = var14;
@@ -2321,32 +2363,32 @@ public final class ShatteredPlansClient extends JagexApplet {
       }
     }
 
-    var13 = -var7 + var6 + Component._jiI.content.height + Component._jiI.content._gb;
-    Component._jiI.content.height -= var13;
-    Component._jiI.content.y += var13;
+    var13 = -var7 + var6 + Component.lobbyChatMessagesScrollPane.content.height + Component.lobbyChatMessagesScrollPane.content._gb;
+    Component.lobbyChatMessagesScrollPane.content.height -= var13;
+    Component.lobbyChatMessagesScrollPane.content.y += var13;
     if (ContextMenu._fpv) {
-      Component._jiI.content.height = var7;
+      Component.lobbyChatMessagesScrollPane.content.height = var7;
     }
 
-    Component._jiI.content._gb = -Component._jiI.content.height + var7;
+    Component.lobbyChatMessagesScrollPane.content._gb = -Component.lobbyChatMessagesScrollPane.content.height + var7;
     if (ContextMenu._fpv) {
       ContextMenu._fpv = false;
-      Component._jiI.content._w = 0;
+      Component.lobbyChatMessagesScrollPane.content._w = 0;
       _K = true;
-      Component._jiI.content.y = -Component._jiI.content.height + Component._jiI.viewport.height;
+      Component.lobbyChatMessagesScrollPane.content.y = -Component.lobbyChatMessagesScrollPane.content.height + Component.lobbyChatMessagesScrollPane.viewport.height;
     }
 
-    if (isChatboxSelected && _faX != null) {
+    if (isChatboxSelected && tabChatPopupPanel != null) {
       _K = true;
     }
 
-    final int var16 = Component._jiI.viewport.height - Component._jiI.content.height - Component._jiI.content._gb;
+    final int var16 = Component.lobbyChatMessagesScrollPane.viewport.height - Component.lobbyChatMessagesScrollPane.content.height - Component.lobbyChatMessagesScrollPane.content._gb;
     if (_K) {
-      Component._jiI.content._w = var16 - Component._jiI.content.y;
+      Component.lobbyChatMessagesScrollPane.content._w = var16 - Component.lobbyChatMessagesScrollPane.content.y;
     }
 
-    Component._jiI.a795(mouseWheelRotation * 2 * Component.LABEL_HEIGHT, Component.LABEL_HEIGHT);
-    _K = var16 == Component._jiI.content._w + Component._jiI.content.y;
+    Component.lobbyChatMessagesScrollPane.a795(mouseWheelRotation * 2 * Component.LABEL_HEIGHT, Component.LABEL_HEIGHT);
+    _K = var16 == Component.lobbyChatMessagesScrollPane.content._w + Component.lobbyChatMessagesScrollPane.content.y;
     return var4;
   }
 
@@ -2392,7 +2434,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   private static boolean a154vc() {
-    return (fullScreenCanvas != null || hadFocus) && (8 & currentTick) == 0;
+    return (fullScreenCanvas != null || hadFocus) && (currentTick & 8) == 0;
   }
 
   private static void b423jf() {
@@ -2438,53 +2480,19 @@ public final class ShatteredPlansClient extends JagexApplet {
   }
 
   public static void f423fr() {
-    final int x = (int) (1600.0D * (1.0D + Math.cos((float) currentTick / 500.0F)));
-    final int y = (int) (1600.0D * (1.0D - Math.sin((float) currentTick / 500.0F)));
-    if (renderQuality.antialiasStarfieldBackground) {
-      a034il(x, y, STAR_FIELD);
-      Drawing.horizontalLine(0, 0, SCREEN_WIDTH, 0);
-    } else {
-      STAR_FIELD.c093(-x >> 4, -y >> 4);
-    }
+    final double x = 100.0D * (1.0D + Math.cos((float) currentTick / 500.0F));
+    final double y = 100.0D * (1.0D - Math.sin((float) currentTick / 500.0F));
+    drawStarField(-x, -y);
   }
 
-  private static void a034il(int x, int y, final Sprite sprite) {
-    if (_cfa == null || _cfa.length != Drawing.width) {
-      _cfa = new int[Drawing.width];
-    }
-
-    final int var4 = y & 15;
-    y >>= 4;
-    final int var5 = x & 15;
-    x >>= 4;
-    int var12 = 0;
-    int var13 = sprite.width * y + x;
-    final int var14 = sprite.width - Drawing.width;
-
-    for (int var15 = -Drawing.height; var15 < 0; var13 += var14) {
-      int var16 = 0;
-
-      for (int var17 = Drawing.width - 1; var17 >= 0; --var17) {
-        final int var6 = sprite.pixels[var13];
-        final int var8 = var6 & '\uff00';
-        final int var7 = var6 & 16711935;
-        final int var10 = 267390960 & var5 * var7;
-        final int var11 = var5 * var8 & 1044480;
-        final int var9 = var11 | var10;
-        final int i = var16 + var9;
-        final int i1 = 267390960 & i;
-        var16 = (var6 << 4) - var9;
-        final int i2 = i & 1044480;
-        final int i3 = -16711936 & var4 * i1;
-        final int i4 = 16711680 & i2 * var4;
-        final int i5 = i3 | i4;
-        Drawing.screenBuffer[var12] = _cfa[var17] + i5 >> 8;
-        _cfa[var17] = (i << 4) - i5;
-        ++var12;
-        ++var13;
-      }
-
-      ++var15;
+  public static void drawStarField(final double x, final double y) {
+    if (renderQuality.antialiasStarfieldBackground || SCREEN_WIDTH != 640 || SCREEN_HEIGHT != 480) {
+      final AffineTransform transform = new AffineTransform();
+      transform.translate(x, y);
+      transform.concatenate(STAR_FIELD_TRANSFORM);
+      STAR_FIELD.drawAntialiased(transform);
+    } else {
+      STAR_FIELD.c093((int) x, (int) y);
     }
   }
 
@@ -2509,16 +2517,16 @@ public final class ShatteredPlansClient extends JagexApplet {
     return color;
   }
 
-  private static void a540ta(boolean var0) {
+  private static void drawLobbyPanels(boolean var0) {
     if (isPopupOpen()) {
       var0 = false;
     }
 
-    a877di(var0);
-    a893ml(var0);
+    drawLobbyBrowser(var0);
+    drawLobbyChatPanel(var0);
   }
 
-  private static void a877di(final boolean var0) {
+  private static void drawLobbyBrowser(final boolean var0) {
     Drawing.withLocalContext(() -> {
       Drawing.expandBoundsToInclude(Drawing.width - SCREEN_WIDTH >> 1, 0, Drawing.width + SCREEN_WIDTH >> 1, Drawing.height);
       if (lobbyBrowserTransitionCounter > 0) {
@@ -2526,8 +2534,8 @@ public final class ShatteredPlansClient extends JagexApplet {
           LOBBY_ICON.c093(Component.lobbyBrowserLeftPanel.x, 0);
         }
 
-        Component.lobbyBrowserLeftPanel.b540(var0 && !showYouHaveBeenKickedDialog);
-        Component.LOBBY_RIGHT_PANEL.b540(var0 && !showYouHaveBeenKickedDialog);
+        Component.lobbyBrowserLeftPanel.draw(var0 && !showYouHaveBeenKickedDialog);
+        Component.LOBBY_RIGHT_PANEL.draw(var0 && !showYouHaveBeenKickedDialog);
       }
 
       if (ratedLobbyRoomTransitionCounter > 0 || unratedLobbyRoomTransitionCounter > 0) {
@@ -2535,8 +2543,8 @@ public final class ShatteredPlansClient extends JagexApplet {
           LOBBY_ICON.c093(lobbyRoomLeftPanel.x, 0);
         }
 
-        lobbyRoomLeftPanel.b540(var0 && !invitePlayersDialogOpen);
-        Component.GAME_INFO_CONTAINER.b540(var0 && !invitePlayersDialogOpen);
+        lobbyRoomLeftPanel.draw(var0 && !invitePlayersDialogOpen);
+        Component.GAME_INFO_CONTAINER.draw(var0 && !invitePlayersDialogOpen);
       }
     });
   }
@@ -2549,7 +2557,7 @@ public final class ShatteredPlansClient extends JagexApplet {
       chatPanelY += (-chatPanelY + _dmgm) * var2 / var1;
     }
 
-    Component._tgc.setBounds(_tmh, chatPanelY, SCREEN_WIDTH, GameUI.CHAT_PANEL_HEIGHT);
+    Component.lobbyChatPanel.setBounds(lobbyChatPanelX, chatPanelY, SCREEN_WIDTH, GameUI.CHAT_PANEL_HEIGHT);
     a370qc(_dmgm - 24, _tga, ClientLobbyRoom._qob);
   }
 
@@ -3802,7 +3810,7 @@ public final class ShatteredPlansClient extends JagexApplet {
 
     a893r(var1);
     if (ReportAbuseDialog.openInstance != null) {
-      ReportAbuseDialog.openInstance.b540(var1);
+      ReportAbuseDialog.openInstance.draw(var1);
     }
 
     a540ho(var1);
@@ -3857,7 +3865,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     final int var2 = 400;
     final int var3 = var2 - transitionCounter * transitionCounter;
     lobbyRoomLeftPanel.setBounds(var1 - 199 * var3 / var2, 90, 199, Drawing.height - 120 - 94);
-    Component.GAME_INFO_CONTAINER.setBounds(438 * var3 / var2 + var1 + 202, 0, 438, Drawing.height - 124);
+    Component.GAME_INFO_CONTAINER.setBounds(438 * var3 / var2 + var1 + 202, 0, SCREEN_WIDTH - 202, Drawing.height - 124);
   }
 
   private static void a630gr(final boolean var0) {
@@ -3886,17 +3894,16 @@ public final class ShatteredPlansClient extends JagexApplet {
     }
   }
 
-  private static void a893ml(final boolean var0) {
-    Component._tgc.b540(var0);
+  private static void drawLobbyChatPanel(final boolean var0) {
+    Component.lobbyChatPanel.draw(var0);
     final DobToEnableChatForm var1 = DobToEnableChatForm.instance;
     if (var1 != null) {
-      var1.drawRoot(Component._tgc.x2, Component._tgc.y2);
+      var1.drawRoot(Component.lobbyChatPanel.x2, Component.lobbyChatPanel.y2);
     }
-
   }
 
   private static void a877rad(final boolean var0) {
-    _faX.b540(var0);
+    tabChatPopupPanel.draw(var0);
     if (ClientLobbyRoom.currentTooltip != null) {
       a407dk(ClientLobbyRoom.currentTooltip);
     }
@@ -3967,7 +3974,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   private static void a326ts(int var0, int var2) {
     var0 += 30;
     var2 += 30;
-    Menu.drawShine(-var0 + SCREEN_WIDTH >> 1, -var2 + SCREEN_HEIGHT >> 1, var0, var2);
+    Menu.drawPanel(-var0 + SCREEN_WIDTH >> 1, -var2 + SCREEN_HEIGHT >> 1, var0, var2);
   }
 
   private static void tickIgnoreList(final boolean mouseStill, final int mouseWheelRotation) {
@@ -4077,9 +4084,8 @@ public final class ShatteredPlansClient extends JagexApplet {
   private static void b150lc() {
     if (isQuickChatOpen) {
       Drawing.h115(Drawing.left, Drawing.top, -Drawing.left + Drawing.right, -Drawing.top + Drawing.bottom);
-      Component._uaf.b540(false);
+      Component._uaf.draw(false);
     }
-
   }
 
   public static void saveProfile() {
@@ -4137,7 +4143,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   private static void a540ho(final boolean var0) {
     if (QuickChatHelpPanel.openInstance != null) {
       Drawing.h115(Drawing.left, Drawing.top, Drawing.right - Drawing.left, -Drawing.top + Drawing.bottom);
-      QuickChatHelpPanel.openInstance.b540(var0);
+      QuickChatHelpPanel.openInstance.draw(var0);
     }
   }
 
@@ -4194,7 +4200,7 @@ public final class ShatteredPlansClient extends JagexApplet {
 
   private static void a893r(final boolean var0) {
     if (AddOrRemovePlayerPopup.openInstance != null) {
-      AddOrRemovePlayerPopup.openInstance.b540(var0);
+      AddOrRemovePlayerPopup.openInstance.draw(var0);
     }
   }
 
@@ -4857,7 +4863,7 @@ public final class ShatteredPlansClient extends JagexApplet {
   protected void render() {
     final Canvas canvas = fullScreenCanvas == null ? JagexBaseApplet.canvas : fullScreenCanvas;
     if (!isConnectedAndLoaded()) {
-      a985no(canvas);
+      drawLoading(canvas);
     } else if (!isFullyLoaded) {
       CommonUI.drawLoading();
       JagexBaseApplet.paint(canvas);
@@ -4899,7 +4905,7 @@ public final class ShatteredPlansClient extends JagexApplet {
       }
 
       if (!_cjx || !_tli) {
-        a813qr(a154vc());
+        drawLobby(a154vc());
       }
 
       if (_ebb > 0) {
@@ -4912,7 +4918,6 @@ public final class ShatteredPlansClient extends JagexApplet {
       } else if (f427kh()) {
         a630gr(true);
       } else if (Menu.isLobbyDialogOpen) {
-
         a326ts(Menu._ahR - Menu._ldj, Menu._rnb);
         Menu.a150rg();
       } else {
@@ -4930,7 +4935,7 @@ public final class ShatteredPlansClient extends JagexApplet {
           final int height = 36;
           final int x = 10 + (maxWidth - width >> 1);
           final int y = 10;
-          Menu.drawShine(x, y, width, height);
+          Menu.drawPanel(x, y, width, height);
           Drawing.withBounds(x, y, x + width, y + height, () -> {
             final int var7 = 10 + (maxWidth / 2);
             Menu.achievementIcon(var3.achievementIndex).draw(var7 + maxWidth / 2 - 36, 14);

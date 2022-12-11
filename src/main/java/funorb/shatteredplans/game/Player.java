@@ -29,7 +29,7 @@ public final class Player {
   public Sprite _p;
   public Sprite _v;
   public Sprite _o;
-  public Sprite _n;
+  public Sprite shipSprite;
   public Sprite _d;
 
   public Player(final int index, final String name, final int darkColor, final int color1, final int color2) {

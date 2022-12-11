@@ -56,10 +56,12 @@ public final class Resources {
       buttonGif.installForDrawing();
       Drawing.e115(Drawing.width, Drawing.height);
 
+      //noinspection SuspiciousNameCombination
       final Sprite var13 = new Sprite(buttonGif.height, buttonGif.height);
       var13.installForDrawing();
       buttonGif.c093(0, 0);
 
+      //noinspection SuspiciousNameCombination
       final Sprite var14 = new Sprite(buttonGif.height, buttonGif.height);
       var14.installForDrawing();
       buttonGif.c093(buttonGif.height - buttonGif.width, 0);

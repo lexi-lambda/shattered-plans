@@ -37,12 +37,10 @@ public final class Menu {
   private static final int[] MEMBERS_PAUSE_MENU_MULTIPLAYER_ITEMS_1 = {Item.RETURN_TO_GAME, Item.SOUND_VOLUME, Item.MUSIC_VOLUME, Item.FULLSCREEN, Item.INSTRUCTIONS_2, 11, Item.RESIGN, Item.RETURN_TO_LOBBY};
   private static final int[] MEMBERS_PAUSE_MENU_MULTIPLAYER_ITEMS_2 = new int[]{Item.RETURN_TO_GAME, Item.SOUND_VOLUME, Item.MUSIC_VOLUME, Item.FULLSCREEN, Item.INSTRUCTIONS_2, 13, Item.RETURN_TO_LOBBY};
   private static final int[] MEMBERS_PAUSE_MENU_MULTIPLAYER_ITEMS_3 = new int[]{Item.RETURN_TO_GAME, Item.SOUND_VOLUME, Item.MUSIC_VOLUME, Item.FULLSCREEN, Item.INSTRUCTIONS_2, Item.RETURN_TO_LOBBY};
-  public static final int[] _emc = new int[4];
   public static final Menu[] menus = new Menu[14];
   public static final Queue<RankingsRequest> rankingsRequests = new ArrayDeque<>();
   private static final int[] _vnr = new int[6];
   private static final int[] _ndd = new int[]{1, 1, 2, 2, 3, 1, 3, 2, 2, 2, 3, 3, 1, 3, 5, 5, 5, 5, 3, 5, 3, 5, 1, 1, 5};
-  public static final int[] _pmDb = new int[4];
   private static final int[] _eig = new int[]{100, 100, 200, 200, 300, 100, 300, 200, 200, 200, 300, 300, 100, 300, 500, 500, 500, 500, 300, 500, 300, 500, 100, 100, 500};
   private static final int[] _kcm = new int[4];
   private static final int[] _sf = new int[4];
@@ -212,8 +210,8 @@ public final class Menu {
     }
   }
 
-  public static void drawShine(final int x, final int y, final int width, final int height) {
-    drawShine(x, y, width, height, 0x3ca4a7);
+  public static void drawPanel(final int x, final int y, final int width, final int height) {
+    drawPanel(x, y, width, height, 0x3ca4a7);
   }
 
   private static void register(@MagicConstant(valuesFromClass = Id.class) final int id,
@@ -256,21 +254,6 @@ public final class Menu {
     }
 
     _kbA -= 294;
-  }
-
-  public static void a487ai() {
-    double var0 = Math.PI * (double) (ShatteredPlansClient.currentTick % 512) / 256.0D;
-    final int var2 = 16 * (GameUI.FACTION_RING.width / 2 - 9);
-    _emc[0] = (int) ((double) var2 * Math.sin(var0));
-    _pmDb[0] = (int) (Math.cos(var0) * (double) var2);
-    _emc[1] = -_emc[0];
-    _pmDb[1] = -_pmDb[0];
-    var0 += 2.0943951023931953D;
-    _emc[2] = (int) (Math.sin(var0) * (double) var2);
-    _pmDb[2] = (int) ((double) var2 * Math.cos(var0));
-    var0 += 2.0943951023931953D;
-    _emc[3] = (int) (Math.sin(var0) * (double) var2);
-    _pmDb[3] = (int) (Math.cos(var0) * (double) var2);
   }
 
   private static void a150mgf() {
@@ -531,7 +514,7 @@ public final class Menu {
     }
   }
 
-  public static void drawShine(final int x, final int y, final int width, final int height, final int color, final boolean var0) {
+  public static void drawPanel(final int x, final int y, final int width, final int height, final int color, final boolean shiny) {
     if (width > 20 && height > 20) {
       final int[] bounds = new int[4];
       Drawing.saveBoundsTo(bounds);
@@ -558,7 +541,7 @@ public final class Menu {
         Drawing.setPixel(width + (x - 1), var8 + 10 + y, color2);
       }
 
-      if (var0) {
+      if (shiny) {
         SHINE_LEFT.drawAdd(x + 4, y + 3, 256);
         final int var8 = x + 4 + SHINE_LEFT.width;
         final int var9 = x + width - 3 - SHINE_RIGHT.width;
@@ -572,8 +555,8 @@ public final class Menu {
     }
   }
 
-  public static void drawShine(final int x, final int y, final int width, final int height, final int color) {
-    drawShine(x, y, width, height, color, false);
+  public static void drawPanel(final int x, final int y, final int width, final int height, final int color) {
+    drawPanel(x, y, width, height, color, false);
   }
 
   private static void a669ks(int var0, final int var2, int var3, int var4) {
@@ -1133,7 +1116,7 @@ public final class Menu {
         Drawing.fillRect(var4, var9, var8, var10, 0x0d0d14, (128 - var2) << 1);
       }
 
-      drawShine(var4, var9, var8, var10);
+      drawPanel(var4, var9, var8, var10);
       Drawing.saveBoundsTo(_sf);
       Drawing.setBounds(var4, var9, var4 + var8, var9 + var10);
       this.e093(var5, 7903);
@@ -1495,7 +1478,7 @@ public final class Menu {
     final int var4 = this.b474() - (var2 - this.c137() >> 1);
     final int var5 = this.h137() - 48 - var3;
     if (var2 > 20) {
-      drawShine(var4, var5, var2, var3);
+      drawPanel(var4, var5, var2, var3);
     }
 
     if (_onc == 32) {
@@ -1624,7 +1607,7 @@ public final class Menu {
     final int var12 = 20 + var4;
     final int var13 = var5 - 10;
     final int var14 = var6 + 10;
-    drawShine(var9, var13, var12, var14);
+    drawPanel(var9, var13, var12, var14);
     Drawing.saveBoundsTo(_sf);
     final int var15 = var10 + (var9 - 20);
     final int var16 = var12 + var9;
@@ -1651,7 +1634,7 @@ public final class Menu {
       final int var4 = this.b474() - (-this.c137() + var2 >> 1);
       final int var5 = this.h137() - var3 - 24;
       if (var2 > 20) {
-        drawShine(var4, var5, var2, var3);
+        drawPanel(var4, var5, var2, var3);
       }
 
       Drawing.setBounds(var4 + 8, 8 + var5, var2 + (var4 - 8), var3 + var5 - 8);
@@ -1711,7 +1694,7 @@ public final class Menu {
     final int var5 = this.b474() - (var3 - this.c137() >> 1);
     final int var6 = this.h137() - 60 - var4 - 48;
     if (var3 > 20) {
-      drawShine(var5, var6, var3, var4);
+      drawPanel(var5, var6, var3, var4);
     }
 
     Drawing.setBounds(8 + var5, 8 + var6, var5 + var3 - 8, var6 - 8 + var4);
@@ -1869,17 +1852,17 @@ public final class Menu {
           var34 = 390;
         }
 
-        a487ai();
-        Drawing.drawCircleGradientAdd(16 * var34 + _emc[0], _pmDb[0] + y * 16, 50, 7, GameUI._hs);
+        GameView.a487ai();
+        Drawing.drawCircleGradientAdd(16 * var34 + GameView.systemScoreOrbXOffsets[0], GameView.systemScoreOrbYOffsets[0] + y * 16, 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
         SMALL_FONT.draw(StringConstants.TEXT_INSTRUCTIONS_ICON_TERRAFORMED, var34 + 22, y + SMALL_FONT.ascent / 4, Drawing.WHITE);
         y += 40;
-        Drawing.drawCircleGradientAdd(16 * var34 + _emc[0], _pmDb[0] + 16 * y, 50, 7, GameUI._hs);
-        Drawing.drawCircleGradientAdd(_emc[1] + 16 * var34, 16 * y + _pmDb[1], 50, 7, GameUI._hs);
+        Drawing.drawCircleGradientAdd(16 * var34 + GameView.systemScoreOrbXOffsets[0], GameView.systemScoreOrbYOffsets[0] + 16 * y, 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
+        Drawing.drawCircleGradientAdd(GameView.systemScoreOrbXOffsets[1] + 16 * var34, 16 * y + GameView.systemScoreOrbYOffsets[1], 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
         SMALL_FONT.draw(StringConstants.TEXT_INSTRUCTIONS_ICON_NEUTRAL, var34 + 22, SMALL_FONT.ascent / 4 + y, Drawing.WHITE);
         y += 40;
-        Drawing.drawCircleGradientAdd(16 * var34 + _emc[0], y * 16 + _pmDb[0], 50, 7, GameUI._hs);
-        Drawing.drawCircleGradientAdd(_emc[2] + var34 * 16, _pmDb[2] + 16 * y, 50, 7, GameUI._hs);
-        Drawing.drawCircleGradientAdd(_emc[3] + var34 * 16, _pmDb[3] + y * 16, 50, 7, GameUI._hs);
+        Drawing.drawCircleGradientAdd(16 * var34 + GameView.systemScoreOrbXOffsets[0], y * 16 + GameView.systemScoreOrbYOffsets[0], 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
+        Drawing.drawCircleGradientAdd(GameView.systemScoreOrbXOffsets[2] + var34 * 16, GameView.systemScoreOrbYOffsets[2] + 16 * y, 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
+        Drawing.drawCircleGradientAdd(GameView.systemScoreOrbXOffsets[3] + var34 * 16, GameView.systemScoreOrbYOffsets[3] + y * 16, 50, 7, GameUI.SYSTEM_SCORE_ORB_GRADIENT);
         SMALL_FONT.draw(StringConstants.TEXT_INSTRUCTIONS_ICON_HOMEWORLD, var34 + 22, y + SMALL_FONT.ascent / 4, Drawing.WHITE);
         y += 40;
         GameView.DEFNET_ANIM_SMALL[0].b115(var34 - 15, y - 15, 30, 30);
@@ -1906,7 +1889,7 @@ public final class Menu {
         var10 = SMALL_FONT.drawParagraph(ShatteredPlansClient.templateDictionary.expand(var5), x + 80, y, var6 - 80, var7, Drawing.WHITE, Font.HorizontalAlignment.JUSTIFY, Font.VerticalAlignment.TOP, var8);
         y += (3 + var10 * 4) * var8 >> 2;
         final int var11 = ShatteredPlansClient.currentTick % 200;
-        GameView.a070eo(false, 68 + y, y + 40, var11, 55 + x, x);
+        GameView.a070eo(x, 68 + y, 55 + x, y + 40, var11, false);
         this.a346(y + 40, var11, x + 55, false, x, y + 68, 0, false);
         var5 = StringConstants.TEXT_INSTRUCTIONS_MOVEMENT;
         var10 = SMALL_FONT.drawParagraph(ShatteredPlansClient.templateDictionary.expand(var5), x + 80, y, var6 - 80, var7, Drawing.WHITE, Font.HorizontalAlignment.JUSTIFY, Font.VerticalAlignment.TOP, var8);
@@ -2096,7 +2079,7 @@ public final class Menu {
         var21 = var8 + var8 * var31;
         SMALL_FONT.drawParagraph(var17, var12, y, var14, var21, Drawing.WHITE, Font.HorizontalAlignment.LEFT, Font.VerticalAlignment.MIDDLE, var8);
         SMALL_FONT.drawParagraph(var18, var13, y, var15, var21, Drawing.WHITE, Font.HorizontalAlignment.LEFT, Font.VerticalAlignment.MIDDLE, var8);
-        GameView.a070eo(false, y + 25, 25 + y, var9, x + 100, x);
+        GameView.a070eo(x, y + 25, x + 100, 25 + y, var9, false);
         this.a346(y + 25, var9, x + 100, false, x, 25 + y, 8, true);
         var22 = (50 + ShatteredPlansClient.currentTick) % 800 / 200;
         this.a132(x + 295, 16, var22, (var21 >> 1) + y, (ShatteredPlansClient.currentTick + 50) % 200);
@@ -2109,7 +2092,7 @@ public final class Menu {
         var21 = var8 * var10 + var8;
         SMALL_FONT.drawParagraph(s, var12, var11, var14, var21, Drawing.WHITE, Font.HorizontalAlignment.LEFT, Font.VerticalAlignment.MIDDLE, var8);
         SMALL_FONT.drawParagraph(a456, var13, var11, var15, var21, Drawing.WHITE, Font.HorizontalAlignment.LEFT, Font.VerticalAlignment.MIDDLE, var8);
-        GameView.a070eo(false, 90 + y, 90 + y, var9, x + 10, x + 110);
+        GameView.a070eo(x + 110, 90 + y, x + 10, 90 + y, var9, false);
         this.a346(90 + y, var9, x + 10, true, 110 + x, 90 + y, 4, true);
         this.a132(x + 295, 16, -1, var11 + (var21 >> 1), (100 + ShatteredPlansClient.currentTick) % 200);
         var11 += var8 + var21;
@@ -2378,7 +2361,7 @@ public final class Menu {
     final int var7 = 20 + var2;
     final int var8 = var4 - 10;
     final int var9 = var3 + 10;
-    drawShine(var5, var8, var7, var9);
+    drawPanel(var5, var8, var7, var9);
     this.e093(var4, 7903);
   }
 
@@ -2574,7 +2557,7 @@ public final class Menu {
     final int var12 = (ShatteredPlansClient.SCREEN_WIDTH - var30) / 2;
     final short var13 = 220;
     if (var30 > 20) {
-      drawShine(var12, var13, var30, var11);
+      drawPanel(var12, var13, var30, var11);
     }
 
     Drawing.setBounds(10 + var12, var13, var12 + var30 - 10, 375);

@@ -259,7 +259,7 @@ public final class ClientGameSession extends GameSession {
   private void showChatMessage(final Player player, final String message) {
     if (!this.isTutorial) {
       final String var4 = player.name + ": ";
-      int var5 = Component._jiI.width;
+      int var5 = Component.lobbyChatMessagesScrollPane.width;
       if (this.isMultiplayer) {
         var5 -= Component.CHAT_FONT.measureLineWidth("[" + Strings.format(StringConstants.XS_GAME, this.gameState.players[0].name) + "] ");
       }
@@ -445,8 +445,8 @@ public final class ClientGameSession extends GameSession {
     this.recalculateTacticalOverlay();
   }
 
-  public void render() {
-    this.gameView.render(this.gameState.tannhauserLinks, this.gameState.projectOrders, ShatteredPlansClient.debugModeEnabled && this.desynced);
+  public void draw() {
+    this.gameView.draw(this.gameState.tannhauserLinks, this.gameState.projectOrders, ShatteredPlansClient.debugModeEnabled && this.desynced);
   }
 
   private void handleRightClickOrderCanceling(final int mouseX, final int mouseY) {
@@ -501,30 +501,35 @@ public final class ClientGameSession extends GameSession {
   @SuppressWarnings("SameParameterValue")
   public boolean handlePacket(final int type, final CipheredBuffer packet, final int len) {
     switch (type) {
-      case S2CPacket.Type.VICTORY:
+      case S2CPacket.Type.VICTORY -> {
         final byte winnerId = packet.readByte();
         this.gameState.setWinner(winnerId);
         this.handleVictory();
         return true;
-      case S2CPacket.Type.DRAW_OFFERS:
+      }
+      case S2CPacket.Type.DRAW_OFFERS -> {
         this.gameState.receivePlayersOfferingDrawBitmap(packet.readUByte());
         if (playSession == this) {
           updateDrawOfferMenuItem();
         }
         return true;
-      case S2CPacket.Type.RESIGNATIONS:
+      }
+      case S2CPacket.Type.RESIGNATIONS -> {
         this.gameState.receiveResignedPlayersBitmap(packet.readUByte());
         return true;
-      case S2CPacket.Type.REMATCH_OFFERS:
+      }
+      case S2CPacket.Type.REMATCH_OFFERS -> {
         this.gameState.receivePlayersOfferingRematchBitmap(packet.readUByte());
         if (this == playSession) {
           ShatteredPlansClient.a150wp();
         }
         return true;
-      case S2CPacket.Type.PLAYERS_LEFT:
+      }
+      case S2CPacket.Type.PLAYERS_LEFT -> {
         this.leftPlayersBitmap = packet.readUByte();
         return true;
-      case S2CPacket.Type.ADVANCE_TURN: {
+      }
+      case S2CPacket.Type.ADVANCE_TURN -> {
         final int turnNumber = packet.readUByte();
         final int alliances = packet.readUShort();
         final int turnSeed = packet.readInt();
@@ -566,30 +571,34 @@ public final class ClientGameSession extends GameSession {
         this.turnTicksLeft = turnTicksLeft;
         return true;
       }
-      case S2CPacket.Type.TURN_ORDERS:
+      case S2CPacket.Type.TURN_ORDERS -> {
         this.readTurnOrders(packet, len);
         return true;
-      case S2CPacket.Type.DIPLOMATIC_PACTS:
+      }
+      case S2CPacket.Type.DIPLOMATIC_PACTS -> {
         this.readPactUpdates(packet, len);
         return true;
-      case S2CPacket.Type.PLAYERS_WAITING_ON:
+      }
+      case S2CPacket.Type.PLAYERS_WAITING_ON -> {
         this.playersWaitingOn = packet.readUByte();
         return true;
-      case S2CPacket.Type.TURN_ORDERS_AND_UPDATE:
+      }
+      case S2CPacket.Type.TURN_ORDERS_AND_UPDATE -> {
         this.readTurnOrdersAndUpdate(packet, len);
         return true;
-      case S2CPacket.Type.RESEND_ALL_TURN_ORDERS:
+      }
+      case S2CPacket.Type.RESEND_ALL_TURN_ORDERS -> {
         this.resendAllTurnOrders();
         return true;
-      case S2CPacket.Type.AI_CHAT: {
+      }
+      case S2CPacket.Type.AI_CHAT -> {
         final int senderIndex = packet.readUByte();
-        @MagicConstant(valuesFromClass = StringConstants.AIMessage.class)
-        final int which = packet.readUByte();
+        @MagicConstant(valuesFromClass = StringConstants.AIMessage.class) final int which = packet.readUByte();
         final int systemIndex = packet.readUByte();
         this.showAIChatMessage(this.gameState.players[senderIndex], this.localPlayer, which, systemIndex);
         return true;
       }
-      case 74:
+      case 74 -> {
         if (ShatteredPlansClient.debugModeEnabled) {
           final int var2 = len / 4;
           for (int i = 0; i < var2; ++i) {
@@ -603,8 +612,10 @@ public final class ClientGameSession extends GameSession {
         } else {
           return false;
         }
-      default:
+      }
+      default -> {
         return false;
+      }
     }
   }
 
@@ -749,9 +760,8 @@ public final class ClientGameSession extends GameSession {
     }
 
     if (!mouseHandled && JagexApplet.mouseWheelRotation != 0) {
-      final short var11 = 320;
       final int var7 = this.ui.getHeight() / 2;
-      final float var8 = var3 + (float) (JagexApplet.mouseX - var11) * this.gameView.unitScalingFactor / 300.0F;
+      final float var8 = var3 + (float) (JagexApplet.mouseX - ShatteredPlansClient.SCREEN_CENTER_X) * this.gameView.unitScalingFactor / 300.0F;
       final float var9 = (float) (JagexApplet.mouseY - var7) * this.gameView.unitScalingFactor / 300.0F + var4;
       int var10;
       if (JagexApplet.mouseWheelRotation <= 0) {
@@ -772,7 +782,7 @@ public final class ClientGameSession extends GameSession {
         }
       }
 
-      var3 = var8 - var5 * (float) (-320 + JagexApplet.mouseX) / 300.0F;
+      var3 = var8 - var5 * (float) (JagexApplet.mouseX - ShatteredPlansClient.SCREEN_CENTER_X) / 300.0F;
       var4 = var9 - var5 * (float) (JagexApplet.mouseY - var7) / 300.0F;
       if (var3 < 0.0F) {
         var3 = 0.0F;
@@ -1004,9 +1014,9 @@ public final class ClientGameSession extends GameSession {
       --len;
       if (type == 0) {
         final int offers = packet.readUByte();
+        --len;
         final int newOffers = ~this.localPlayer.incomingPactOffersBitmap & offers;
         this.localPlayer.incomingPactOffersBitmap = offers;
-        --len;
         if (newOffers == 0) {
           continue;
         }
@@ -1019,12 +1029,12 @@ public final class ClientGameSession extends GameSession {
       } else if (type == 1) {
         final int offererIndex = packet.readUByte();
         final int offereeIndex = packet.readUByte();
+        len -= 2;
         final Player offerer = this.gameState.players[offererIndex];
         final Player offeree = this.gameState.players[offereeIndex];
         JagexApplet.printDebug("RECV PACT " + offerer + " <-> " + offeree);
         Player.establishPact(offerer, offeree);
         this.handlePactAccepted(offerer, offeree);
-        len -= 3;
       }
     }
   }
@@ -1292,15 +1302,15 @@ public final class ClientGameSession extends GameSession {
             Sounds.play(Sounds.SFX_SHIP_SELECTION);
             this.ui.setPlacementMode(PlacementMode.MOVE_FLEET_DEST);
 
-            this.gameView.highlightedSystems[this.selectedSystem.index] = SystemHighlight.SOURCE;
+            this.gameView.highlightedSystems[this.selectedSystem.index] = SystemHighlight.GREEN;
             for (final StarSystem neighbor : this.selectedSystem.neighbors) {
               if (neighbor.owner == null || !this.localPlayer.allies[neighbor.owner.index]) {
-                this.gameView.highlightedSystems[neighbor.index] = SystemHighlight.TARGET;
+                this.gameView.highlightedSystems[neighbor.index] = SystemHighlight.GRAY;
               }
             }
             for (final StarSystem system : this.selectedSystem.contiguousForce) {
               if (system != this.selectedSystem && this.gameState.movementInRange(this.selectedSystem, system)) {
-                this.gameView.highlightedSystems[system.index] = SystemHighlight.TARGET;
+                this.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
               }
             }
           }
@@ -1415,7 +1425,7 @@ public final class ClientGameSession extends GameSession {
 
             for (final StarSystem system : this.gameState.map.systems) {
               if (system != this.gameView.targetedSystem && !this.gameView.targetedSystem.hasNeighbor(system)) {
-                this.gameView.highlightedSystems[system.index] = SystemHighlight.TARGET;
+                this.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
               }
             }
           }
@@ -1806,7 +1816,7 @@ public final class ClientGameSession extends GameSession {
     } else {
       this.ui.setPlacementMode(PlacementMode.BUILD_FLEET);
       for (final StarSystem system : this.selectedForce) {
-        this.gameView.highlightedSystems[system.index] = SystemHighlight.TARGET;
+        this.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
       }
     }
     this.recalculateTacticalOverlay();

@@ -9,16 +9,36 @@ Shattered Plans is a turn-based strategy game by [Jagex Ltd.][jagex] It was orig
 Running Shattered Plans requires [Java 17 or newer][download-java] and [the latest version of the game JAR][download-shattered-plans]. You can then run the game by running the following command:
 
 ```sh
-java -jar shattered-plans-0.0.5.jar --local-server
+java -jar shatteredplans-0.0.6.jar --local-server
 ```
 
 As the name suggests, passing the `--local-server` flag will run a Shattered Plans server locally, allowing you to play the game in singleplayer mode. Other players can connect to your server by running
 
 ```sh
-java -jar shattered-plans-0.0.5.jar --host <HOST>
+java -jar shatteredplans-0.0.6.jar --host <HOST>
 ```
 
 replacing `<HOST>` with your IP address. By default, the server runs on port 43594, but you can specify a different port using the `--port` flag. A few other options are also available, pass `--help` to see them all.
+
+### Experimental: Adjusting the user interface scale
+
+Limited support for adjusting the UI scale is available by setting one or both of the following JVM properties:
+
+  * `funorb.shatteredplans.client.uiScale` — Accepts any real value, but reasonable values are in the range `1.0`–`3.0`. The default is `1.0`. Larger values increase the internal resolution of the game’s renderer, which effectively makes individual user interface elements smaller.
+
+  * `funorb.shatteredplans.client.aspectRatio` — Accepts a ratio of two integers in the format `N:M`. The default is `4:3`, and the most reasonable alternative value is `16:9`.
+
+For example, the following command will force the game to render at 1.5× standard height using a widescreen aspect ratio:
+
+```sh
+java -Dfunorb.shatteredplans.client.uiScale=1.5 -Dfunorb.shatteredplans.client.aspectRatio=16:9 -jar shatteredplans-0.0.6.jar
+```
+
+In-game, the result looks like this:
+
+[![Screenshot of widescreen Shattered Plans gameplay.][screenshot-widescreen.png]][screenshot-widescreen.png]
+
+Setting these options is particularly useful on large screens, as it makes the in-game user interface less cramped. However, the game was originally designed to run at a fixed resolution of 640×480, so altering the UI scale may cause rendering glitches, and particularly large resolutions may cause performance problems on slower machines. All the critical UIs in the game have been patched to automatically adapt to larger UI scales, but some minor visual issues remain.
 
 ## What works, what doesn’t, and other limitations
 
@@ -49,9 +69,10 @@ If you’d like to find people to play with, or if you have any further question
 Shattered Plans and FunOrb are the property of [Jagex Ltd.][jagex] This project is a fan effort to keep a wonderful, creative game from being permanently lost. I do not commercially benefit from this project in any way, and it does not compete in any way with any of Jagex’s current commercial offerings, none of which are even remotely similar to Shattered Plans.
 
 [download-java]: https://www.oracle.com/java/technologies/downloads/
-[download-shattered-plans]: https://github.com/lexi-lambda/shattered-plans/releases/download/v0.0.5/shatteredplans-0.0.5.jar
+[download-shattered-plans]: https://github.com/lexi-lambda/shattered-plans/releases/download/v0.0.6/shatteredplans-0.0.6.jar
 [FunOrb]: https://en.wikipedia.org/wiki/FunOrb
 [funorb-discord]: https://discord.gg/MGfDrDf
 [funorb-wiki:shattered-plans]: https://funorb.fandom.com/wiki/Shattered_Plans
 [jagex]: https://www.jagex.com/
 [screenshot.png]: docs/screenshot.png
+[screenshot-widescreen.png]: docs/screenshot-widescreen.png

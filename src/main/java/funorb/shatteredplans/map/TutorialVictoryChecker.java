@@ -76,9 +76,7 @@ public final class TutorialVictoryChecker extends VictoryChecker {
       }
 
       return true;
-    } else if (TutorialState.stage < 6) {
-      return false;
-    } else if (!state.isPlayerDefeated(2)) {
+    } else if (TutorialState.stage < 6 || !state.isPlayerDefeated(2)) {
       return false;
     } else {
       this.victors = new Player[1];

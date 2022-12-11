@@ -119,9 +119,8 @@ public class Label extends Button {
   public final void handleClicked(final int button, final int x, final int y) {
     super.handleClicked(button, x, y);
     if (this.listener != null) {
-      this.hotspotAt(x - this.x, y - this.y).ifPresent(hotspot -> {
-        ((LinkedTextListener) this.listener).handleLinkClicked(hotspot.index);
-      });
+      this.hotspotAt(x - this.x, y - this.y).ifPresent(hotspot ->
+          ((LinkedTextListener) this.listener).handleLinkClicked(hotspot.index));
     }
   }
 
@@ -131,6 +130,7 @@ public class Label extends Button {
         .findFirst();
   }
 
+  @SuppressWarnings("WeakerAccess")
   private static final class Hotspot {
     public final int index;
     public final int x;
