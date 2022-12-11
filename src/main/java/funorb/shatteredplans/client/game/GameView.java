@@ -3082,6 +3082,8 @@ public final class GameView extends AbstractGameView {
       if (owner == this.localPlayer && this.localPlayer != null) {
         if (!this.tacticalAnalysis.isOwnershipPossible(system)) {
           drawSystemHatching(var6, Drawing.RED, this.tacticalAnalysis.getEarliestGuaranteedCollapseWave(system) == 0 ? 192 : 96);
+        } else if (this.tacticalAnalysis.isThreatened(system)) {
+          drawSystemHatching(var6, Drawing.ORANGE, 192);
         } else if (!this.tacticalAnalysis.isOwnershipGuaranteed(system)) {
           drawSystemHatching(var6, Drawing.YELLOW, this.tacticalAnalysis.getEarliestPossibleCollapseWave(system) == 0 ? 128 : 64);
         }

@@ -21,6 +21,7 @@ public final class Drawing {
   public static final int RED = 0xff0000;
   public static final int GREEN = 0x00ff00;
   public static final int YELLOW = 0xffff00;
+  public static final int ORANGE = 0xff8000;
   public static int[] screenBuffer;
   public static int width;
   public static int height;
