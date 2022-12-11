@@ -22,7 +22,7 @@ public final class MidiPlayerNoteState_idk extends NodeList.Node {
   public int _h;
   public int noteOffNote_idk;
   public int volume_idk;
-  public int _p;
+  public int lenRemaining_idk;
   public int _B;
   public int vibratoPhase_idk;
 

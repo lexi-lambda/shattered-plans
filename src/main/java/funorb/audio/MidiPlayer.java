@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 // "play time" has units of tick-microseconds per quarter note, i.e. it has an extra factor of ticks per
-// quarter note in it, which is constant for any given song
+// quarter note in it, which is constant for any given song. "play time" is abbreviated to "pt" in many places
 public final class MidiPlayer extends AudioSource {
   private static final double PHASE_512_TO_RADIANS = 0.01227184630308513D;
 
@@ -41,9 +41,9 @@ public final class MidiPlayer extends AudioSource {
   private int microsecondsPerSecond = 1000000;
   private final int[] chExpression = new int[16];
   private int trackWithSoonestEvent;
-  private long lastBufferPlayTime;
+  private long outputPt;
   private int nextEventTicks;
-  private long currentPlayTime;
+  private long playerPt;
   private boolean looped;
   private SongData songData;
 
@@ -172,20 +172,20 @@ public final class MidiPlayer extends AudioSource {
   @Override
   public synchronized void processAndWrite(final int[] dataS16P8, int offset, int len) {
     if (this.midiReader.isLoaded()) {
-      final int var4 = this.midiReader.ticksPerQuarterNote * this.microsecondsPerSecond / SampledAudioChannelS16.SAMPLE_RATE;
+      final long ptPerSample = this.midiReader.ticksPerQuarterNote * this.microsecondsPerSecond / SampledAudioChannelS16.SAMPLE_RATE;
 
       do {
-        final long var5 = this.lastBufferPlayTime + (long) len * (long) var4;
-        if (this.currentPlayTime - var5 >= 0L) {
-          this.lastBufferPlayTime = var5;
+        final long bufferPt = this.outputPt + len * ptPerSample;
+        if (this.playerPt - bufferPt >= 0L) {
+          this.outputPt = bufferPt;
           break;
         }
 
-        final int var7 = (int) ((-this.lastBufferPlayTime + (this.currentPlayTime - (-((long) var4) + 1L))) / (long) var4);
-        this.lastBufferPlayTime += (long) var7 * (long) var4;
-        this.noteSet.processAndWrite(dataS16P8, offset, var7);
-        offset += var7;
-        len -= var7;
+        final long samples = (this.playerPt - this.outputPt + ptPerSample - 1L) / ptPerSample;
+        this.outputPt += samples * ptPerSample;
+        this.noteSet.processAndWrite(dataS16P8, offset, (int) samples);
+        offset += samples;
+        len -= samples;
         this.pumpEvents();
       } while (this.midiReader.isLoaded());
     }
@@ -196,19 +196,19 @@ public final class MidiPlayer extends AudioSource {
   @Override
   public synchronized void processAndDiscard(int len) {
     if (this.midiReader.isLoaded()) {
-      final int samplesToPlayTime = this.midiReader.ticksPerQuarterNote * this.microsecondsPerSecond / SampledAudioChannelS16.SAMPLE_RATE;
+      final long ptPerSample = this.midiReader.ticksPerQuarterNote * this.microsecondsPerSecond / SampledAudioChannelS16.SAMPLE_RATE;
 
       do {
-        final long bufferPlayTime = (long) len * (long) samplesToPlayTime + this.lastBufferPlayTime;
-        if (this.currentPlayTime - bufferPlayTime >= 0L) {
-          this.lastBufferPlayTime = bufferPlayTime;
+        final long bufferPt = len * ptPerSample + this.outputPt;
+        if (this.playerPt - bufferPt >= 0L) {
+          this.outputPt = bufferPt;
           break;
         }
 
-        final int var5 = (int) ((-1L - this.lastBufferPlayTime + this.currentPlayTime + (long) samplesToPlayTime) / (long) samplesToPlayTime);
-        this.lastBufferPlayTime += (long) var5 * (long) samplesToPlayTime;
-        this.noteSet.processAndDiscard(var5);
-        len -= var5;
+        final long samples = (this.playerPt - this.outputPt + ptPerSample - 1) / ptPerSample;
+        this.outputPt += samples * ptPerSample;
+        this.noteSet.processAndDiscard((int) samples);
+        len -= samples;
         this.pumpEvents();
       } while (this.midiReader.isLoaded());
     }
@@ -231,8 +231,8 @@ public final class MidiPlayer extends AudioSource {
     for (final MidiPlayerNoteState_idk note : this.noteSet.notes) {
       if (channel < 0 || channel == note.channel) {
         if (note.playback != null) {
-          note.playback.g150(SampledAudioChannelS16.SAMPLE_RATE / 100);
-          if (note.playback.volDeltaNonZero()) {
+          note.playback.setVolZeroRamped(SampledAudioChannelS16.SAMPLE_RATE / 100);
+          if (note.playback.isRampTimeNonzero()) {
             this.noteSet.sum.addFirst(note.playback);
           }
 
@@ -498,7 +498,7 @@ public final class MidiPlayer extends AudioSource {
     this.reset(doSoundOff);
     this.midiReader.load(songData.midiData);
     this.looped = looped;
-    this.lastBufferPlayTime = 0L;
+    this.outputPt = 0L;
     final int numTracks = this.midiReader.numTracks();
 
     for (int track = 0; track < numTracks; ++track) {
@@ -509,7 +509,7 @@ public final class MidiPlayer extends AudioSource {
 
     this.trackWithSoonestEvent = this.midiReader.trackWithSoonestNextTick();
     this.nextEventTicks = this.midiReader.trackNextTick[this.trackWithSoonestEvent];
-    this.currentPlayTime = this.midiReader.getPlayTime(this.nextEventTicks);
+    this.playerPt = this.midiReader.getPlayTime(this.nextEventTicks);
   }
 
   private void handleGeneral6Off(final int var2) {
@@ -590,7 +590,7 @@ public final class MidiPlayer extends AudioSource {
 
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean a543(final int var1, final int[] var2, final MidiPlayerNoteState_idk var4, final int var5) {
-    var4._p = SampledAudioChannelS16.SAMPLE_RATE / 100;
+    var4.lenRemaining_idk = SampledAudioChannelS16.SAMPLE_RATE / 100;
     if (var4.notePlaying_idfk < 0 || var4.playback != null && !var4.playback.isPlayheadOutOfBounds()) {
       int var6 = var4._pitch_fac_2;
       if (var6 > 0) {
@@ -602,7 +602,7 @@ public final class MidiPlayer extends AudioSource {
         var4._pitch_fac_2 = var6;
       }
 
-      var4.playback.setPitchX(this.calcPitchX_idk(var4));
+      var4.playback.setAbsSpeed_p8(this.calcPitchX_idk(var4));
       final KeyParams_idk var7 = var4.keyParams_idk;
       var4.vibratoPhase_idk += var7.vibratoPhaseSpeed_idk;
       ++var4._C;
@@ -653,14 +653,14 @@ public final class MidiPlayer extends AudioSource {
       }
 
       if (var8) {
-        var4.playback.g150(var4._p);
+        var4.playback.setVolZeroRamped(var4.lenRemaining_idk);
         if (var2 == null) {
           var4.playback.processAndDiscard(var5);
         } else {
           var4.playback.processAndWrite(var2, var1, var5);
         }
 
-        if (var4.playback.volDeltaNonZero()) {
+        if (var4.playback.isRampTimeNonzero()) {
           this.noteSet.sum.addFirst(var4.playback);
         }
 
@@ -675,7 +675,7 @@ public final class MidiPlayer extends AudioSource {
         return true;
       } else {
 
-        var4.playback.a326(var4._p, this.calcVolumeX_idk(var4), this.calcPanX_idk(var4));
+        var4.playback.setVolAndPanRamped_p14(var4.lenRemaining_idk, this.calcVolumeX_idk(var4), this.calcPanX_idk(var4));
         return false;
       }
     } else {
@@ -708,7 +708,7 @@ public final class MidiPlayer extends AudioSource {
   private void pumpEvents() {
     int track = this.trackWithSoonestEvent;
     int ticks = this.nextEventTicks;
-    long playTime = this.currentPlayTime;
+    long playTime = this.playerPt;
 
     if (this.songData != null && ticks == 0) {
       this.changeSong(this.looped, this.songData, false);
@@ -755,11 +755,11 @@ public final class MidiPlayer extends AudioSource {
 
       this.trackWithSoonestEvent = track;
       this.nextEventTicks = ticks;
-      this.currentPlayTime = playTime;
+      this.playerPt = playTime;
       if (this.songData != null && ticks > 0) {
         this.trackWithSoonestEvent = -1;
         this.nextEventTicks = 0;
-        this.currentPlayTime = this.midiReader.getPlayTime(this.nextEventTicks);
+        this.playerPt = this.midiReader.getPlayTime(this.nextEventTicks);
       }
 
     }
@@ -774,7 +774,7 @@ public final class MidiPlayer extends AudioSource {
       playhead = (int) ((long) this.chGeneral1[note.channel] * (long) var6 >> 6);
       sampleLength <<= 8;
       if (playhead >= sampleLength) {
-        note.playback.setPitchXNegAbs_idk();
+        note.playback.setBackwards();
         playhead = -playhead + sampleLength + sampleLength - 1;
       }
     } else {
