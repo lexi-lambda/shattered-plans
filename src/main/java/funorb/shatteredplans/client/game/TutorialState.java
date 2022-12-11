@@ -262,7 +262,7 @@ public final class TutorialState {
 
         for (var3 = 0; var2.length > var3; ++var3) {
           var4 = var2[var3];
-          if (var4.owner == localPlayer && !session.systemsWillOwn[var4.index]) {
+          if (var4.owner == localPlayer && !session.isSystemOwnershipGuaranteed(var4)) {
             session.gameView.a021(92, var4, 300.0F);
             return;
           }

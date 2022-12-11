@@ -3214,17 +3214,17 @@ public final class GameUI {
     this.gameSession.gameView.stopCombatAnimations();
     this.gameSession.recalculateSystemState();
     if (this.gameSession.localPlayer != null) {
-      final StatusPanelState var2 = (StatusPanelState) this.statusPanel.state;
-      if (var2.icon.isEmpty() && this.gameSession.placementMode != PlacementMode.BUILD_FLEET) {
+      final StatusPanelState statusState = (StatusPanelState) this.statusPanel.state;
+      if (statusState.icon.isEmpty() && this.gameSession.placementMode != PlacementMode.BUILD_FLEET) {
         if (this.gameSession.gameState.gameOptions.unifiedTerritories) {
           if (this.gameSession.localPlayer.combinedForce.fleetsAvailableToBuild > 0) {
             this.activateFleetPlacement(this.gameSession.localPlayer.combinedForce, true);
             return;
           }
         } else {
-          for (final ContiguousForce var3 : this.gameSession.localPlayer.contiguousForces) {
-            if (var3.fleetsAvailableToBuild > 0) {
-              this.activateFleetPlacement(var3, true);
+          for (final ContiguousForce force : this.gameSession.localPlayer.contiguousForces) {
+            if (force.fleetsAvailableToBuild > 0) {
+              this.activateFleetPlacement(force, true);
               return;
             }
           }
@@ -3233,7 +3233,7 @@ public final class GameUI {
 
       this.gameSession.endTurn();
       this.endTurnButton.activate();
-      var2.icon.setSprite(null);
+      statusState.icon.setSprite(null);
       if (this.gameSession.playersWaitingOn == 1) {
         this.setActionHint(StringConstants.TEXT_WAITING_FOR_PLAYER);
       } else {

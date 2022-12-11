@@ -1333,6 +1333,11 @@ public final class GameState {
     return kills;
   }
 
+  public boolean isStellarBombTarget(final Player player, final StarSystem system) {
+    return this.projectOrders.stream().anyMatch(order ->
+        order.player == player && order.type == ResourceType.ENERGY && order.target == system);
+  }
+
   public void recalculateFleetProduction() {
     for (final Player player : this.players) {
       this.recalculateFleetProduction(player);

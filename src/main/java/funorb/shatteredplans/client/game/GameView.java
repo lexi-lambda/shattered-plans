@@ -74,6 +74,7 @@ public final class GameView extends AbstractGameView {
   public boolean _Gb;
   public boolean _Ab;
   public MoveFleetsOrder _rb;
+  protected TacticalAnalysis tacticalAnalysis;
   private Sprite[] _Mb;
   private ArgbSprite _K;
   private double _wb;
@@ -3055,9 +3056,9 @@ public final class GameView extends AbstractGameView {
       final boolean isAttacked = system.incomingOrders.stream()
           .anyMatch(order -> order.player == this.localPlayer);
       if (isAttacked && this.localPlayer != null) {
-        if (!this.canOwnSystem[system.index]) {
+        if (!this.tacticalAnalysis.isOwnershipPossible(system)) {
           drawSystemHatching(this.systemHexes[system.index], Drawing.RED, 96);
-        } else if (this.willOwnSystem[system.index]) {
+        } else if (this.tacticalAnalysis.isOwnershipGuaranteed(system)) {
           drawSystemHatching(this.systemHexes[system.index], Drawing.GREEN, 64);
         } else {
           drawSystemHatching(this.systemHexes[system.index], Drawing.YELLOW, 64);
@@ -3079,10 +3080,10 @@ public final class GameView extends AbstractGameView {
       }
 
       if (owner == this.localPlayer && this.localPlayer != null) {
-        if (!this.canOwnSystem[system.index]) {
-          drawSystemHatching(var6, Drawing.RED, this.systemCollapseStages[system.index] == 0 ? 192 : 96);
-        } else if (!this.willOwnSystem[system.index]) {
-          drawSystemHatching(var6, Drawing.YELLOW, this.possibleSystemCollapseStages[system.index] == 0 ? 128 : 64);
+        if (!this.tacticalAnalysis.isOwnershipPossible(system)) {
+          drawSystemHatching(var6, Drawing.RED, this.tacticalAnalysis.getEarliestGuaranteedCollapseWave(system) == 0 ? 192 : 96);
+        } else if (!this.tacticalAnalysis.isOwnershipGuaranteed(system)) {
+          drawSystemHatching(var6, Drawing.YELLOW, this.tacticalAnalysis.getEarliestPossibleCollapseWave(system) == 0 ? 128 : 64);
         }
       }
     }
@@ -3700,5 +3701,9 @@ public final class GameView extends AbstractGameView {
         }
       }
     }
+  }
+
+  public final void setTacticalAnalysis(final TacticalAnalysis tacticalAnalysis) {
+    this.tacticalAnalysis = tacticalAnalysis;
   }
 }

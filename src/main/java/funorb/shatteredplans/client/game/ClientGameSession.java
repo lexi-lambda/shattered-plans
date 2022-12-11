@@ -65,6 +65,7 @@ public final class ClientGameSession extends GameSession {
   private Player[] systemOwners;
   private ContiguousForce[] systemForces;
   private int[] remainingGarrisons;
+  private TacticalAnalysis tacticalAnalysis;
 
   public boolean desynced;
   public int turnNumberWhenJoined;
@@ -92,15 +93,6 @@ public final class ClientGameSession extends GameSession {
 
   private TickTimer recentlyPlayedBuildSfxQueue;
   private int recentlyPlayedBuildSfxCounter;
-
-  public boolean[] systemsWillOwn;
-  private boolean[] systemsCanOwn;
-  private int[] possibleCollapseStages;
-  private int[] minGarrisonsAtTurnEnd;
-  private int[] guaranteedCollapseStages;
-  private int[] maxGarrisonsAtTurnEnd;
-  private int[] safeGarrisonsToHold;
-  private int[] minGarrisonsToHold;
 
   public ClientGameSession(final boolean isMultiplayer,
                            final boolean isTutorial,
@@ -202,17 +194,10 @@ public final class ClientGameSession extends GameSession {
       }
     }
 
-    final int systemCount = this.gameState.map.systems.length;
-    this.systemsCanOwn = new boolean[systemCount];
-    this.systemsWillOwn = new boolean[systemCount];
-    this.guaranteedCollapseStages = new int[systemCount];
-    this.possibleCollapseStages = new int[systemCount];
-    this.minGarrisonsAtTurnEnd = new int[systemCount];
-    this.safeGarrisonsToHold = new int[systemCount];
-    this.maxGarrisonsAtTurnEnd = new int[systemCount];
-    this.minGarrisonsToHold = new int[systemCount];
     this.gameState.recalculatePlayerFleetProduction();
-    this.gameView.setTacticalOverlay(this.systemsCanOwn, this.systemsWillOwn, this.guaranteedCollapseStages, this.possibleCollapseStages);
+
+    this.tacticalAnalysis = new TacticalAnalysis(this.gameState.map.systems.length);
+    this.gameView.setTacticalAnalysis(this.tacticalAnalysis);
 
     if (this.localPlayerIndex < 0) {
       isAutoPlaying = false;
@@ -300,115 +285,12 @@ public final class ClientGameSession extends GameSession {
     ShatteredPlansClient.saveProfile();
   }
 
-  /**
-   * Recalculates the “hatching” overlay used to display which systems are
-   * expected or in danger of being captured or lost.
-   */
-  private void recalculateTacticalOverlay() {
-    for (final StarSystem system : this.gameState.map.systems) {
-      this.guaranteedCollapseStages[system.index] = 0;
-      this.possibleCollapseStages[system.index] = 0;
-      if (system.owner == this.localPlayer) {
-        this.systemsCanOwn[system.index] = true;
-        this.maxGarrisonsAtTurnEnd[system.index] = system.remainingGarrison;
-        this.systemsWillOwn[system.index] = true;
-        this.minGarrisonsAtTurnEnd[system.index] = system.remainingGarrison;
-      } else {
-        this.systemsCanOwn[system.index] = false;
-        this.maxGarrisonsAtTurnEnd[system.index] = 0;
-        this.systemsWillOwn[system.index] = false;
-        this.minGarrisonsAtTurnEnd[system.index] = 0;
-      }
+  private void recalculateTacticalAnalysis() {
+    this.tacticalAnalysis.analyze(this.gameState, this.localPlayer);
+  }
 
-      for (final MoveFleetsOrder incomingOrder : system.incomingOrders) {
-        if (incomingOrder.player == this.localPlayer) {
-          this.maxGarrisonsAtTurnEnd[system.index] += incomingOrder.quantity;
-          this.systemsCanOwn[system.index] = true;
-          if (incomingOrder.target.owner == this.localPlayer || incomingOrder.target.garrison == 0) {
-            this.minGarrisonsAtTurnEnd[system.index] += incomingOrder.quantity;
-            this.systemsWillOwn[system.index] = true;
-          }
-        }
-      }
-
-      if (this.localPlayer != null) {
-        for (final StarSystem neighbor : system.neighbors) {
-          if (neighbor.owner != null && neighbor.owner != this.localPlayer
-              && (system.owner != this.localPlayer || !neighbor.owner.allies[this.localPlayer.index])
-              && !this.isStellarBombTarget(this.localPlayer, neighbor)) {
-            this.systemsWillOwn[system.index] = false;
-            this.minGarrisonsAtTurnEnd[system.index] = 0;
-            break;
-          }
-        }
-      }
-    }
-
-    if (this.gameState.gameOptions.noChainCollapsing) {
-      for (final StarSystem system : this.gameState.map.systems) {
-        this.minGarrisonsToHold[system.index] = 0;
-        this.safeGarrisonsToHold[system.index] = 0;
-      }
-    } else if (this.gameState.gameOptions.simpleGarrisoning) {
-      for (final StarSystem system : this.gameState.map.systems) {
-        this.minGarrisonsToHold[system.index] = 1;
-        this.safeGarrisonsToHold[system.index] = 1;
-      }
-    } else {
-      for (final StarSystem system : this.gameState.map.systems) {
-        this.minGarrisonsToHold[system.index] = (int) Arrays.stream(system.neighbors).filter(neighbor -> !this.systemsCanOwn[neighbor.index]).count();
-        this.safeGarrisonsToHold[system.index] = (int) Arrays.stream(system.neighbors).filter(neighbor -> !this.systemsWillOwn[neighbor.index]).count();
-      }
-    }
-
-    if (!this.gameState.gameOptions.noChainCollapsing) {
-      boolean goAgain = true;
-      while (goAgain) {
-        goAgain = false;
-
-        for (final StarSystem system : this.gameState.map.systems) {
-          final int index = system.index;
-          if (this.systemsCanOwn[index] && this.minGarrisonsToHold[index] > this.maxGarrisonsAtTurnEnd[index]) {
-            goAgain = true;
-            this.systemsCanOwn[index] = false;
-            final int nextStage = this.guaranteedCollapseStages[index] + 1;
-
-            for (final StarSystem neighbor : system.neighbors) {
-              if (this.gameState.gameOptions.simpleGarrisoning) {
-                this.minGarrisonsToHold[neighbor.index] = 1;
-              } else {
-                this.minGarrisonsToHold[neighbor.index]++;
-              }
-
-              if (this.guaranteedCollapseStages[neighbor.index] > nextStage || this.systemsCanOwn[neighbor.index]) {
-                this.guaranteedCollapseStages[neighbor.index] = nextStage;
-              }
-            }
-          }
-
-          if (this.systemsWillOwn[index] && this.safeGarrisonsToHold[index] > this.minGarrisonsAtTurnEnd[index]) {
-            goAgain = true;
-            this.systemsWillOwn[index] = false;
-            this.minGarrisonsAtTurnEnd[index] = 0;
-            final int nextStage = this.possibleCollapseStages[index] + 1;
-
-            for (final StarSystem neighbor : system.neighbors) {
-              if (this.gameState.gameOptions.simpleGarrisoning) {
-                this.safeGarrisonsToHold[neighbor.index] = 1;
-              } else {
-                this.safeGarrisonsToHold[neighbor.index]++;
-              }
-
-              if (nextStage < this.possibleCollapseStages[neighbor.index] || this.systemsWillOwn[neighbor.index]) {
-                this.possibleCollapseStages[neighbor.index] = nextStage;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    this.gameView.setTacticalOverlay(this.systemsCanOwn, this.systemsWillOwn, this.guaranteedCollapseStages, this.possibleCollapseStages);
+  public boolean isSystemOwnershipGuaranteed(final StarSystem system) {
+    return this.tacticalAnalysis.isOwnershipGuaranteed(system);
   }
 
   private void readTurnOrdersAndUpdate(final CipheredBuffer packet, final int len) {
@@ -427,22 +309,18 @@ public final class ClientGameSession extends GameSession {
       order.source.remainingGarrison -= order.quantity;
     }
 
-    this.recalculateTacticalOverlay();
+    this.recalculateTacticalAnalysis();
   }
 
   // only used by the tutorial
   public void setMap(final Map map) {
     this.gameState.setMap(map);
+
+    this.tacticalAnalysis = new TacticalAnalysis(map.systems.length);
+    this.recalculateTacticalAnalysis();
+
     this.gameView.setMap(map);
-    this.maxGarrisonsAtTurnEnd = new int[map.systems.length];
-    this.minGarrisonsToHold = new int[map.systems.length];
-    this.systemsCanOwn = new boolean[map.systems.length];
-    this.guaranteedCollapseStages = new int[map.systems.length];
-    this.minGarrisonsAtTurnEnd = new int[map.systems.length];
-    this.safeGarrisonsToHold = new int[map.systems.length];
-    this.systemsWillOwn = new boolean[map.systems.length];
-    this.possibleCollapseStages = new int[map.systems.length];
-    this.recalculateTacticalOverlay();
+    this.gameView.setTacticalAnalysis(this.tacticalAnalysis);
   }
 
   public void draw() {
@@ -1412,7 +1290,7 @@ public final class ClientGameSession extends GameSession {
             this.gameView.stopCombatAnimations();
             this.recalculateSystemState();
             this.handleBuildProject(GameState.ResourceType.ENERGY, target);
-            this.recalculateTacticalOverlay();
+            this.recalculateTacticalAnalysis();
             this.ui.setPlacementMode(PlacementMode.NONE);
             this.ui.markProjectPending(GameState.ResourceType.ENERGY);
           }
@@ -1481,7 +1359,7 @@ public final class ClientGameSession extends GameSession {
     this.gameState.projectOrders.remove(order);
     this.ui.handleProjectOrderCanceled(order.type);
     if (order.type == GameState.ResourceType.ENERGY) {
-      this.recalculateTacticalOverlay();
+      this.recalculateTacticalAnalysis();
     }
   }
 
@@ -1534,7 +1412,7 @@ public final class ClientGameSession extends GameSession {
       this.cancelOrdersToAttackPlayer(offerer);
     }
 
-    this.recalculateTacticalOverlay();
+    this.recalculateTacticalAnalysis();
     super.handlePactAccepted(offerer, offeree);
   }
 
@@ -1590,15 +1468,6 @@ public final class ClientGameSession extends GameSession {
 
     for (final StarSystem system : this.gameState.map.systems) {
       system.remainingGarrison = system.garrison;
-      if (system.owner == this.localPlayer) {
-        this.maxGarrisonsAtTurnEnd[system.index] = system.garrison;
-        this.minGarrisonsAtTurnEnd[system.index] = system.garrison;
-      } else {
-        this.systemsCanOwn[system.index] = false;
-        this.systemsWillOwn[system.index] = false;
-        this.maxGarrisonsAtTurnEnd[system.index] = 0;
-        this.minGarrisonsAtTurnEnd[system.index] = 0;
-      }
     }
 
     if (this.systemOwners == null || this.systemOwners.length < this.gameState.map.systems.length) {
@@ -1615,13 +1484,12 @@ public final class ClientGameSession extends GameSession {
     }
 
     this.gameView.assignSystemState(this.remainingGarrisons, this.systemForces, this.systemOwners, false);
-    this.gameView.setTacticalOverlay(this.systemsCanOwn, this.systemsWillOwn, this.guaranteedCollapseStages, this.possibleCollapseStages);
-    this.recalculateTacticalOverlay();
+    this.recalculateTacticalAnalysis();
     if (this.isMultiplayer || this.ais[this.localPlayerIndex] == null) {
       if (isAutoPlaying && !this.desynced && this.localPlayerIsAlive) {
         this.ais[this.localPlayerIndex].makeDesiredPactOffers();
         this.ais[this.localPlayerIndex].planTurnOrders();
-        this.recalculateTacticalOverlay();
+        this.recalculateTacticalAnalysis();
 
         this.unsentMoveOrders.addAll(this.gameState.moveOrders);
         this.unsentBuildOrders.addAll(this.gameState.buildOrders);
@@ -1650,14 +1518,9 @@ public final class ClientGameSession extends GameSession {
         JagexApplet.clientError(var6, "AI has errored in single player game");
       }
 
-      this.recalculateTacticalOverlay();
+      this.recalculateTacticalAnalysis();
       this.advanceTurnSinglePlayer();
     }
-  }
-
-  private boolean isStellarBombTarget(final Player player, final StarSystem system) {
-    return this.gameState.projectOrders.stream().anyMatch(order ->
-        order.player == player && order.type == GameState.ResourceType.ENERGY && order.target == system);
   }
 
   private void resendAllTurnOrders() {
@@ -1681,7 +1544,7 @@ public final class ClientGameSession extends GameSession {
     orders.projectOrders.forEach(this::addOrder);
     orders.buildOrders.forEach(this::addOrder);
     orders.moveOrders.forEach(this::addOrder);
-    this.recalculateTacticalOverlay();
+    this.recalculateTacticalAnalysis();
     this.ui.updateAvailableFleetCounters();
   }
 
@@ -1707,8 +1570,6 @@ public final class ClientGameSession extends GameSession {
 
     order.system.remainingGarrison += order.quantity;
     this.remainingGarrisons[order.system.index] += order.quantity;
-    this.maxGarrisonsAtTurnEnd[order.system.index] += order.quantity;
-    this.minGarrisonsAtTurnEnd[order.system.index] += order.quantity;
     force.fleetsAvailableToBuild -= order.quantity;
   }
 
@@ -1762,7 +1623,7 @@ public final class ClientGameSession extends GameSession {
         this.gameState.moveOrders.remove(order);
       }
 
-      this.recalculateTacticalOverlay();
+      this.recalculateTacticalAnalysis();
       if (this.isMultiplayer) {
         this.unsentMoveOrders.remove(order);
         this.unsentMoveOrders.add(order);
@@ -1819,12 +1680,12 @@ public final class ClientGameSession extends GameSession {
         this.gameView.highlightedSystems[system.index] = SystemHighlight.GRAY;
       }
     }
-    this.recalculateTacticalOverlay();
+    this.recalculateTacticalAnalysis();
   }
 
   private void handleMoveFleets(final StarSystem source, final StarSystem target, final int quantity) {
     this.addOrder(new MoveFleetsOrder(source, target, quantity));
-    this.recalculateTacticalOverlay();
+    this.recalculateTacticalAnalysis();
   }
 
   private void handleBuildProject(@MagicConstant(valuesFromClass = GameState.ResourceType.class) final int type, final StarSystem target) {

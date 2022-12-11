@@ -45,16 +45,13 @@ public abstract class AbstractGameView {
   public boolean isAnimatingViewport;
   public StarSystem targetedSystem;
   public MoveFleetsOrder selectedFleetOrder;
-  protected int[] possibleSystemCollapseStages;
   protected Random random;
   protected int animationTick;
   public SystemHighlight[] highlightedSystems;
   protected int[] systemDrawX;
   protected List<CombatEngagementAnimationState> combatEngagements;
   protected int[] clonedRemainingGarrisons;
-  protected boolean[] willOwnSystem;
   protected int _n;
-  protected int[] systemCollapseStages;
   private int largestFleetMovement;
   protected int largestFleetBuildQuantity;
   protected List<MoveFleetsAnimationState> fleetMovements;
@@ -66,7 +63,6 @@ public abstract class AbstractGameView {
   protected Player[] clonedSystemOwners;
   protected Collection<ProjectOrder> projectOrders;
   protected List<MoveFleetsAnimationState> combatRetreats;
-  protected boolean[] canOwnSystem;
   protected int[] systemDrawY;
   protected Player[] systemOwners;
   @MagicConstant(valuesFromClass = GameView.AnimationPhase.class)
@@ -241,16 +237,6 @@ public abstract class AbstractGameView {
     if (phase >= this.buildPhases) {
       this.buildPhases = phase + 1;
     }
-  }
-
-  public final void setTacticalOverlay(final boolean[] canOwnSystem,
-                                       final boolean[] willOwnSystem,
-                                       final int[] collapseStages,
-                                       final int[] possibleCollapseStages) {
-    this.possibleSystemCollapseStages = possibleCollapseStages;
-    this.systemCollapseStages = collapseStages;
-    this.canOwnSystem = canOwnSystem;
-    this.willOwnSystem = willOwnSystem;
   }
 
   private void addBuildTannhauserEvent(final Player player, final StarSystem source, final StarSystem target) {
