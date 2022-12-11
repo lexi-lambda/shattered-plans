@@ -9,11 +9,11 @@ public final class PlayingSound {
   public PlayingSound(final RawSamplePlayer var1) {
     this._p = var1;
     this.volume = var1.getVol_p14();
-    this._p.setVolume((128 + (this.volume * Sounds.soundVolume)) >> 8);
+    this._p.setVol_p14((128 + (this.volume * Sounds.soundVolume)) >> 8);
   }
 
   public void setVolume(final int volume) {
     this.volume = volume;
-    this._p.setVolume((128 + (volume * Sounds.soundVolume)) >> 8);
+    this._p.setVol_p14((128 + (volume * Sounds.soundVolume)) >> 8);
   }
 }
