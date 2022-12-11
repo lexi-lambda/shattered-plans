@@ -70,42 +70,40 @@ public final class SynthMystery {
 
     if (this._d[idx] == 0) {
       return 0;
-    } else {
-      var3 = this.b427(idx, 0, var2);
-      _f[idx][0] = -2.0f * var3 * (float) Math.cos(this.a427(idx, 0, var2));
-      _f[idx][1] = var3 * var3;
-
-      int var4;
-      for (var4 = 1; var4 < this._d[idx]; ++var4) {
-        var3 = this.b427(idx, var4, var2);
-        final float var5 = -2.0f * var3 * (float) Math.cos(this.a427(idx, var4, var2));
-        final float var6 = var3 * var3;
-        _f[idx][var4 * 2 + 1] = _f[idx][var4 * 2 - 1] * var6;
-        _f[idx][var4 * 2] = _f[idx][var4 * 2 - 1] * var5 + _f[idx][var4 * 2 - 2] * var6;
-
-        for (int var7 = var4 * 2 - 1; var7 >= 2; --var7) {
-          final float[] var10000 = _f[idx];
-          var10000[var7] += _f[idx][var7 - 1] * var5 + _f[idx][var7 - 2] * var6;
-        }
-
-        final float[] var10000 = _f[idx];
-        var10000[1] += _f[idx][0] * var5 + var6;
-        var10000[0] += var5;
-      }
-
-      if (idx == 0) {
-        for (var4 = 0; var4 < this._d[0] * 2; ++var4) {
-          final float[] var10000 = _f[0];
-          var10000[var4] *= _h;
-        }
-      }
-
-      for (var4 = 0; var4 < this._d[idx] * 2; ++var4) {
-        someAmps[idx][var4] = (int) (_f[idx][var4] * 65536.0F);
-      }
-
-      return this._d[idx] * 2;
     }
+
+    var3 = this.b427(idx, 0, var2);
+    _f[idx][0] = -2.0f * var3 * (float) Math.cos(this.a427(idx, 0, var2));
+    _f[idx][1] = var3 * var3;
+
+    for (int i = 1; i < this._d[idx]; ++i) {
+      var3 = this.b427(idx, i, var2);
+      final float var5 = -2.0f * var3 * (float) Math.cos(this.a427(idx, i, var2));
+      final float var6 = var3 * var3;
+      _f[idx][i * 2 + 1] = _f[idx][i * 2 - 1] * var6;
+      _f[idx][i * 2] = _f[idx][i * 2 - 1] * var5 + _f[idx][i * 2 - 2] * var6;
+
+      for (int var7 = i * 2 - 1; var7 >= 2; --var7) {
+        final float[] var10000 = _f[idx];
+        var10000[var7] += _f[idx][var7 - 1] * var5 + _f[idx][var7 - 2] * var6;
+      }
+
+      final float[] var10000 = _f[idx];
+      var10000[1] += _f[idx][0] * var5 + var6;
+      var10000[0] += var5;
+    }
+
+    if (idx == 0) {
+      for (int i = 0; i < this._d[0] * 2; ++i) {
+        _f[0][i] *= _h;
+      }
+    }
+
+    for (int i = 0; i < this._d[idx] * 2; ++i) {
+      someAmps[idx][i] = (int) (_f[idx][i] * 65536.0F);
+    }
+
+    return this._d[idx] * 2;
   }
 
   private float a427(final int var1, final int var2, final float var3) {

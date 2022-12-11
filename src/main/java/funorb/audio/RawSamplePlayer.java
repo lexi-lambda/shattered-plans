@@ -8,21 +8,24 @@ import java.util.Iterator;
 public final class RawSamplePlayer extends AudioSource {
   private static final double INV_0x2000 = 1.220703125E-4D;
 
-  private final int loopStart_idfk;
   private final boolean isLooped_idk;
+  private final int loopStart_idfk;
   private final int loopEnd_idfk;
-  private int ampL_p14;
-  private int pan_p14; // left=0.0/0, center=0.5/0x2000, right=1.0/0x4000. negative values are "surround"
-  private int amp_p14;
-  private int ampRateR;
-  private int ampRateL;
-  private int playhead_p8; // sample data index << 8
-  private int vol_p14;
-  private int volTime;
   private int loopDirection_idk;
-  private int speed_p8;
-  private int ampRate_p14;
+
+  private int vol_p14;
+  private int pan_p14; // left=0.0/0, center=0.5/0x2000, right=1.0/0x4000. negative values are "surround"
+
+  private int amp_p14;
+  private int ampL_p14;
   private int ampR_p14;
+  private int ampRate_p14;
+  private int ampRateR_p14;
+  private int ampRateL_p14;
+  private int ampTime;
+
+  private int playhead_p8;
+  private int speed_p8;
 
   private RawSamplePlayer(final RawSampleS8 raw, final int speed_p8, final int vol_p14, final int pan_p14) {
     this.rawSample = raw;
@@ -514,19 +517,19 @@ public final class RawSamplePlayer extends AudioSource {
   private synchronized void setVolAndPan_p14(final int vol_p14, final int pan_p14) {
     this.vol_p14 = vol_p14;
     this.pan_p14 = pan_p14;
-    this.volTime = 0;
+    this.ampTime = 0;
     this.resetAmp();
   }
 
   private int writeAudioDataForwards_idk(final int[] dest_s16p8, int dstOff, final int srcEnd_p8, final int dstLen, final int stitch_s8) {
     while (true) {
-      if (this.volTime > 0) {
-        int var6 = dstOff + this.volTime;
-        if (var6 > dstLen) {
-          var6 = dstLen;
+      if (this.ampTime > 0) {
+        int dstEnd = dstOff + this.ampTime;
+        if (dstEnd > dstLen) {
+          dstEnd = dstLen;
         }
 
-        this.volTime += dstOff;
+        this.ampTime += dstOff;
         if (this.speed_p8 == 256 && (this.playhead_p8 & 255) == 0) {
           dstOff = xferRamped(
             this.rawSample.data_s8,
@@ -535,9 +538,9 @@ public final class RawSamplePlayer extends AudioSource {
             dstOff,
             this.ampL_p14,
             this.ampR_p14,
-            this.ampRateL,
-            this.ampRateR,
-            var6,
+            this.ampRateL_p14,
+            this.ampRateR_p14,
+            dstEnd,
             srcEnd_p8,
             this
           );
@@ -549,9 +552,9 @@ public final class RawSamplePlayer extends AudioSource {
             dstOff,
             this.ampL_p14,
             this.ampR_p14,
-            this.ampRateL,
-            this.ampRateR,
-            var6,
+            this.ampRateL_p14,
+            this.ampRateR_p14,
+            dstEnd,
             srcEnd_p8,
             this,
             this.speed_p8,
@@ -559,16 +562,15 @@ public final class RawSamplePlayer extends AudioSource {
           );
         }
 
-        this.volTime -= dstOff;
-        if (this.volTime != 0) {
+        this.ampTime -= dstOff;
+        if (this.ampTime != 0) {
           return dstOff;
         }
 
-        if (!this.h801()) {
-          continue;
+        if (this.updateAmpRate()) {
+          return dstLen;
         }
 
-        return dstLen;
       } else {
         if (this.speed_p8 == 256 && (this.playhead_p8 & 255) == 0) {
           return xfer(
@@ -622,10 +624,10 @@ public final class RawSamplePlayer extends AudioSource {
 
   public synchronized void g150(int var1) {
     if (var1 == 0) {
-      this.setVolume(0);
+      this.setVol_p14(0);
       this.unlink();
     } else if (this.ampL_p14 == 0 && this.ampR_p14 == 0) {
-      this.volTime = 0;
+      this.ampTime = 0;
       this.vol_p14 = 0;
       this.amp_p14 = 0;
       this.unlink();
@@ -655,11 +657,11 @@ public final class RawSamplePlayer extends AudioSource {
         var1 = var2;
       }
 
-      this.volTime = var1;
+      this.ampTime = var1;
       this.vol_p14 = Integer.MIN_VALUE;
       this.ampRate_p14 = -this.amp_p14 / var1;
-      this.ampRateL = -this.ampL_p14 / var1;
-      this.ampRateR = -this.ampR_p14 / var1;
+      this.ampRateL_p14 = -this.ampL_p14 / var1;
+      this.ampRateR_p14 = -this.ampR_p14 / var1;
     }
   }
 
@@ -670,7 +672,7 @@ public final class RawSamplePlayer extends AudioSource {
   }
 
   public synchronized boolean volDeltaNonZero() {
-    return this.volTime != 0;
+    return this.ampTime != 0;
   }
 
   public synchronized void setPitchXNegAbs_idk() {
@@ -680,24 +682,24 @@ public final class RawSamplePlayer extends AudioSource {
 
   @Override
   public synchronized void processAndDiscard(int len) {
-    if (this.volTime > 0) {
-      if (len >= this.volTime) {
+    if (this.ampTime > 0) {
+      if (len >= this.ampTime) {
         if (this.vol_p14 == Integer.MIN_VALUE) {
           this.vol_p14 = 0;
           this.ampR_p14 = 0;
           this.ampL_p14 = 0;
           this.amp_p14 = 0;
           this.unlink();
-          len = this.volTime;
+          len = this.ampTime;
         }
 
-        this.volTime = 0;
+        this.ampTime = 0;
         this.resetAmp();
       } else {
         this.amp_p14 += this.ampRate_p14 * len;
-        this.ampL_p14 += this.ampRateL * len;
-        this.ampR_p14 += this.ampRateR * len;
-        this.volTime -= len;
+        this.ampL_p14 += this.ampRateL_p14 * len;
+        this.ampR_p14 += this.ampRateR_p14 * len;
+        this.ampTime -= len;
       }
     }
 
@@ -828,7 +830,7 @@ public final class RawSamplePlayer extends AudioSource {
       final int ampL = calcAmpL(volX, panX);
       final int ampR = calcAmpR(volX, panX);
       if (this.ampL_p14 == ampL && this.ampR_p14 == ampR) {
-        this.volTime = 0;
+        this.ampTime = 0;
       } else {
         int var6 = volX - this.amp_p14;
         if (this.amp_p14 - volX > var6) {
@@ -855,12 +857,12 @@ public final class RawSamplePlayer extends AudioSource {
           time = var6;
         }
 
-        this.volTime = time;
+        this.ampTime = time;
         this.vol_p14 = volX;
         this.pan_p14 = panX;
         this.ampRate_p14 = (volX - this.amp_p14) / time;
-        this.ampRateL = (ampL - this.ampL_p14) / time;
-        this.ampRateR = (ampR - this.ampR_p14) / time;
+        this.ampRateL_p14 = (ampL - this.ampL_p14) / time;
+        this.ampRateR_p14 = (ampR - this.ampR_p14) / time;
       }
     }
   }
@@ -872,7 +874,7 @@ public final class RawSamplePlayer extends AudioSource {
 
   @Override
   public int returns_0_1_or_2() {
-    return this.vol_p14 == 0 && this.volTime == 0 ? 0 : 1;
+    return this.vol_p14 == 0 && this.ampTime == 0 ? 0 : 1;
   }
 
   public synchronized void setPitchX(final int var1) {
@@ -886,7 +888,7 @@ public final class RawSamplePlayer extends AudioSource {
 
   @Override
   public synchronized void processAndWrite(final int[] dataS16P8, final int offset, final int len) {
-    if (this.vol_p14 == 0 && this.volTime == 0) {
+    if (this.vol_p14 == 0 && this.ampTime == 0) {
       this.processAndDiscard(len);
       return;
     }
@@ -1078,12 +1080,12 @@ public final class RawSamplePlayer extends AudioSource {
   }
 
   private void j797() {
-    if (this.volTime != 0) {
+    if (this.ampTime != 0) {
       if (this.vol_p14 == Integer.MIN_VALUE) {
         this.vol_p14 = 0;
       }
 
-      this.volTime = 0;
+      this.ampTime = 0;
       this.resetAmp();
     }
   }
@@ -1094,25 +1096,25 @@ public final class RawSamplePlayer extends AudioSource {
 
   private int writeAudioDataBackwards_idk(final int[] dest, int index, final int loopPoint, final int end, final int loopSample) {
     while (true) {
-      if (this.volTime > 0) {
-        int var6 = index + this.volTime;
+      if (this.ampTime > 0) {
+        int var6 = index + this.ampTime;
         if (var6 > end) {
           var6 = end;
         }
 
-        this.volTime += index;
+        this.ampTime += index;
         if (this.speed_p8 == -256 && (this.playhead_p8 & 255) == 0) {
-          index = xferBackRamped(this.rawSample.data_s8, dest, this.playhead_p8, index, this.ampL_p14, this.ampR_p14, this.ampRateL, this.ampRateR, var6, loopPoint, this);
+          index = xferBackRamped(this.rawSample.data_s8, dest, this.playhead_p8, index, this.ampL_p14, this.ampR_p14, this.ampRateL_p14, this.ampRateR_p14, var6, loopPoint, this);
         } else {
-          index = xferBackRampedPitched(this.rawSample.data_s8, dest, this.playhead_p8, index, this.ampL_p14, this.ampR_p14, this.ampRateL, this.ampRateR, var6, loopPoint, this, this.speed_p8, loopSample);
+          index = xferBackRampedPitched(this.rawSample.data_s8, dest, this.playhead_p8, index, this.ampL_p14, this.ampR_p14, this.ampRateL_p14, this.ampRateR_p14, var6, loopPoint, this, this.speed_p8, loopSample);
         }
 
-        this.volTime -= index;
-        if (this.volTime != 0) {
+        this.ampTime -= index;
+        if (this.ampTime != 0) {
           return index;
         }
 
-        if (!this.h801()) {
+        if (!this.updateAmpRate()) {
           continue;
         }
 
@@ -1130,20 +1132,21 @@ public final class RawSamplePlayer extends AudioSource {
   }
 
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  private boolean h801() {
-    int volume = this.vol_p14;
-    final int ampL;
-    final int ampR;
-    if (volume == Integer.MIN_VALUE) {
-      ampR = 0;
-      ampL = 0;
-      volume = 0;
+  private boolean updateAmpRate() {
+    int vol_p14 = this.vol_p14;
+    final int ampL_p14;
+    final int ampR_p14;
+
+    if (vol_p14 == Integer.MIN_VALUE) {
+      ampR_p14 = 0;
+      ampL_p14 = 0;
+      vol_p14 = 0;
     } else {
-      ampL = calcAmpL(volume, this.pan_p14);
-      ampR = calcAmpR(volume, this.pan_p14);
+      ampL_p14 = calcAmpL(vol_p14, this.pan_p14);
+      ampR_p14 = calcAmpR(vol_p14, this.pan_p14);
     }
 
-    if (this.amp_p14 == volume && this.ampL_p14 == ampL && this.ampR_p14 == ampR) {
+    if (this.amp_p14 == vol_p14 && this.ampL_p14 == ampL_p14 && this.ampR_p14 == ampR_p14) {
       if (this.vol_p14 == Integer.MIN_VALUE) {
         this.vol_p14 = 0;
         this.unlink();
@@ -1152,55 +1155,55 @@ public final class RawSamplePlayer extends AudioSource {
         this.resetAmp();
         return false;
       }
-    } else {
-      if (this.amp_p14 < volume) {
-        this.ampRate_p14 = 1;
-        this.volTime = volume - this.amp_p14;
-      } else if (this.amp_p14 > volume) {
-        this.ampRate_p14 = -1;
-        this.volTime = this.amp_p14 - volume;
-      } else {
-        this.ampRate_p14 = 0;
-      }
-
-      if (this.ampL_p14 < ampL) {
-        this.ampRateL = 1;
-        if (this.volTime == 0 || this.volTime > ampL - this.ampL_p14) {
-          this.volTime = ampL - this.ampL_p14;
-        }
-      } else if (this.ampL_p14 > ampL) {
-        this.ampRateL = -1;
-        if (this.volTime == 0 || this.volTime > this.ampL_p14 - ampL) {
-          this.volTime = this.ampL_p14 - ampL;
-        }
-      } else {
-        this.ampRateL = 0;
-      }
-
-      if (this.ampR_p14 < ampR) {
-        this.ampRateR = 1;
-        if (this.volTime == 0 || this.volTime > ampR - this.ampR_p14) {
-          this.volTime = ampR - this.ampR_p14;
-        }
-      } else if (this.ampR_p14 > ampR) {
-        this.ampRateR = -1;
-        if (this.volTime == 0 || this.volTime > this.ampR_p14 - ampR) {
-          this.volTime = this.ampR_p14 - ampR;
-        }
-      } else {
-        this.ampRateR = 0;
-      }
-
-      return false;
     }
+
+    if (this.amp_p14 < vol_p14) {
+      this.ampRate_p14 = 1;
+      this.ampTime = vol_p14 - this.amp_p14;
+    } else if (this.amp_p14 > vol_p14) {
+      this.ampRate_p14 = -1;
+      this.ampTime = this.amp_p14 - vol_p14;
+    } else {
+      this.ampRate_p14 = 0;
+    }
+
+    if (this.ampL_p14 < ampL_p14) {
+      this.ampRateL_p14 = 1;
+      if (this.ampTime == 0 || this.ampTime > ampL_p14 - this.ampL_p14) {
+        this.ampTime = ampL_p14 - this.ampL_p14;
+      }
+    } else if (this.ampL_p14 > ampL_p14) {
+      this.ampRateL_p14 = -1;
+      if (this.ampTime == 0 || this.ampTime > this.ampL_p14 - ampL_p14) {
+        this.ampTime = this.ampL_p14 - ampL_p14;
+      }
+    } else {
+      this.ampRateL_p14 = 0;
+    }
+
+    if (this.ampR_p14 < ampR_p14) {
+      this.ampRateR_p14 = 1;
+      if (this.ampTime == 0 || this.ampTime > ampR_p14 - this.ampR_p14) {
+        this.ampTime = ampR_p14 - this.ampR_p14;
+      }
+    } else if (this.ampR_p14 > ampR_p14) {
+      this.ampRateR_p14 = -1;
+      if (this.ampTime == 0 || this.ampTime > this.ampR_p14 - ampR_p14) {
+        this.ampTime = this.ampR_p14 - ampR_p14;
+      }
+    } else {
+      this.ampRateR_p14 = 0;
+    }
+
+    return false;
   }
 
   public synchronized int getPan_p14() {
     return this.pan_p14 < 0 ? -1 : this.pan_p14;
   }
 
-  public synchronized void setVolume(final int volume) {
-    this.setVolAndPan_p14(volume, this.getPan_p14());
+  public synchronized void setVol_p14(final int vol_p14) {
+    this.setVolAndPan_p14(vol_p14, this.getPan_p14());
   }
 
   public synchronized void f150() {

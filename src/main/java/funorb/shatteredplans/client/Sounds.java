@@ -87,7 +87,7 @@ public final class Sounds {
   static void setSoundVolume(final int volume) {
     soundVolume = volume;
     playingSounds.removeIf(sound -> !sound._p.isLinked());
-    playingSounds.forEach(sound -> sound._p.setVolume(sound.volume * soundVolume + 128 >> 8));
+    playingSounds.forEach(sound -> sound._p.setVol_p14(sound.volume * soundVolume + 128 >> 8));
   }
 
   public static void setMusicVolume(final int volume) {
