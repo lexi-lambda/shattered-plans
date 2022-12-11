@@ -11,35 +11,36 @@ import java.util.Map;
 // "play time" has units of tick-microseconds per quarter note, i.e. it has an extra factor of ticks per
 // quarter note in it, which is constant for any given song. "play time" is abbreviated to "pt" in many places
 public final class MidiPlayer extends AudioSource {
-  private static final double PHASE_512_TO_RADIANS = 0.01227184630308513D;
+  private static final double P9_TURNS_TO_RADIANS = 0.01227184630308513D;
+  private static final double P8_NOTE_TO_OCTAVE = 3.255208333333333E-4D;
 
   public static final int FLAG_SUSTAIN = 0x0001;
   public static final int FLAG_PORTAMENTO = 0x0002;
   public static final int FLAG_GENERAL_6 = 0x0004;
 
-  public final int[] chGeneral1 = new int[16];
+  public final int[] chStartOffset_p6 = new int[16]; // GP controller 1
+  private final int[] chGeneral2 = new int[16]; // GP controller 2
+  public final int[] chGeneral2Exp = new int[16];
   public final int[] chFlags = new int[16];
   private final int[] chModWheel = new int[16];
-  private final int[] chVolume = new int[16];
+  private final int[] chVol_p14 = new int[16];
   private final int[] chRpn = new int[16];
-  private final MidiPlayerNoteState_idk[][] noteStates = new MidiPlayerNoteState_idk[16][128];
+  private final MidiPlayingNote[][] noteStates = new MidiPlayingNote[16][128];
   private final int[] chPitchBendRange = new int[16];
   private final int[] chDefaultBank_idk = new int[16];
   private final Map<Integer, MidiInstrument> instruments;
-  private final int[] chPan = new int[16];
+  private final int[] chPan_p14 = new int[16];
   private final MidiReader midiReader = new MidiReader();
   private final int[] chCurrentProgram = new int[16];
   private final int[] chBank = new int[16];
-  private final int[] chGeneral2 = new int[16];
   private final int[] chPortaTime = new int[16];
-  private final int[] chVolumeAgainForSomeReason_idk = new int[16];
+  private final int[] chGlobalAmp_p8 = new int[16];
   private final int[] chPitchWheel = new int[16];
-  private final MidiPlayerNoteSet_idk noteSet = new MidiPlayerNoteSet_idk(this);
-  public final int[] _u = new int[16];
-  private int volume = 256;
-  private final MidiPlayerNoteState_idk[][] noteOffStates_idk = new MidiPlayerNoteState_idk[16][128];
-  private int microsecondsPerSecond = 1000000;
-  private final int[] chExpression = new int[16];
+  private final MidiPlayingNoteSet noteSet = new MidiPlayingNoteSet(this);
+  private int amp_p8 = 256;
+  private final MidiPlayingNote[][] noteOffStates_idk = new MidiPlayingNote[16][128];
+  private int usPerSec = 1000000;
+  private final int[] chExpression_p14 = new int[16];
   private int trackWithSoonestEvent;
   private long outputPt;
   private int nextEventTicks;
@@ -49,14 +50,14 @@ public final class MidiPlayer extends AudioSource {
 
   public MidiPlayer() {
     this.instruments = new HashMap<>();
-    this.a679();
+    this.initChGlobalAmp();
     this.handleReset(true);
   }
 
   @SuppressWarnings("CopyConstructorMissesField")
   public MidiPlayer(final MidiPlayer copyInstruments) {
     this.instruments = copyInstruments.instruments;
-    this.a679();
+    this.initChGlobalAmp();
     this.handleReset(true);
   }
 
@@ -80,28 +81,31 @@ public final class MidiPlayer extends AudioSource {
 
   private void handleGeneral2(final int value, final int channel) {
     this.chGeneral2[channel] = value;
-    this._u[channel] = (int) (0.5D + 2097152.0D * Math.pow(2.0D, 5.4931640625E-4D * (double) value));
+    this.chGeneral2Exp[channel] = (int) (0.5D + 2097152.0D * Math.pow(2.0D, 5.4931640625E-4D * (double) value));
   }
 
-  private int calcPitchX_idk(final MidiPlayerNoteState_idk note) {
-    int var3 = (note._pitch_fac_1 * note._pitch_fac_2 >> 12) + note.pitch_idk;
-    var3 += this.chPitchBendRange[note.channel] * (this.chPitchWheel[note.channel] - 8192) >> 12;
-    final KeyParams_idk var4 = note.keyParams_idk;
-    int pitch;
-    if (var4.vibratoPhaseSpeed_idk > 0 && (var4._f > 0 || this.chModWheel[note.channel] > 0)) {
-      pitch = var4._f << 2;
-      final int var7 = var4._j << 1;
-      if (var7 > note._C) {
-        pitch = note._C * pitch / var7;
+  private int calcSpeed_p8(final MidiPlayingNote note) {
+    int relNote_p8 = (note.portaRange_p8 * note.portaMag_p12 >> 12) + note.relNote_p8;
+    relNote_p8 += this.chPitchBendRange[note.channel] * (this.chPitchWheel[note.channel] - 8192) >> 12;
+    final MidiKeyParams params = note.params;
+
+    int vibrato_p8;
+    if (params.vibratoPhaseSpeed_p9 > 0 && (params.vibrato_p6 > 0 || this.chModWheel[note.channel] > 0)) {
+      vibrato_p8 = params.vibrato_p6 << 2;
+      final int vibratoAttack = params.vibratoAttack << 1;
+      if (note.vibratoTime < vibratoAttack) {
+        vibrato_p8 = note.vibratoTime * vibrato_p8 / vibratoAttack;
       }
 
-      pitch += this.chModWheel[note.channel] >> 7;
-      final double vibrato = Math.sin((double) (note.vibratoPhase_idk & 0x1ff) * PHASE_512_TO_RADIANS);
-      var3 += (int) ((double) pitch * vibrato);
+      vibrato_p8 += this.chModWheel[note.channel] >> 7;
+      relNote_p8 += (int) (vibrato_p8 * Math.sin((note.vibratoPhase_p9 & 0x1ff) * P9_TURNS_TO_RADIANS));
     }
 
-    pitch = (int) ((double) (256 * note.sampleData.sampleRate) * Math.pow(2.0D, 3.255208333333333E-4D * (double) var3) / (double) SampledAudioChannelS16.SAMPLE_RATE + 0.5D);
-    return Math.max(pitch, 1);
+    int speed_p8 = (int)(
+      (double)(256 * note.sampleData.sampleRate)
+      * Math.pow(2.0D, P8_NOTE_TO_OCTAVE * relNote_p8) / (double) SampledAudioChannelS16.SAMPLE_RATE
+      + 0.5D);
+    return Math.max(speed_p8, 1);
   }
 
   public synchronized void f150() {
@@ -111,37 +115,37 @@ public final class MidiPlayer extends AudioSource {
   }
 
   private void handleAllNotesOff(final int channel) {
-    for (final MidiPlayerNoteState_idk state : this.noteSet.notes) {
-      if ((channel < 0 || state.channel == channel) && state.notePlaying_idfk < 0) {
+    for (final MidiPlayingNote state : this.noteSet.notes) {
+      if ((channel < 0 || state.channel == channel) && state.relEnvTime < 0) {
         this.noteStates[state.channel][state.note] = null;
-        state.notePlaying_idfk = 0;
+        state.relEnvTime = 0;
       }
     }
   }
 
   private void handleNoteOff(final int channel, final int note) {
-    final MidiPlayerNoteState_idk state = this.noteStates[channel][note];
+    final MidiPlayingNote state = this.noteStates[channel][note];
     if (state != null) {
       this.noteStates[channel][note] = null;
       if ((FLAG_PORTAMENTO & this.chFlags[channel]) == 0) {
-        state.notePlaying_idfk = 0;
-      } else if (this.noteSet.notes.stream().anyMatch(var6 -> state.channel == var6.channel && var6.notePlaying_idfk < 0 && var6 != state)) {
-        state.notePlaying_idfk = 0;
+        state.relEnvTime = 0;
+      } else if (this.noteSet.notes.stream().anyMatch(n -> state.channel == n.channel && n.relEnvTime < 0 && n != state)) {
+        state.relEnvTime = 0;
       }
     }
   }
 
-  public synchronized void c430() {
-    this.microsecondsPerSecond = 1000000;
+  public synchronized void initMicrosecondsPerSecond() {
+    this.usPerSec = 1000000;
   }
 
-  public synchronized void a679() {
+  public synchronized void initChGlobalAmp() {
     for (int channel = 0; channel < 16; ++channel) {
-      this.chVolumeAgainForSomeReason_idk[channel] = 256;
+      this.chGlobalAmp_p8[channel] = 256;
     }
   }
 
-  public synchronized void a350(final SoundLoader soundLoader, final ResourceLoader loader, final SongData track) {
+  public synchronized void loadNoteSamplesForSong(final SoundLoader soundLoader, final ResourceLoader loader, final SongData track) {
     track.analyzeNotesUsedPerProgram();
 
     boolean success = true;
@@ -170,9 +174,9 @@ public final class MidiPlayer extends AudioSource {
   }
 
   @Override
-  public synchronized void processAndWrite(final int[] dataS16P8, int offset, int len) {
+  public synchronized void processAndWrite(final int[] data_s16p8, int offset, int len) {
     if (this.midiReader.isLoaded()) {
-      final long ptPerSample = this.midiReader.ticksPerQuarterNote * this.microsecondsPerSecond / SampledAudioChannelS16.SAMPLE_RATE;
+      final long ptPerSample = (long) this.midiReader.ticksPerQn * this.usPerSec / SampledAudioChannelS16.SAMPLE_RATE;
 
       do {
         final long bufferPt = this.outputPt + len * ptPerSample;
@@ -183,20 +187,20 @@ public final class MidiPlayer extends AudioSource {
 
         final long samples = (this.playerPt - this.outputPt + ptPerSample - 1L) / ptPerSample;
         this.outputPt += samples * ptPerSample;
-        this.noteSet.processAndWrite(dataS16P8, offset, (int) samples);
+        this.noteSet.processAndWrite(data_s16p8, offset, (int) samples);
         offset += samples;
         len -= samples;
         this.pumpEvents();
       } while (this.midiReader.isLoaded());
     }
 
-    this.noteSet.processAndWrite(dataS16P8, offset, len);
+    this.noteSet.processAndWrite(data_s16p8, offset, len);
   }
 
   @Override
   public synchronized void processAndDiscard(int len) {
     if (this.midiReader.isLoaded()) {
-      final long ptPerSample = this.midiReader.ticksPerQuarterNote * this.microsecondsPerSecond / SampledAudioChannelS16.SAMPLE_RATE;
+      final long ptPerSample = (long) this.midiReader.ticksPerQn * this.usPerSec / SampledAudioChannelS16.SAMPLE_RATE;
 
       do {
         final long bufferPt = len * ptPerSample + this.outputPt;
@@ -217,8 +221,8 @@ public final class MidiPlayer extends AudioSource {
   }
 
   @SuppressWarnings("SameParameterValue")
-  public synchronized void setVolume(final int volume) {
-    this.volume = volume;
+  public synchronized void setAmp_p8(final int amp_p8) {
+    this.amp_p8 = amp_p8;
   }
 
   private synchronized void reset(final boolean doSoundOff) {
@@ -228,7 +232,7 @@ public final class MidiPlayer extends AudioSource {
   }
 
   private void handleAllSoundOff(final int channel) {
-    for (final MidiPlayerNoteState_idk note : this.noteSet.notes) {
+    for (final MidiPlayingNote note : this.noteSet.notes) {
       if (channel < 0 || channel == note.channel) {
         if (note.playback != null) {
           note.playback.setVolZeroRamped(SampledAudioChannelS16.SAMPLE_RATE / 100);
@@ -236,10 +240,10 @@ public final class MidiPlayer extends AudioSource {
             this.noteSet.sum.addFirst(note.playback);
           }
 
-          note.reset_idk();
+          note.reset();
         }
 
-        if (note.notePlaying_idfk < 0) {
+        if (note.relEnvTime < 0) {
           this.noteStates[note.channel][note.note] = null;
         }
 
@@ -250,24 +254,24 @@ public final class MidiPlayer extends AudioSource {
 
   private void handlePortamentoOff(final int channel) {
     if ((FLAG_PORTAMENTO & this.chFlags[channel]) != 0) {
-      for (final MidiPlayerNoteState_idk var3 : this.noteSet.notes) {
-        if (var3.channel == channel && this.noteStates[channel][var3.note] == null && var3.notePlaying_idfk < 0) {
-          var3.notePlaying_idfk = 0;
+      for (final MidiPlayingNote var3 : this.noteSet.notes) {
+        if (var3.channel == channel && this.noteStates[channel][var3.note] == null && var3.relEnvTime < 0) {
+          var3.relEnvTime = 0;
         }
       }
     }
   }
 
-  public synchronized void a077(final SongData songData, final boolean looped) {
+  public synchronized void changeSong(final SongData songData, final boolean looped) {
     this.changeSong(looped, songData, true);
   }
 
   private void handleResetAllControllers(int channel) {
     if (channel >= 0) {
-      this.chVolume[channel] = 12800;
-      this.chPan[channel] = 8192;
+      this.chVol_p14[channel] = 12800; // not a typo, many midi impls default to vol=100
+      this.chPan_p14[channel] = 8192;
 
-      this.chExpression[channel] = 16383;
+      this.chExpression_p14[channel] = 16383;
       this.chPitchWheel[channel] = 8192;
       this.chModWheel[channel] = 0;
       this.chPortaTime[channel] = 8192;
@@ -276,7 +280,7 @@ public final class MidiPlayer extends AudioSource {
       this.chFlags[channel] = 0;
       this.chRpn[channel] = 32767;
       this.chPitchBendRange[channel] = 256;
-      this.chGeneral1[channel] = 0;
+      this.chStartOffset_p6[channel] = 0;
       this.handleGeneral2(8192, channel);
     } else {
       for (channel = 0; channel < 16; ++channel) {
@@ -306,9 +310,9 @@ public final class MidiPlayer extends AudioSource {
   }
 
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  public boolean a258(final MidiPlayerNoteState_idk note) {
+  public boolean noteIgnored(final MidiPlayingNote note) {
     if (note.playback == null) {
-      if (note.notePlaying_idfk >= 0) {
+      if (note.relEnvTime >= 0) {
         note.unlink();
         if (note.noteOffNote_idk > 0 && note == this.noteOffStates_idk[note.channel][note.noteOffNote_idk]) {
           this.noteOffStates_idk[note.channel][note.noteOffNote_idk] = null;
@@ -368,25 +372,25 @@ public final class MidiPlayer extends AudioSource {
         }
 
         if (controller == 7) { // volume msb
-          this.chVolume[channel] = (value << 7) + (0xffffc07f & this.chVolume[channel]);
+          this.chVol_p14[channel] = (value << 7) + (0xffffc07f & this.chVol_p14[channel]);
         }
         if (controller == 39) { // volume lsb
-          this.chVolume[channel] = (0xffffff80 & this.chVolume[channel]) + value;
+          this.chVol_p14[channel] = (0xffffff80 & this.chVol_p14[channel]) + value;
         }
 
         if (controller == 10) { // pan msb
-          this.chPan[channel] = (value << 7) + (this.chPan[channel] & 0xffffc07f);
+          this.chPan_p14[channel] = (value << 7) + (this.chPan_p14[channel] & 0xffffc07f);
         }
         if (controller == 42) { // pan lsb
-          this.chPan[channel] = (this.chPan[channel] & 0xffffff80) + value;
+          this.chPan_p14[channel] = (this.chPan_p14[channel] & 0xffffff80) + value;
         }
 
         if (controller == 11) { // expression msb
-          this.chExpression[channel] = (value << 7) + (0xffffc07f & this.chExpression[channel]);
+          this.chExpression_p14[channel] = (value << 7) + (0xffffc07f & this.chExpression_p14[channel]);
         }
 
         if (controller == 43) { // expression lsb
-          this.chExpression[channel] = value + (this.chExpression[channel] & 0xffffff80);
+          this.chExpression_p14[channel] = value + (this.chExpression_p14[channel] & 0xffffff80);
         }
 
         if (controller == 64) { // sustain on/off
@@ -444,10 +448,10 @@ public final class MidiPlayer extends AudioSource {
         }
 
         if (controller == 16) { // gp controller #1 msb
-          this.chGeneral1[channel] = (value << 7) + (this.chGeneral1[channel] & 0xffffc07f);
+          this.chStartOffset_p6[channel] = (value << 7) + (this.chStartOffset_p6[channel] & 0xffffc07f);
         }
         if (controller == 48) { // gp controller #1 lsb
-          this.chGeneral1[channel] = (this.chGeneral1[channel] & 0xffffff80) + value;
+          this.chStartOffset_p6[channel] = (this.chStartOffset_p6[channel] & 0xffffff80) + value;
         }
 
         if (controller == 81) { // gp controller #6 lsb
@@ -514,7 +518,7 @@ public final class MidiPlayer extends AudioSource {
 
   private void handleGeneral6Off(final int var2) {
     if ((FLAG_GENERAL_6 & this.chFlags[var2]) != 0) {
-      for (final MidiPlayerNoteState_idk var3 : this.noteSet.notes) {
+      for (final MidiPlayingNote var3 : this.noteSet.notes) {
         if (var3.channel == var2) {
           var3._j = 0;
         }
@@ -526,15 +530,15 @@ public final class MidiPlayer extends AudioSource {
   private void handleNoteOn(final int noteNumber, final int channel, final int velocity) {
     this.handleNoteOff(channel, noteNumber);
     if ((this.chFlags[channel] & FLAG_PORTAMENTO) != 0) {
-      for (final Iterator<MidiPlayerNoteState_idk> it = this.noteSet.notes.descendingIterator(); it.hasNext(); ) {
-        final MidiPlayerNoteState_idk note = it.next();
-        if (note.channel == channel && note.notePlaying_idfk < 0) {
+      for (final Iterator<MidiPlayingNote> it = this.noteSet.notes.descendingIterator(); it.hasNext(); ) {
+        final MidiPlayingNote note = it.next();
+        if (note.channel == channel && note.relEnvTime < 0) {
           this.noteStates[channel][note.note] = null;
           this.noteStates[channel][noteNumber] = note;
-          final int var6 = (note._pitch_fac_2 * note._pitch_fac_1 >> 12) + note.pitch_idk;
-          note.pitch_idk += -note.note + noteNumber << 8;
-          note._pitch_fac_2 = 4096;
-          note._pitch_fac_1 = -note.pitch_idk + var6;
+          final int curNote_p8 = (note.portaMag_p12 * note.portaRange_p8 >> 12) + note.relNote_p8;
+          note.relNote_p8 += -note.note + noteNumber << 8;
+          note.portaMag_p12 = 4096;
+          note.portaRange_p8 = curNote_p8 - note.relNote_p8;
           note.note = noteNumber;
           return;
         }
@@ -542,150 +546,161 @@ public final class MidiPlayer extends AudioSource {
     }
 
     final MidiInstrument instrument = this.instruments.get(this.chCurrentProgram[channel]);
-    if (instrument != null) {
-      final RawSampleS8 sample = instrument.noteSample[noteNumber];
-      if (sample != null) {
-        final MidiPlayerNoteState_idk note = new MidiPlayerNoteState_idk();
-        note.channel = channel;
-        note.instrument = instrument;
-        note.sampleData = sample;
-        note.keyParams_idk = instrument.keyParams_idk[noteNumber];
-        note.noteOffNote_idk = instrument.noteOffNote_idk[noteNumber];
-        note.note = noteNumber;
-        note.volume_idk = instrument.noteVolume_idk[noteNumber] * velocity * velocity * instrument.mainVolume_idk + 1024 >> 11;
-        note.pan_idk = instrument.notePan_idk[noteNumber] & 255;
-        note.pitch_idk = (noteNumber << 8) - (instrument.noteTuning_idk[noteNumber] & 32767);
-        note._B = 0;
-        note.notePlaying_idfk = -1;
-        note._F = 0;
-        note._h = 0;
-        note._v = 0;
-        if (this.chGeneral1[channel] == 0) {
-          note.playback = RawSamplePlayer.start(sample, this.calcPitchX_idk(note), this.calcVolumeX_idk(note), this.calcPanX_idk(note));
-        } else {
-          note.playback = RawSamplePlayer.start(sample, this.calcPitchX_idk(note), 0, this.calcPanX_idk(note));
-          this.a559(note, instrument.noteTuning_idk[noteNumber] < 0);
-        }
+    if (instrument == null) return;
 
-        if (instrument.noteTuning_idk[noteNumber] < 0) {
-          assert note.playback != null;
-          note.playback.f150();
-        }
+    final RawSampleS8 sample = instrument.noteSample[noteNumber];
+    if (sample == null) return;
 
-        if (note.noteOffNote_idk >= 0) {
-          final MidiPlayerNoteState_idk noteOff = this.noteOffStates_idk[channel][note.noteOffNote_idk];
-          if (noteOff != null && noteOff.notePlaying_idfk < 0) {
-            this.noteStates[channel][noteOff.note] = null;
-            noteOff.notePlaying_idfk = 0;
-          }
+    final MidiPlayingNote note = new MidiPlayingNote();
+    note.channel = channel;
+    note.instrument = instrument;
+    note.sampleData = sample;
+    note.params = instrument.keyParams[noteNumber];
+    note.noteOffNote_idk = instrument.noteOffNote_idk[noteNumber];
+    note.note = noteNumber;
+    note.amp_p15 = instrument.noteAmp[noteNumber] * velocity * velocity * instrument.mainAmp + 1024 >> 11;
+    note.pan_p7 = instrument.notePan_p7[noteNumber] & 255;
+    note.relNote_p8 = (noteNumber << 8) - (instrument.baseNote_p8[noteNumber] & 32767);
+    note.relEnvTime = -1;
+    note.volEnvTime = 0;
+    note.expEnvTime = 0;
+    note.volEnvIdx = 0;
+    note.relEnvIdx = 0;
 
-          this.noteOffStates_idk[channel][note.noteOffNote_idk] = note;
-        }
-
-        this.noteSet.notes.addLast(note);
-        this.noteStates[channel][noteNumber] = note;
-      }
+    if (this.chStartOffset_p6[channel] == 0) {
+      note.playback = RawSamplePlayer.of(
+        sample,
+        this.calcSpeed_p8(note),
+        this.calcVol_p14(note),
+        this.calcPan_p14(note)
+      );
+    } else {
+      note.playback = RawSamplePlayer.of(sample, this.calcSpeed_p8(note), 0, this.calcPan_p14(note));
+      this.initPlayhead(note, instrument.baseNote_p8[noteNumber] < 0);
     }
+
+    if (instrument.baseNote_p8[noteNumber] < 0) {
+      assert note.playback != null;
+      note.playback.setLooped();
+    }
+
+    if (note.noteOffNote_idk >= 0) {
+      final MidiPlayingNote noteOff = this.noteOffStates_idk[channel][note.noteOffNote_idk];
+      if (noteOff != null && noteOff.relEnvTime < 0) {
+        this.noteStates[channel][noteOff.note] = null;
+        noteOff.relEnvTime = 0;
+      }
+
+      this.noteOffStates_idk[channel][note.noteOffNote_idk] = note;
+    }
+
+    this.noteSet.notes.addLast(note);
+    this.noteStates[channel][noteNumber] = note;
   }
 
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  public boolean a543(final int var1, final int[] var2, final MidiPlayerNoteState_idk var4, final int var5) {
-    var4.lenRemaining_idk = SampledAudioChannelS16.SAMPLE_RATE / 100;
-    if (var4.notePlaying_idfk < 0 || var4.playback != null && !var4.playback.isPlayheadOutOfBounds()) {
-      int var6 = var4._pitch_fac_2;
-      if (var6 > 0) {
-        var6 -= (int) (Math.pow(2.0D, (double) this.chPortaTime[var4.channel] * 4.921259842519685E-4D) * 16.0D + 0.5D);
-        if (var6 < 0) {
-          var6 = 0;
-        }
+  public boolean processNote(final int offset, final int[] dest_s16p8, final MidiPlayingNote note, final int len) {
+    note.timeLeft = SampledAudioChannelS16.SAMPLE_RATE / 100;
 
-        var4._pitch_fac_2 = var6;
-      }
-
-      var4.playback.setAbsSpeed_p8(this.calcPitchX_idk(var4));
-      final KeyParams_idk var7 = var4.keyParams_idk;
-      var4.vibratoPhase_idk += var7.vibratoPhaseSpeed_idk;
-      ++var4._C;
-      boolean var8 = false;
-      final double var9 = 5.086263020833333E-6D * (double) ((var4.note - 60 << 8) + (var4._pitch_fac_2 * var4._pitch_fac_1 >> 12));
-      if (var7._h > 0) {
-        if (var7._a > 0) {
-          var4._h += (int) (Math.pow(2.0D, var9 * (double) var7._a) * 128.0D + 0.5D);
-        } else {
-          var4._h += 128;
-        }
-
-        if (var7._h * var4._h >= 819200) {
-          var8 = true;
-        }
-      }
-
-      if (var7._n != null) {
-        if (var7._k <= 0) {
-          var4._F += 128;
-        } else {
-          var4._F += (int) (0.5D + Math.pow(2.0D, var9 * (double) var7._k) * 128.0D);
-        }
-
-        while (var4._B < var7._n.length - 2 && ('\uff00' & var7._n[2 + var4._B] << 8) < var4._F) {
-          var4._B += 2;
-        }
-
-        if (var7._n.length - 2 == var4._B && var7._n[1 + var4._B] == 0) {
-          var8 = true;
-        }
-      }
-
-      if (var4.notePlaying_idfk >= 0 && var7._e != null && (FLAG_SUSTAIN & this.chFlags[var4.channel]) == 0 && (var4.noteOffNote_idk < 0 || this.noteOffStates_idk[var4.channel][var4.noteOffNote_idk] != var4)) {
-        if (var7._c <= 0) {
-          var4.notePlaying_idfk += 128;
-        } else {
-          var4.notePlaying_idfk += (int) (0.5D + 128.0D * Math.pow(2.0D, (double) var7._c * var9));
-        }
-
-        while (var4._v < var7._e.length - 2 && var4.notePlaying_idfk > (255 & var7._e[2 + var4._v]) << 8) {
-          var4._v += 2;
-        }
-
-        if (var7._e.length - 2 == var4._v) {
-          var8 = true;
-        }
-      }
-
-      if (var8) {
-        var4.playback.setVolZeroRamped(var4.lenRemaining_idk);
-        if (var2 == null) {
-          var4.playback.processAndDiscard(var5);
-        } else {
-          var4.playback.processAndWrite(var2, var1, var5);
-        }
-
-        if (var4.playback.isRampTimeNonzero()) {
-          this.noteSet.sum.addFirst(var4.playback);
-        }
-
-        var4.reset_idk();
-        if (var4.notePlaying_idfk >= 0) {
-          var4.unlink();
-          if (var4.noteOffNote_idk > 0 && this.noteOffStates_idk[var4.channel][var4.noteOffNote_idk] == var4) {
-            this.noteOffStates_idk[var4.channel][var4.noteOffNote_idk] = null;
-          }
-        }
-
-        return true;
-      } else {
-
-        var4.playback.setVolAndPanRamped_p14(var4.lenRemaining_idk, this.calcVolumeX_idk(var4), this.calcPanX_idk(var4));
-        return false;
-      }
-    } else {
-      var4.reset_idk();
-      var4.unlink();
-      if (var4.noteOffNote_idk > 0 && this.noteOffStates_idk[var4.channel][var4.noteOffNote_idk] == var4) {
-        this.noteOffStates_idk[var4.channel][var4.noteOffNote_idk] = null;
+    if (note.relEnvTime >= 0 && (note.playback == null || note.playback.isPlayheadOutOfBounds())) {
+      note.reset();
+      note.unlink();
+      if (note.noteOffNote_idk > 0 && this.noteOffStates_idk[note.channel][note.noteOffNote_idk] == note) {
+        this.noteOffStates_idk[note.channel][note.noteOffNote_idk] = null;
       }
 
       return true;
+    }
+
+    int porta = note.portaMag_p12;
+    if (porta > 0) {
+      porta -= (int) (Math.pow(2.0D, (double) this.chPortaTime[note.channel] * 4.921259842519685E-4D) * 16.0D + 0.5D);
+      if (porta < 0) {
+        porta = 0;
+      }
+
+      note.portaMag_p12 = porta;
+    }
+
+    note.playback.setAbsSpeed_p8(this.calcSpeed_p8(note));
+    final MidiKeyParams params = note.params;
+    note.vibratoPhase_p9 += params.vibratoPhaseSpeed_p9;
+    ++note.vibratoTime;
+
+    boolean envEnded = false;
+
+    // relative to middle C (note=60), used for keytracking
+    final double relOctave = 5.086263020833333E-6D * (double) ((note.note - 60 << 8) + (note.portaMag_p12 * note.portaRange_p8 >> 12));
+
+    if (params.expEnv > 0) {
+      if (params.expEnvKeytrack > 0) {
+        note.expEnvTime += (int) (Math.pow(2.0D, relOctave * (double) params.expEnvKeytrack) * 128.0D + 0.5D);
+      } else {
+        note.expEnvTime += 128;
+      }
+
+      if (params.expEnv * note.expEnvTime >= 819200) {
+        envEnded = true;
+      }
+    }
+
+    if (params.volEnv != null) {
+      if (params.volEnvKeytrack <= 0) {
+        note.volEnvTime += 128;
+      } else {
+        note.volEnvTime += (int) (0.5D + Math.pow(2.0D, relOctave * (double) params.volEnvKeytrack) * 128.0D);
+      }
+
+      while (note.volEnvIdx < params.volEnv.length - 2 && ('\uff00' & params.volEnv[2 + note.volEnvIdx] << 8) < note.volEnvTime) {
+        note.volEnvIdx += 2;
+      }
+
+      if (params.volEnv.length - 2 == note.volEnvIdx && params.volEnv[1 + note.volEnvIdx] == 0) {
+        envEnded = true;
+      }
+    }
+
+    if (note.relEnvTime >= 0 && params.relEnv != null && (FLAG_SUSTAIN & this.chFlags[note.channel]) == 0 && (note.noteOffNote_idk < 0 || this.noteOffStates_idk[note.channel][note.noteOffNote_idk] != note)) {
+      if (params.relEnvKeytrack <= 0) {
+        note.relEnvTime += 128;
+      } else {
+        note.relEnvTime += (int) (0.5D + 128.0D * Math.pow(2.0D, (double) params.relEnvKeytrack * relOctave));
+      }
+
+      while (note.relEnvIdx < params.relEnv.length - 2 && note.relEnvTime > (255 & params.relEnv[2 + note.relEnvIdx]) << 8) {
+        note.relEnvIdx += 2;
+      }
+
+      if (params.relEnv.length - 2 == note.relEnvIdx) {
+        envEnded = true;
+      }
+    }
+
+    if (envEnded) {
+      note.playback.setVolZeroRamped(note.timeLeft);
+      if (dest_s16p8 == null) {
+        note.playback.processAndDiscard(len);
+      } else {
+        note.playback.processAndWrite(dest_s16p8, offset, len);
+      }
+
+      if (note.playback.isRampTimeNonzero()) {
+        this.noteSet.sum.addFirst(note.playback);
+      }
+
+      note.reset();
+      if (note.relEnvTime >= 0) {
+        note.unlink();
+        if (note.noteOffNote_idk > 0 && this.noteOffStates_idk[note.channel][note.noteOffNote_idk] == note) {
+          this.noteOffStates_idk[note.channel][note.noteOffNote_idk] = null;
+        }
+      }
+
+      return true;
+    } else {
+
+      note.playback.setVolAndPanRamped_p14(note.timeLeft, this.calcVol_p14(note), this.calcPan_p14(note));
+      return false;
     }
   }
 
@@ -698,11 +713,11 @@ public final class MidiPlayer extends AudioSource {
     }
   }
 
-  private int calcPanX_idk(final MidiPlayerNoteState_idk note) {
-    final int midiPan = this.chPan[note.channel];
-    return midiPan >= 8192
-      ? -(32 + (128 - note.pan_idk) * (-midiPan + 16384) >> 6) + 16384
-      : 32 + note.pan_idk * midiPan >> 6;
+  private int calcPan_p14(final MidiPlayingNote note) {
+    final int chPan_p14 = this.chPan_p14[note.channel];
+    return chPan_p14 >= 8192
+      ? 16384 - (32 + (128 - note.pan_p7) * (16384 - chPan_p14) >> 6)
+      : 32 + note.pan_p7 * chPan_p14 >> 6;
   }
 
   private void pumpEvents() {
@@ -724,7 +739,7 @@ public final class MidiPlayer extends AudioSource {
             this.midiReader.setTrackPlaybackPosToCursor(track);
             if (this.midiReader.allTracksStopped()) {
               if (this.songData != null) {
-                this.a077(this.songData, this.looped);
+                this.changeSong(this.songData, this.looped);
                 this.pumpEvents();
                 return;
               }
@@ -765,66 +780,68 @@ public final class MidiPlayer extends AudioSource {
     }
   }
 
-  public void a559(final MidiPlayerNoteState_idk note, final boolean var3) {
+  public void initPlayhead(final MidiPlayingNote note, final boolean isLooped) {
 
     int sampleLength = note.sampleData.data_s8.length;
     int playhead;
-    if (var3 && note.sampleData.isLooped_idk) {
-      final int var6 = -note.sampleData.loopStart_idfk + sampleLength + sampleLength;
-      playhead = (int) ((long) this.chGeneral1[note.channel] * (long) var6 >> 6);
+    if (isLooped && note.sampleData.isPingPongLoop) {
+      final int var6 = -note.sampleData.loopStart + sampleLength + sampleLength;
+      playhead = (int) ((long) this.chStartOffset_p6[note.channel] * (long) var6 >> 6);
       sampleLength <<= 8;
       if (playhead >= sampleLength) {
         note.playback.setBackwards();
         playhead = -playhead + sampleLength + sampleLength - 1;
       }
     } else {
-      playhead = (int) ((long) this.chGeneral1[note.channel] * (long) sampleLength >> 6);
+      playhead = (int) ((long) this.chStartOffset_p6[note.channel] * (long) sampleLength >> 6);
     }
 
     note.playback.setPlayhead_p8(playhead);
   }
 
-  private int calcVolumeX_idk(final MidiPlayerNoteState_idk note) {
-    if (this.chVolumeAgainForSomeReason_idk[note.channel] == 0) {
+  private int calcVol_p14(final MidiPlayingNote note) {
+    if (this.chGlobalAmp_p8[note.channel] == 0) {
       return 0;
     }
 
-    final KeyParams_idk keyParams = note.keyParams_idk;
-    int x = this.chVolume[note.channel] * this.chExpression[note.channel] + 4096 >> 13;
-    x = x * x + 16384 >> 15;
-    x = note.volume_idk * x + 16384 >> 15;
-    x = 128 + this.volume * x >> 8;
-    x = this.chVolumeAgainForSomeReason_idk[note.channel] * x + 128 >> 8;
-    if (keyParams._h > 0) {
-      x = (int) (0.5D + (double) x * Math.pow(0.5D, (double) note._h * 1.953125E-5D * (double) keyParams._h));
+    final MidiKeyParams keyParams = note.params;
+    int x;
+    x = 4096 + this.chVol_p14[note.channel] * this.chExpression_p14[note.channel] >> 13;
+    x = 16384 + x * x >> 15;
+    x = 16384 + note.amp_p15 * x >> 15;
+    x = 128 + this.amp_p8 * x >> 8;
+    x = 128 + this.chGlobalAmp_p8[note.channel] * x >> 8;
+    if (keyParams.expEnv > 0) {
+      x = (int) (0.5D + (double) x * Math.pow(0.5D, (double) note.expEnvTime * 1.953125E-5D * (double) keyParams.expEnv));
     }
 
-    int var5;
-    int var6;
-    int var7;
-    int var8;
-    if (keyParams._n != null) {
-      var5 = note._F;
-      var6 = keyParams._n[1 + note._B];
-      if (note._B < keyParams._n.length - 2) {
-        var7 = keyParams._n[note._B] << 8 & '\uff00';
-        var8 = (255 & keyParams._n[2 + note._B]) << 8;
-        var6 += (-var6 + keyParams._n[note._B + 3]) * (-var7 + var5) / (-var7 + var8);
+    int t_p8;
+    int env;
+    int t0_p8;
+    int t1_p8;
+
+    if (keyParams.volEnv != null) {
+      t_p8 = note.volEnvTime;
+      env = keyParams.volEnv[note.volEnvIdx + 1];
+      if (note.volEnvIdx < keyParams.volEnv.length - 2) {
+        t0_p8 = (255 & keyParams.volEnv[note.volEnvIdx]) << 8;
+        t1_p8 = (255 & keyParams.volEnv[note.volEnvIdx + 2]) << 8;
+        env += (keyParams.volEnv[note.volEnvIdx + 3] - env) * (t_p8 - t0_p8) / (t1_p8 - t0_p8);
       }
 
-      x = var6 * x + 32 >> 6;
+      x = 32 + env * x >> 6;
     }
 
-    if (note.notePlaying_idfk > 0 && keyParams._e != null) {
-      var5 = note.notePlaying_idfk;
-      var6 = keyParams._e[1 + note._v];
-      if (keyParams._e.length - 2 > note._v) {
-        var7 = (255 & keyParams._e[note._v]) << 8;
-        var8 = keyParams._e[2 + note._v] << 8 & '\uff00';
-        var6 += (keyParams._e[note._v + 3] - var6) * (-var7 + var5) / (-var7 + var8);
+    if (note.relEnvTime > 0 && keyParams.relEnv != null) {
+      t_p8 = note.relEnvTime;
+      env = keyParams.relEnv[note.relEnvIdx + 1];
+      if (note.relEnvIdx < keyParams.relEnv.length - 2) {
+        t0_p8 = (255 & keyParams.relEnv[note.relEnvIdx]) << 8;
+        t1_p8 = (255 & keyParams.relEnv[note.relEnvIdx + 2]) << 8;
+        env += (keyParams.relEnv[note.relEnvIdx + 3] - env) * (t_p8 - t0_p8) / (-t0_p8 + t1_p8);
       }
 
-      x = 32 + x * var6 >> 6;
+      x = 32 + env * x >> 6;
     }
 
     return x;

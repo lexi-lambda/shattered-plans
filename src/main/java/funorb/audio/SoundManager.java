@@ -30,9 +30,9 @@ public final class SoundManager extends AudioSource {
   }
 
   @Override
-  public synchronized void processAndWrite(final int[] dataS16P8, final int offset, final int len) {
+  public synchronized void processAndWrite(final int[] data_s16p8, final int offset, final int len) {
     for (final AudioSource gen : this.inner) {
-      gen.processAndWriteIfEnabled(dataS16P8, offset, len);
+      gen.processAndWriteIfEnabled(data_s16p8, offset, len);
     }
   }
 }

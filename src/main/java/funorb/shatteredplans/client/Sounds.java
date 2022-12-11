@@ -42,13 +42,13 @@ public final class Sounds {
   public static void loadSoundEffects(final ResourceLoader loader1, final ResourceLoader loader2) {
     SoundLoader.globalLoader = new SoundLoader(loader1, loader2);
 
-    SFX_SHIP_SELECTION = SoundEffect.load1("shatteredplans_ship_selection", 256);
-    SFX_SHIP_MOVE_ORDER = SoundEffect.load1("shatteredplans_ship_move_order", 256);
-    SFX_SHIP_ATTACK_ORDER = SoundEffect.load1("shatteredplans_ship_attack_order", 256);
-    SFX_FACTORY_NOISE = SoundEffect.load1("shatteredplans_factory_noise", 256);
-    SFX_EXPLOSION = SoundEffect.load2("shatteredplans_explosion", 120);
-    SFX_NEXT_OPEN = SoundEffect.load1("shatteredplans_next_open", 256);
-    SFX_NEXT_CLOSE = SoundEffect.load1("shatteredplans_next_close", 256);
+    SFX_SHIP_SELECTION = SoundEffect.loadSynth("shatteredplans_ship_selection", 256);
+    SFX_SHIP_MOVE_ORDER = SoundEffect.loadSynth("shatteredplans_ship_move_order", 256);
+    SFX_SHIP_ATTACK_ORDER = SoundEffect.loadSynth("shatteredplans_ship_attack_order", 256);
+    SFX_FACTORY_NOISE = SoundEffect.loadSynth("shatteredplans_factory_noise", 256);
+    SFX_EXPLOSION = SoundEffect.loadVorbis("shatteredplans_explosion", 120);
+    SFX_NEXT_OPEN = SoundEffect.loadSynth("shatteredplans_next_open", 256);
+    SFX_NEXT_CLOSE = SoundEffect.loadSynth("shatteredplans_next_close", 256);
   }
 
   public static void loadMusic(final ResourceLoader loader1, final ResourceLoader loader2) {
@@ -59,9 +59,9 @@ public final class Sounds {
     MUSIC_LOSE = SongData.load(loader1, "shattered_plans_lose");
 
     ShatteredPlansClient.currentTrack = MUSIC_IN_GAME_2;
-    musicTn.midiPlayer2.a350(SoundLoader.globalLoader, loader2, MUSIC_INTRO);
-    musicTn.midiPlayer2.a350(SoundLoader.globalLoader, loader2, MUSIC_IN_GAME_1);
-    musicTn.midiPlayer2.a350(SoundLoader.globalLoader, loader2, MUSIC_IN_GAME_2);
+    musicTn.midiPlayer2.loadNoteSamplesForSong(SoundLoader.globalLoader, loader2, MUSIC_INTRO);
+    musicTn.midiPlayer2.loadNoteSamplesForSong(SoundLoader.globalLoader, loader2, MUSIC_IN_GAME_1);
+    musicTn.midiPlayer2.loadNoteSamplesForSong(SoundLoader.globalLoader, loader2, MUSIC_IN_GAME_2);
     musicTn.midiPlayer2.f150();
 
     SoundLoader.globalLoader = null;
@@ -76,7 +76,7 @@ public final class Sounds {
   }
 
   private static PlayingSound play(final RawSampleS8 var1, final int volume) {
-    final RawSamplePlayer var01 = RawSamplePlayer.a638(var1, volume);
+    final RawSamplePlayer var01 = RawSamplePlayer.of(var1, volume);
     assert var01 != null;
     final PlayingSound sound = new PlayingSound(var01);
     playingSounds.add(sound);
@@ -93,7 +93,7 @@ public final class Sounds {
   public static void setMusicVolume(final int volume) {
     musicVolume = volume;
     if (musicTn != null) {
-      musicTn.setVolume(volume);
+      musicTn.setVolume_p8(volume);
     }
   }
 }
