@@ -10,13 +10,13 @@ public abstract class AudioSource extends NodeList.Node implements Iterable<Audi
 
   protected AudioSource() {}
 
-  public abstract void processAndWrite(int[] dataS16P8, int offset, int len);
+  public abstract void processAndWrite(int[] data_s16p8, int offset, int len);
 
   public abstract void processAndDiscard(int len);
 
-  protected final void processAndWriteIfEnabled(final int[] dataS16P8, final int offset, final int len) {
+  protected final void processAndWriteIfEnabled(final int[] data_s16p8, final int offset, final int len) {
     if (this.enabled) {
-      this.processAndWrite(dataS16P8, offset, len);
+      this.processAndWrite(data_s16p8, offset, len);
     } else {
       this.processAndDiscard(len);
     }

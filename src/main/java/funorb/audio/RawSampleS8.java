@@ -1,11 +1,11 @@
 package funorb.audio;
 
 public final class RawSampleS8 {
-  public final int loopEnd_idfk;
-  public final int loopStart_idfk;
+  public final int loopEnd;
+  public final int loopStart;
   public final int sampleRate;
   public final byte[] data_s8;
-  public final boolean isLooped_idk;
+  public final boolean isPingPongLoop;
   public int someCounter_idk;
 
   public RawSampleS8(final byte[] data, final int loopStart, final int loopEnd) {
@@ -17,12 +17,12 @@ public final class RawSampleS8 {
     final byte[] data,
     final int loopStart,
     final int loopEnd,
-    final boolean isLooped
+    final boolean isPingPongLoop
   ) {
     this.sampleRate = sampleRate;
     this.data_s8 = data;
-    this.loopStart_idfk = loopStart;
-    this.loopEnd_idfk = loopEnd;
-    this.isLooped_idk = isLooped;
+    this.loopStart = loopStart;
+    this.loopEnd = loopEnd;
+    this.isPingPongLoop = isPingPongLoop;
   }
 }

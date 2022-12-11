@@ -4265,8 +4265,8 @@ public final class ShatteredPlansClient extends JagexApplet {
     final MusicManager musicTn = new MusicManager();
     musicTn.midiPlayer2.initialize();
     musicTn.midiPlayer1.initialize();
-    musicTn.midiPlayer2.setVolume(Sounds.MAX_VOLUME);
-    musicTn.midiPlayer1.setVolume(Sounds.MAX_VOLUME);
+    musicTn.midiPlayer2.setAmp_p8(Sounds.MAX_VOLUME);
+    musicTn.midiPlayer1.setAmp_p8(Sounds.MAX_VOLUME);
 
     Sounds.musicChannel = createAudioChannel(0, SampledAudioChannelS16.SAMPLE_RATE);
     Sounds.soundsChannel = createAudioChannel(1, 1102);
@@ -4274,7 +4274,7 @@ public final class ShatteredPlansClient extends JagexApplet {
     Sounds.soundsTn = new SoundManager();
     Sounds.soundsChannel.setSource(Sounds.soundsTn);
     Sounds.musicTn = musicTn;
-    Sounds.musicTn.setVolume(Sounds.musicVolume);
+    Sounds.musicTn.setVolume_p8(Sounds.musicVolume);
     Sounds.musicChannel.setSource(Sounds.musicTn);
 
     renderQuality = RenderQuality.high();

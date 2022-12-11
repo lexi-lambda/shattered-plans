@@ -10,12 +10,12 @@ public final class SoundEffect {
   }
 
   @SuppressWarnings("SameParameterValue")
-  public static SoundEffect load1(final String item, final int volume) {
-    return new SoundEffect(SoundLoader.globalLoader.load1(item), volume);
+  public static SoundEffect loadSynth(final String item, final int volume) {
+    return new SoundEffect(SoundLoader.globalLoader.loadSynth(item), volume);
   }
 
   @SuppressWarnings("SameParameterValue")
-  public static SoundEffect load2(final String item, final int volume) {
-    return new SoundEffect(SoundLoader.globalLoader.load2(item), volume);
+  public static SoundEffect loadVorbis(final String item, final int volume) {
+    return new SoundEffect(SoundLoader.globalLoader.loadVorbis(item), volume);
   }
 }

@@ -42,7 +42,7 @@ public final class MidiReader {
   };
 
   private final Buffer midi = new Buffer(null);
-  public int ticksPerQuarterNote;
+  public int ticksPerQn;
   public int[] trackNextTick;
   private int[] trackPlaybackPos;
   private int[] trackStartPos;
@@ -206,7 +206,7 @@ public final class MidiReader {
     this.midi.data = midiData;
     this.midi.pos = 10; // skip to count of MTrk chunks in MThd
     final int numTracks = this.midi.readUShort();
-    this.ticksPerQuarterNote = this.midi.readUShort();
+    this.ticksPerQn = this.midi.readUShort();
     this.tempo = 500000; // 120 bpm
     this.trackStartPos = new int[numTracks];
 

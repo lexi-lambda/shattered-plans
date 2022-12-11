@@ -4,12 +4,12 @@ import funorb.io.Buffer;
 
 public final class MidiInstrument {
   public final RawSampleS8[] noteSample = new RawSampleS8[128];
-  public final KeyParams_idk[] keyParams_idk = new KeyParams_idk[128];
-  public final byte[] notePan_idk = new byte[128];
-  public final int mainVolume_idk;
-  public final short[] noteTuning_idk = new short[128];
+  public final MidiKeyParams[] keyParams = new MidiKeyParams[128];
+  public final byte[] notePan_p7 = new byte[128];
+  public final int mainAmp;
+  public final short[] baseNote_p8 = new short[128]; // <0 for looped
   public final byte[] noteOffNote_idk = new byte[128];
-  public final byte[] noteVolume_idk = new byte[128];
+  public final byte[] noteAmp = new byte[128];
   private int[] noteSampleIds_idk = new int[128];
 
   public MidiInstrument(final byte[] instrumentData) {
@@ -88,20 +88,20 @@ public final class MidiInstrument {
       }
     }
 
-    final KeyParams_idk[] var37 = new KeyParams_idk[var12];
+    final MidiKeyParams[] var37 = new MidiKeyParams[var12];
 
-    KeyParams_idk var38;
+    MidiKeyParams var38;
     for (var14 = 0; var14 < var37.length; ++var14) {
-      var38 = var37[var14] = new KeyParams_idk();
+      var38 = var37[var14] = new MidiKeyParams();
       final int var16 = buf.readUByte();
       if (var16 > 0) {
-        var38._n = new byte[var16 * 2];
+        var38.volEnv = new byte[var16 * 2];
       }
 
       final int j137 = buf.readUByte();
       if (j137 > 0) {
-        var38._e = new byte[2 * j137 + 2];
-        var38._e[1] = 64;
+        var38.relEnv = new byte[2 * j137 + 2];
+        var38.relEnv[1] = 64;
       }
     }
 
@@ -129,14 +129,14 @@ public final class MidiInstrument {
     int var20;
     for (var20 = 0; var20 < 128; ++var20) {
       var19 += buf.readUByte();
-      this.noteTuning_idk[var20] = (short) var19;
+      this.baseNote_p8[var20] = (short) var19;
     }
 
     var19 = 0;
 
     for (var20 = 0; var20 < 128; ++var20) {
       var19 += buf.readUByte();
-      this.noteTuning_idk[var20] = (short) (this.noteTuning_idk[var20] + (var19 << 8));
+      this.baseNote_p8[var20] = (short) (this.baseNote_p8[var20] + (var19 << 8));
     }
 
     var20 = 0;
@@ -155,7 +155,7 @@ public final class MidiInstrument {
         var22 = buf.readVariableInt();
       }
 
-      this.noteTuning_idk[var23] = (short) (this.noteTuning_idk[var23] + ((var22 - 1 & 2) << 14));
+      this.baseNote_p8[var23] = (short) (this.baseNote_p8[var23] + ((var22 - 1 & 2) << 14));
       --var20;
       this.noteSampleIds_idk[var23] = var22;
     }
@@ -199,13 +199,13 @@ public final class MidiInstrument {
         }
 
         --var20;
-        this.notePan_idk[var25] = (byte) var24;
+        this.notePan_p7[var25] = (byte) var24;
       }
     }
 
     int i2 = 0;
     var20 = 0;
-    KeyParams_idk var42 = null;
+    MidiKeyParams var42 = null;
 
     int var26;
     for (var26 = 0; var26 < 128; ++var26) {
@@ -220,7 +220,7 @@ public final class MidiInstrument {
         }
 
         --var20;
-        this.keyParams_idk[var26] = var42;
+        this.keyParams[var26] = var42;
       }
     }
 
@@ -243,24 +243,24 @@ public final class MidiInstrument {
       }
 
       --var20;
-      this.noteVolume_idk[var27] = (byte) var26;
+      this.noteAmp[var27] = (byte) var26;
     }
 
-    this.mainVolume_idk = buf.readUByte() + 1;
+    this.mainAmp = buf.readUByte() + 1;
 
-    KeyParams_idk var28;
+    MidiKeyParams var28;
     int var29;
     for (var27 = 0; var27 < var12; ++var27) {
       var28 = var37[var27];
-      if (var28._n != null) {
-        for (var29 = 1; var29 < var28._n.length; var29 += 2) {
-          var28._n[var29] = buf.readByte();
+      if (var28.volEnv != null) {
+        for (var29 = 1; var29 < var28.volEnv.length; var29 += 2) {
+          var28.volEnv[var29] = buf.readByte();
         }
       }
 
-      if (var28._e != null) {
-        for (var29 = 3; var28._e.length - 2 > var29; var29 += 2) {
-          var28._e[var29] = buf.readByte();
+      if (var28.relEnv != null) {
+        for (var29 = 3; var28.relEnv.length - 2 > var29; var29 += 2) {
+          var28.relEnv[var29] = buf.readByte();
         }
       }
     }
@@ -279,24 +279,24 @@ public final class MidiInstrument {
 
     for (var27 = 0; var27 < var12; ++var27) {
       var28 = var37[var27];
-      if (var28._e != null) {
+      if (var28.relEnv != null) {
         var19 = 0;
 
-        for (var29 = 2; var29 < var28._e.length; var29 += 2) {
+        for (var29 = 2; var29 < var28.relEnv.length; var29 += 2) {
           var19 = buf.readUByte() + var19 + 1;
-          var28._e[var29] = (byte) var19;
+          var28.relEnv[var29] = (byte) var19;
         }
       }
     }
 
     for (var27 = 0; var12 > var27; ++var27) {
       var28 = var37[var27];
-      if (var28._n != null) {
+      if (var28.volEnv != null) {
         var19 = 0;
 
-        for (var29 = 2; var29 < var28._n.length; var29 += 2) {
+        for (var29 = 2; var29 < var28.volEnv.length; var29 += 2) {
           var19 = buf.readUByte() + var19 + 1;
-          var28._n[var29] = (byte) var19;
+          var28.volEnv[var29] = (byte) var19;
         }
       }
     }
@@ -320,7 +320,7 @@ public final class MidiInstrument {
       byte var43 = var39[1];
 
       for (var29 = 0; var29 < var47; ++var29) {
-        this.noteVolume_idk[var29] = (byte) (32 + this.noteVolume_idk[var29] * var43 >> 6);
+        this.noteAmp[var29] = (byte) (32 + this.noteAmp[var29] * var43 >> 6);
       }
 
       for (var29 = 2; var29 < var39.length; var47 = var30) {
@@ -330,7 +330,7 @@ public final class MidiInstrument {
 
         for (var33 = var47; var30 > var33; ++var33) {
           var34 = a666ql(var32, var30 - var47);
-          this.noteVolume_idk[var33] = (byte) (32 + this.noteVolume_idk[var33] * var34 >> 6);
+          this.noteAmp[var33] = (byte) (32 + this.noteAmp[var33] * var34 >> 6);
           var32 += -var43 + var31;
         }
 
@@ -339,7 +339,7 @@ public final class MidiInstrument {
       }
 
       for (var45 = var47; var45 < 128; ++var45) {
-        this.noteVolume_idk[var45] = (byte) (32 + this.noteVolume_idk[var45] * var43 >> 6);
+        this.noteAmp[var45] = (byte) (32 + this.noteAmp[var45] * var43 >> 6);
       }
     }
 
@@ -356,7 +356,7 @@ public final class MidiInstrument {
       int var44 = var40[1] << 1;
 
       for (var29 = 0; var29 < var47; ++var29) {
-        var45 = (this.notePan_idk[var29] & 255) + var44;
+        var45 = (this.notePan_p7[var29] & 255) + var44;
         if (var45 < 0) {
           var45 = 0;
         }
@@ -365,7 +365,7 @@ public final class MidiInstrument {
           var45 = 128;
         }
 
-        this.notePan_idk[var29] = (byte) var45;
+        this.notePan_p7[var29] = (byte) var45;
       }
 
       int var46;
@@ -376,7 +376,7 @@ public final class MidiInstrument {
 
         for (var33 = var47; var33 < var30; ++var33) {
           var34 = a666ql(var32, -var47 + var30);
-          int var35 = var34 + (255 & this.notePan_idk[var33]);
+          int var35 = var34 + (255 & this.notePan_p7[var33]);
           if (var35 < 0) {
             var35 = 0;
           }
@@ -385,7 +385,7 @@ public final class MidiInstrument {
             var35 = 128;
           }
 
-          this.notePan_idk[var33] = (byte) var35;
+          this.notePan_p7[var33] = (byte) var35;
           var32 += -var44 + var46;
         }
 
@@ -394,7 +394,7 @@ public final class MidiInstrument {
       }
 
       for (var45 = var47; var45 < 128; ++var45) {
-        var46 = var44 + (this.notePan_idk[var45] & 255);
+        var46 = var44 + (this.notePan_p7[var45] & 255);
         if (var46 < 0) {
           var46 = 0;
         }
@@ -403,44 +403,44 @@ public final class MidiInstrument {
           var46 = 128;
         }
 
-        this.notePan_idk[var45] = (byte) var46;
+        this.notePan_p7[var45] = (byte) var46;
       }
     }
 
     for (var27 = 0; var12 > var27; ++var27) {
-      var37[var27]._h = buf.readUByte();
+      var37[var27].expEnv = buf.readUByte();
     }
 
     for (var27 = 0; var12 > var27; ++var27) {
       var28 = var37[var27];
-      if (var28._n != null) {
-        var28._k = buf.readUByte();
+      if (var28.volEnv != null) {
+        var28.volEnvKeytrack = buf.readUByte();
       }
 
-      if (var28._e != null) {
-        var28._c = buf.readUByte();
+      if (var28.relEnv != null) {
+        var28.relEnvKeytrack = buf.readUByte();
       }
 
-      if (var28._h > 0) {
-        var28._a = buf.readUByte();
+      if (var28.expEnv > 0) {
+        var28.expEnvKeytrack = buf.readUByte();
       }
     }
 
     for (var27 = 0; var27 < var12; ++var27) {
-      var37[var27].vibratoPhaseSpeed_idk = buf.readUByte();
+      var37[var27].vibratoPhaseSpeed_p9 = buf.readUByte();
     }
 
     for (var27 = 0; var12 > var27; ++var27) {
       var28 = var37[var27];
-      if (var28.vibratoPhaseSpeed_idk > 0) {
-        var28._f = buf.readUByte();
+      if (var28.vibratoPhaseSpeed_p9 > 0) {
+        var28.vibrato_p6 = buf.readUByte();
       }
     }
 
     for (var27 = 0; var12 > var27; ++var27) {
       var28 = var37[var27];
-      if (var28._f > 0) {
-        var28._j = buf.readUByte();
+      if (var28.vibrato_p6 > 0) {
+        var28.vibratoAttack = buf.readUByte();
       }
     }
 
@@ -463,9 +463,9 @@ public final class MidiInstrument {
           if (sampleId != var6) {
             var6 = sampleId--;
             if ((1 & sampleId) == 0) {
-              sampleData = loader.loadSingleton1(sampleId >> 2);
+              sampleData = loader.loadSingletonSynth(sampleId >> 2);
             } else {
-              sampleData = loader.loadSingleton2(sampleId >> 2);
+              sampleData = loader.loadSingletonVorbis(sampleId >> 2);
             }
 
             if (sampleData == null) {
