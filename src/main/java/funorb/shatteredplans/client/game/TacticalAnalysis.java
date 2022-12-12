@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class performs some simple analyses of the current map from the
@@ -97,6 +98,7 @@ public final class TacticalAnalysis {
     return this.systemWillOwn[system.index];
   }
 
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public boolean isOwnershipPossible(final @NotNull StarSystem system) {
     return this.systemCanOwn[system.index];
   }
@@ -169,47 +171,31 @@ public final class TacticalAnalysis {
     }
 
     if (!gameState.gameOptions.noChainCollapsing) {
-      boolean goAgain = true;
-      while (goAgain) {
-        goAgain = false;
+      analyzeCollapse(gameState.gameOptions.simpleGarrisoning, gameState.map.systems, this.systemCanOwn, this.minGarrisonToHold, this.maxGarrisonAtTurnEnd, this.guaranteedCollapseWave);
+      analyzeCollapse(gameState.gameOptions.simpleGarrisoning, gameState.map.systems, this.systemWillOwn, this.safeGarrisonToHold, this.minGarrisonAtTurnEnd, this.possibleCollapseWave);
+    }
+  }
 
-        for (final StarSystem system : gameState.map.systems) {
-          final int index = system.index;
-          if (this.systemCanOwn[index] && this.minGarrisonToHold[index] > this.maxGarrisonAtTurnEnd[index]) {
-            goAgain = true;
-            this.systemCanOwn[index] = false;
-            final int nextStage = this.guaranteedCollapseWave[index] + 1;
+  private static void analyzeCollapse(final boolean simpleGarrisoning,
+                                      final StarSystem[] systems,
+                                      final boolean[] willOwn,
+                                      final int[] garrisonToHold,
+                                      final int[] garrisonAtTurnEnd,
+                                      final int[] collapseWave) {
+    for (int currentWave = 0;; currentWave++) {
+      final List<StarSystem> collapsed = Arrays.stream(systems)
+          .filter(system -> willOwn[system.index] && garrisonToHold[system.index] > garrisonAtTurnEnd[system.index])
+          .toList();
+      if (collapsed.isEmpty()) break;
 
-            for (final StarSystem neighbor : system.neighbors) {
-              if (gameState.gameOptions.simpleGarrisoning) {
-                this.minGarrisonToHold[neighbor.index] = 1;
-              } else {
-                this.minGarrisonToHold[neighbor.index]++;
-              }
-
-              if (this.guaranteedCollapseWave[neighbor.index] > nextStage || this.systemCanOwn[neighbor.index]) {
-                this.guaranteedCollapseWave[neighbor.index] = nextStage;
-              }
-            }
-          }
-
-          if (this.systemWillOwn[index] && this.safeGarrisonToHold[index] > this.minGarrisonAtTurnEnd[index]) {
-            goAgain = true;
-            this.systemWillOwn[index] = false;
-            this.minGarrisonAtTurnEnd[index] = 0;
-            final int nextStage = this.possibleCollapseWave[index] + 1;
-
-            for (final StarSystem neighbor : system.neighbors) {
-              if (gameState.gameOptions.simpleGarrisoning) {
-                this.safeGarrisonToHold[neighbor.index] = 1;
-              } else {
-                this.safeGarrisonToHold[neighbor.index]++;
-              }
-
-              if (nextStage < this.possibleCollapseWave[neighbor.index] || this.systemWillOwn[neighbor.index]) {
-                this.possibleCollapseWave[neighbor.index] = nextStage;
-              }
-            }
+      for (final StarSystem system : collapsed) {
+        willOwn[system.index] = false;
+        collapseWave[system.index] = currentWave;
+        for (final StarSystem neighbor : system.neighbors) {
+          if (simpleGarrisoning) {
+            garrisonToHold[neighbor.index] = 1;
+          } else {
+            garrisonToHold[neighbor.index]++;
           }
         }
       }
