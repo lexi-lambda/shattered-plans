@@ -224,8 +224,12 @@ public final class Map {
     buffer.writeByte(allContiguousForces.size());
     allContiguousForces.forEach(force -> force.write(buffer));
 
-    buffer.writeByte(players.length);
-    Arrays.stream(players).forEach(player -> player.combinedForce.write(buffer));
+    final List<CombinedForce> allCombinedForces = Arrays.stream(players)
+        .map(player -> player.combinedForce)
+        .filter(force -> !force.isEmpty())
+        .toList();
+    buffer.writeByte(allCombinedForces.size());
+    allCombinedForces.forEach(force -> force.write(buffer));
 
     for (int i = 0; i < players.length; i++) {
       for (int j = i + 1; j < players.length; j++) {

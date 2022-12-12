@@ -69,6 +69,7 @@ public abstract class Force implements Iterable<StarSystem> {
   }
 
   public final void write(final WritableBuffer buffer) {
+    assert !this.isEmpty();
     this.player.write(buffer);
     this.getCapital().write(buffer);
     buffer.writeByte(this.size());
