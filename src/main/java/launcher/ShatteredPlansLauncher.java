@@ -134,7 +134,7 @@ public final class ShatteredPlansLauncher {
       }
     });
     frame.setContentPane(app);
-    stub.appletResize(640, 480);
+    stub.appletResize(ShatteredPlansClient.SCREEN_WIDTH, ShatteredPlansClient.SCREEN_HEIGHT);
     app.init();
     app.start();
     // canvas exists now
