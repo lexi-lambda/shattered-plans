@@ -74,5 +74,5 @@ Shattered Plans and FunOrb are the property of [Jagex Ltd.][jagex] This project 
 [funorb-discord]: https://discord.gg/MGfDrDf
 [funorb-wiki:shattered-plans]: https://funorb.fandom.com/wiki/Shattered_Plans
 [jagex]: https://www.jagex.com/
-[screenshot.png]: docs/screenshot.png
-[screenshot-widescreen.png]: docs/screenshot-widescreen.png
+[screenshot.png]: docs/images/screenshot.png
+[screenshot-widescreen.png]: docs/images/screenshot-widescreen.png
