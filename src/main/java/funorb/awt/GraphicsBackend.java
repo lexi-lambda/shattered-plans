@@ -39,36 +39,36 @@ public final class GraphicsBackend {
     return values;
   }
 
-  public void enter(final Frame var1, final int var2, final int var3, final int var4, int var5) {
+  public void enter(final Frame frame, final int width, final int height, final int bitDepth, int refreshRate) {
     this.mode = this.device.getDisplayMode();
     if (this.mode == null) {
       throw new NullPointerException();
     } else {
-      var1.setUndecorated(true);
-      var1.enableInputMethods(false);
+      frame.setUndecorated(true);
+      frame.enableInputMethods(false);
 
-      this.device.setFullScreenWindow(var1);
-      if (var5 == 0) {
-        final int var6 = this.mode.getRefreshRate();
-        final DisplayMode[] var7 = this.device.getDisplayModes();
-        boolean var8 = false;
+      this.device.setFullScreenWindow(frame);
+      if (refreshRate == 0) {
+        final int defaultRefresh = this.mode.getRefreshRate();
+        final DisplayMode[] modes = this.device.getDisplayModes();
+        boolean foundRefresh = false;
 
-        for (final DisplayMode displayMode : var7) {
-          if (var2 == displayMode.getWidth() && var3 == displayMode.getHeight() && displayMode.getBitDepth() == var4) {
-            final int var10 = displayMode.getRefreshRate();
-            if (!var8 || Math.abs(-var6 + var10) < Math.abs(-var6)) {
-              var8 = true;
-              var5 = var10;
+        for (final DisplayMode mode : modes) {
+          if (width == mode.getWidth() && height == mode.getHeight() && mode.getBitDepth() == bitDepth) {
+            final int modeRefresh = mode.getRefreshRate();
+            if (!foundRefresh || Math.abs(-defaultRefresh + modeRefresh) < Math.abs(-defaultRefresh)) {
+              foundRefresh = true;
+              refreshRate = modeRefresh;
             }
           }
         }
 
-        if (!var8) {
-          var5 = var6;
+        if (!foundRefresh) {
+          refreshRate = defaultRefresh;
         }
       }
 
-      this.device.setDisplayMode(new DisplayMode(var2, var3, var4, var5));
+      this.device.setDisplayMode(new DisplayMode(width, height, bitDepth, refreshRate));
     }
   }
 

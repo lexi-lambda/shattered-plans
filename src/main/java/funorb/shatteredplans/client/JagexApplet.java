@@ -243,21 +243,24 @@ public abstract class JagexApplet extends JagexBaseApplet {
     int bitDepth = 0;
     final DisplayMode[] modes = listDisplayModes();
 
-    boolean foundMode = false;
+    DisplayMode foundMode = null;
     for (final DisplayMode mode : modes) {
       if (mode.width == ShatteredPlansClient.SCREEN_WIDTH
           && mode.height == ShatteredPlansClient.SCREEN_HEIGHT
-          && (!foundMode || bitDepth < mode.bitDepth)) {
-        foundMode = true;
-        bitDepth = mode.bitDepth;
+          && (foundMode == null || foundMode.bitDepth < mode.bitDepth)) {
+        foundMode = mode;
       }
     }
 
-    if (!foundMode) {
+    if (foundMode == null) {
       return null;
     }
 
-    final MailboxMessage message = MessagePumpThread.instance.sendEnterFullScreenMessage(bitDepth);
+    final MailboxMessage message = MessagePumpThread.instance.sendEnterFullScreenMessage(
+      foundMode.width,
+      foundMode.height,
+      foundMode.bitDepth
+    );
     message.busyAwait();
 
     final Frame frame = (Frame) message.response;
