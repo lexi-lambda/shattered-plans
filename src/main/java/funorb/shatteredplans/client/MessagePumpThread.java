@@ -100,8 +100,11 @@ public final class MessagePumpThread implements Runnable {
     return this.sendMessage(MailboxMessage.Type.OPEN_SOCKET, var3, var2, 0);
   }
 
-  public MailboxMessage sendEnterFullScreenMessage(final int bitDepth) {
-    return this.sendMessage(MailboxMessage.Type.ENTER_FULL_SCREEN, null, 41943520, (bitDepth << 16));
+  public MailboxMessage sendEnterFullScreenMessage(final int width, final int height, final int bitDepth) {
+    final int refreshRate = 0; // use default
+    final int iPayload1 = (width << 16) | (height & 0xffff);
+    final int iPayload2 = (bitDepth << 16) | (refreshRate & 0xffff);
+    return this.sendMessage(MailboxMessage.Type.ENTER_FULL_SCREEN, null, iPayload1, iPayload2);
   }
 
   public MailboxMessage sendOpenUrlStreamMessage(final URL var1) {
@@ -197,7 +200,13 @@ public final class MessagePumpThread implements Runnable {
             final Frame frame = new Frame("Jagex Full Screen");
             msg.response = frame;
             frame.setResizable(false);
-            this.graphicsBackend.enter(frame, msg.ipayload1 >>> 16, msg.ipayload1 & 0xffff, msg.ipayload2 >> 16, msg.ipayload2 & 0xffff);
+            this.graphicsBackend.enter(
+              frame,
+              msg.ipayload1 >>> 16,
+              msg.ipayload1 & 0xffff,
+              msg.ipayload2 >> 16,
+              msg.ipayload2 & 0xffff
+            );
           }
           case MailboxMessage.Type.EXIT_FULL_SCREEN -> this.graphicsBackend.exit();
           case MailboxMessage.Type.GET_DECLARED_METHOD -> {
