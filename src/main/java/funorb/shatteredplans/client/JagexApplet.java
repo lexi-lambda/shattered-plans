@@ -1517,7 +1517,10 @@ public abstract class JagexApplet extends JagexBaseApplet {
   static void drawLoadingScreen(final int percent, final String message, final boolean clear) {
     try {
       final Graphics2D g = (Graphics2D) canvas.getGraphics();
-      g.scale(canvas.getWidth() / 640.0, canvas.getHeight() / 480.0);
+      g.scale(
+        canvas.getWidth() / (double) ShatteredPlansClient.SCREEN_WIDTH,
+        canvas.getHeight() / (double) ShatteredPlansClient.SCREEN_HEIGHT
+      );
 
       if (loadingScreenFont == null) {
         loadingScreenFont = new java.awt.Font("Helvetica", java.awt.Font.BOLD, 13);
@@ -1527,6 +1530,11 @@ public abstract class JagexApplet extends JagexBaseApplet {
         g.setColor(Color.black);
         g.fillRect(0, 0, ShatteredPlansClient.SCREEN_WIDTH, ShatteredPlansClient.SCREEN_HEIGHT);
       }
+
+      g.translate(
+        (ShatteredPlansClient.SCREEN_WIDTH - ShatteredPlansClient.ORIGINAL_SCREEN_WIDTH) / 2,
+        (ShatteredPlansClient.SCREEN_HEIGHT - ShatteredPlansClient.ORIGINAL_SCREEN_HEIGHT) / 2
+      );
 
       try {
         if (_rma == null) {

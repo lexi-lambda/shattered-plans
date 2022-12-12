@@ -1328,14 +1328,14 @@ public class Sprite {
     }
   }
 
-  public void d093(int var1, int var2) {
-    var1 += this.x >> 1;
-    var2 += this.y >> 1;
-    final int var3 = var1 < Drawing.left ? Drawing.left - var1 << 1 : 0;
-    final int var4 = var1 + (this.width >> 1) > Drawing.right ? Drawing.right - var1 << 1 : this.width;
-    final int var5 = var2 < Drawing.top ? Drawing.top - var2 << 1 : 0;
-    final int var6 = var2 + (this.height >> 1) > Drawing.bottom ? Drawing.bottom - var2 << 1 : this.height;
-    a600(this.pixels, var5 * this.width + var3, (var2 + (var5 >> 1)) * Drawing.width + var1 + (var3 >> 1), (this.width << 1) - (var4 - var3) + (this.width & 1), Drawing.width - (var4 - var3 >> 1), this.width, var4 - var3 >> 1, var6 - var5 >> 1);
+  public void d093(int x, int y) {
+    x += this.x >> 1;
+    y += this.y >> 1;
+    final int var3 = x < Drawing.left ? Drawing.left - x << 1 : 0;
+    final int var4 = x + (this.width >> 1) > Drawing.right ? Drawing.right - x << 1 : this.width;
+    final int var5 = y < Drawing.top ? Drawing.top - y << 1 : 0;
+    final int var6 = y + (this.height >> 1) > Drawing.bottom ? Drawing.bottom - y << 1 : this.height;
+    a600(this.pixels, var5 * this.width + var3, (y + (var5 >> 1)) * Drawing.width + x + (var3 >> 1), (this.width << 1) - (var4 - var3) + (this.width & 1), Drawing.width - (var4 - var3 >> 1), this.width, var4 - var3 >> 1, var6 - var5 >> 1);
   }
 
   public final void a115(final int var3) {

@@ -13,6 +13,9 @@ import funorb.util.BitMath;
 import java.util.stream.IntStream;
 
 public final class JagexLogoIntroAnimation {
+  private static final int LOGICAL_CANVAS_WIDTH = 640;
+  private static final int LOGICAL_CANVAS_HEIGHT = 480;
+
   private static final Sprite _rfh = new Sprite(270, 70);
   private static final Sprite _ini = new Sprite(540, 140);
   private static sr_[] _vcd;
@@ -143,6 +146,9 @@ public final class JagexLogoIntroAnimation {
   }
 
   public static void draw() {
+    final int xOffset = (Drawing.width - LOGICAL_CANVAS_WIDTH) / 2;
+    final int yOffset = (Drawing.height - LOGICAL_CANVAS_HEIGHT) / 2;
+
     if (jagexIntroAnimationFrame >= 0) {
       final int var2 = 185;
       final int var3 = 205;
@@ -166,9 +172,9 @@ public final class JagexLogoIntroAnimation {
       });
 
       if (jagexIntroAnimationFrame < 150) {
-        _ini.d093(var2, var3);
+        _ini.d093(xOffset + var2, yOffset + var3);
       } else {
-        _qaq.draw(200, 215, var4);
+        _qaq.draw(xOffset + 200, yOffset + 215, var4);
       }
 
       final int var5 = jagexIntroAnimationFrame - 125;
@@ -176,12 +182,12 @@ public final class JagexLogoIntroAnimation {
       if (var5 > 0 && var5 < 50) {
         if (var5 < 20) {
           var6 = var5 * 256 / 20;
-          _rfh.drawAdd(var2, var3, var6);
+          _rfh.drawAdd(xOffset + var2, yOffset + var3, var6);
         } else if (var5 >= 30) {
           var6 = 256 * (50 - var5) / 20;
-          _rfh.drawAdd(var2, var3, var6);
+          _rfh.drawAdd(xOffset + var2, yOffset + var3, var6);
         } else {
-          _rfh.drawAdd(var2, var3, 256);
+          _rfh.drawAdd(xOffset + var2, yOffset + var3, 256);
         }
       }
 
@@ -192,7 +198,7 @@ public final class JagexLogoIntroAnimation {
           var6 = i * 256 / 20;
         }
 
-        _akz.draw(200, 215, var6 * var4 >> 8);
+        _akz.draw(xOffset + 200, yOffset + 215, var6 * var4 >> 8);
       }
     }
   }
