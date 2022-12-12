@@ -1134,14 +1134,14 @@ public final class ClientGameSession extends GameSession {
 
     isAutoPlaying = true;
 
-    for (final MoveFleetsOrder order : this.gameState.moveOrders) {
-      this.cancelMoveOrder(order);
+    while (!this.gameState.moveOrders.isEmpty()) {
+      this.cancelMoveOrder(this.gameState.moveOrders.get(0));
     }
-    for (final BuildFleetsOrder order : this.gameState.buildOrders) {
-      this.cancelBuildOrder(order);
+    while (!this.gameState.buildOrders.isEmpty()) {
+      this.cancelBuildOrder(this.gameState.buildOrders.get(0));
     }
-    for (final ProjectOrder order : this.gameState.projectOrders) {
-      this.cancelProjectOrder(order);
+    while (!this.gameState.projectOrders.isEmpty()) {
+      this.cancelProjectOrder(this.gameState.projectOrders.get(0));
     }
     this.playerIssuedOrder();
 
