@@ -43,3 +43,5 @@ One important property that follows from the above is that there is almost alway
 ### The tactical overlay and stellar bombs
 
 Because stellar bombs prevent all fleet movements out of the target system for a turn, deploying a stellar bomb can affect the tactical overlay. Most significantly, if a system you control is only bordered by one hostile system, deploying a stellar bomb on that system will eliminate the **orange** hatching on the adjacent system! This is in fact the *only* way to remove such hatching, so although it may be counterintuitive, the most valuable way to use a stellar bomb may be defensive rather than offensive.
+
+Note, however, that this ability cuts both ways: fleet movements out of any system at risk of being stellar bombed may be canceled. Therefore, such fleet movements do not count towards the worst-case garrison calculation and will not eliminate hatching on their destination system. This can be somewhat counterintuitive, but erring on the side of caution ensures that the absence of any hatching on a system is a true guarantee that the system will not be lost.

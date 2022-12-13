@@ -25,6 +25,12 @@ public final class TacticalAnalysis {
   private final boolean[] systemThreatened;
 
   /**
+   * {@code true} for systems that could be the target of a stellar bomb on
+   * this turn.
+   */
+  private final boolean[] systemBombable;
+
+  /**
    * {@code true} for systems that the local player is <i>guaranteed</i> to own
    * after this turn. Implies {@link #systemCanOwn}.
    */
@@ -80,6 +86,7 @@ public final class TacticalAnalysis {
 
   public TacticalAnalysis(final int systemCount) {
     this.systemThreatened = new boolean[systemCount];
+    this.systemBombable = new boolean[systemCount];
     this.systemCanOwn = new boolean[systemCount];
     this.systemWillOwn = new boolean[systemCount];
     this.guaranteedCollapseWave = new int[systemCount];
@@ -128,11 +135,17 @@ public final class TacticalAnalysis {
         this.minGarrisonAtTurnEnd[system.index] = 0;
       }
 
+      this.systemBombable[system.index] = Arrays.stream(system.neighbors)
+          .anyMatch(neighbor -> neighbor.owner != null
+              && system.owner != neighbor.owner
+              && (system.owner == null || !neighbor.owner.allies[system.owner.index]));
+
       for (final MoveFleetsOrder incomingOrder : system.incomingOrders) {
         if (incomingOrder.player == localPlayer) {
           this.maxGarrisonAtTurnEnd[system.index] += incomingOrder.quantity;
           this.systemCanOwn[system.index] = true;
-          if (incomingOrder.target.owner == localPlayer || incomingOrder.target.garrison == 0) {
+          if ((incomingOrder.target.owner == localPlayer || incomingOrder.target.garrison == 0)
+              && !this.systemBombable[incomingOrder.source.index]) {
             this.minGarrisonAtTurnEnd[system.index] += incomingOrder.quantity;
             this.systemWillOwn[system.index] = true;
           }
