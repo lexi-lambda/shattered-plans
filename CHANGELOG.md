@@ -1,4 +1,4 @@
-## 0.0.7 (not yet released)
+## 0.0.7 (2022-12-13)
 
 * Several improvements have been made to the tactical overlay:
 
