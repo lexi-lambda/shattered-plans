@@ -6,7 +6,7 @@
 
     <groupId>net.alterorb</groupId>
     <artifactId>shatteredplans</artifactId>
-    <version>0.0.7-SNAPSHOT</version>
+    <version>0.0.7</version>
 
     <name>Shattered Plans</name>
     <url>https://alterorb.net</url>
