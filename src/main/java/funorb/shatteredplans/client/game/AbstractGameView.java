@@ -159,16 +159,17 @@ public abstract class AbstractGameView {
   public final void setMap(final Map map) {
     this.map = map;
     this.maxUnitScalingFactor = (float) (this.map.drawingWidth * 300 / 450);
-    final SystemHighlight[] var3 = new SystemHighlight[this.map.systems.length];
-    final boolean[] var4 = new boolean[this.map.systems.length];
+    final SystemHighlight[] highlightedSystems = new SystemHighlight[this.map.systems.length];
+    Arrays.fill(highlightedSystems, SystemHighlight.NONE);
+    final boolean[] retreatTargets = new boolean[this.map.systems.length];
 
     for (int i = 0; i < this.highlightedSystems.length; ++i) {
-      var3[i] = this.highlightedSystems[i];
-      var4[i] = this.retreatTargets[i];
+      highlightedSystems[i] = this.highlightedSystems[i];
+      retreatTargets[i] = this.retreatTargets[i];
     }
 
-    this.highlightedSystems = var3;
-    this.retreatTargets = var4;
+    this.highlightedSystems = highlightedSystems;
+    this.retreatTargets = retreatTargets;
     this.a487();
   }
 
