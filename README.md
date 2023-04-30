@@ -9,13 +9,13 @@ Shattered Plans is a turn-based strategy game by [Jagex Ltd.][jagex] It was orig
 Running Shattered Plans requires [Java 17 or newer][download-java] and [the latest version of the game JAR][download-shattered-plans]. You can then run the game by running the following command:
 
 ```sh
-java -jar shatteredplans-0.0.7.jar --local-server
+java -jar shatteredplans-0.1.0.jar --local-server
 ```
 
 As the name suggests, passing the `--local-server` flag will run a Shattered Plans server locally, allowing you to play the game in singleplayer mode. Other players can connect to your server by running
 
 ```sh
-java -jar shatteredplans-0.0.7.jar --host <HOST>
+java -jar shatteredplans-0.1.0.jar --host <HOST>
 ```
 
 replacing `<HOST>` with your IP address. By default, the server runs on port 43594, but you can specify a different port using the `--port` flag. A few other options are also available, pass `--help` to see them all.
@@ -31,7 +31,7 @@ Limited support for adjusting the UI scale is available by setting one or both o
 For example, the following command will force the game to render at 1.5× standard height using a widescreen aspect ratio:
 
 ```sh
-java -Dfunorb.shatteredplans.client.uiScale=1.5 -Dfunorb.shatteredplans.client.aspectRatio=16:9 -jar shatteredplans-0.0.7.jar
+java -Dfunorb.shatteredplans.client.uiScale=1.5 -Dfunorb.shatteredplans.client.aspectRatio=16:9 -jar shatteredplans-0.1.0.jar
 ```
 
 In-game, the result looks like this:
@@ -69,7 +69,7 @@ If you’d like to find people to play with, or if you have any further question
 Shattered Plans and FunOrb are the property of [Jagex Ltd.][jagex] This project is a fan effort to keep a wonderful, creative game from being permanently lost. I do not commercially benefit from this project in any way, and it does not compete in any way with any of Jagex’s current commercial offerings, none of which are even remotely similar to Shattered Plans.
 
 [download-java]: https://www.oracle.com/java/technologies/downloads/
-[download-shattered-plans]: https://github.com/lexi-lambda/shattered-plans/releases/download/v0.0.7/shatteredplans-0.0.7.jar
+[download-shattered-plans]: https://github.com/lexi-lambda/shattered-plans/releases/download/v0.1.0/shatteredplans-0.1.0.jar
 [FunOrb]: https://en.wikipedia.org/wiki/FunOrb
 [funorb-discord]: https://discord.gg/MGfDrDf
 [funorb-wiki:shattered-plans]: https://funorb.fandom.com/wiki/Shattered_Plans

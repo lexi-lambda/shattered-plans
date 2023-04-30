@@ -1,3 +1,7 @@
+## 0.1.0 (2023-04-30)
+
+* Fixed a small bug that caused a crash early in the tutorial.
+
 ## 0.0.7 (2022-12-13)
 
 * Several improvements have been made to the tactical overlay:
