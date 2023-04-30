@@ -1233,7 +1233,7 @@ public final class JagexLogoIntroAnimation {
 
       return var4;
     } else {
-      throw new IllegalStateException("" + var1);
+      throw new IllegalStateException(String.valueOf(var1));
     }
   }
 

@@ -87,8 +87,8 @@ public final class SongData {
       + nPolyAftertouchDeltas);
     midiSize += nChannelAftertouchDeltas + nPatchChangeDeltas;
 
-    int startOfTicksTable = input.pos;
-    int numEvents =
+    final int startOfTicksTable = input.pos;
+    final int numEvents =
       numTracks
       + nTempos
       + nCommands

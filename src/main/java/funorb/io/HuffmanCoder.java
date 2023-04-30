@@ -235,7 +235,7 @@ public final class HuffmanCoder {
       final int var10 = this._a[byteToEncode];
       final byte var11 = this.codes[byteToEncode];
       if (var11 == 0) {
-        throw new RuntimeException("" + byteToEncode);
+        throw new RuntimeException(String.valueOf(byteToEncode));
       }
 
       int destPos = var8 >> 3;

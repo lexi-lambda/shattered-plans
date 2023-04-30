@@ -162,7 +162,7 @@ public final class PageLoader {
   private @Nullable WorkItem tryLoadGroup(final @NotNull LoadMethod how, final int groupId) {
     WorkItem item = this.dataItems.get(groupId);
     if (how == LoadMethod.TRY_CACHE_ELSE_FETCH
-        && item instanceof CacheWorker.WorkItem cacheItem
+        && item instanceof final CacheWorker.WorkItem cacheItem
         && !cacheItem.isTryWithoutWrite
         && !item.isLoaded()) {
       this.dataItems.remove(groupId);
@@ -186,7 +186,7 @@ public final class PageLoader {
     }
 
     final byte[] data = item.getData();
-    if (item instanceof CacheWorker.WorkItem cacheItem) {
+    if (item instanceof final CacheWorker.WorkItem cacheItem) {
       try {
         if (data == null || data.length <= 2) {
           throw new RuntimeException();

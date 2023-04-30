@@ -240,7 +240,6 @@ public abstract class JagexApplet extends JagexBaseApplet {
   }
 
   protected static Frame createFullScreenFrame() {
-    int bitDepth = 0;
     final DisplayMode[] modes = listDisplayModes();
 
     DisplayMode foundMode = null;
@@ -350,7 +349,7 @@ public abstract class JagexApplet extends JagexBaseApplet {
         return;
       }
 
-      final MailboxMessage var4 = MessagePumpThread.instance.sendOpenUrlStreamMessage(new URL(_eic.getCodeBase(), "clienterror.ws?c=" + getInstance().gameCrc + "&u=" + "" + _coo + "&v1=" + MessagePumpThread.JAVA_VENDOR + "&v2=" + MessagePumpThread.JAVA_VERSION + "&e=" + var3));
+      final MailboxMessage var4 = MessagePumpThread.instance.sendOpenUrlStreamMessage(new URL(_eic.getCodeBase(), "clienterror.ws?c=" + getInstance().gameCrc + "&u=" + _coo + "&v1=" + MessagePumpThread.JAVA_VENDOR + "&v2=" + MessagePumpThread.JAVA_VERSION + "&e=" + var3));
 
       while (var4.status == MailboxMessage.Status.PENDING) {
         JagexBaseApplet.maybeSleep(1L);

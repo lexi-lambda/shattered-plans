@@ -97,9 +97,9 @@ public final class ResourceLoader {
   private static byte[] asBytes(final Object o) {
     if (o == null) {
       return null;
-    } else if (o instanceof byte[] bs) {
+    } else if (o instanceof final byte[] bs) {
       return bs;
-    } else if (o instanceof ByteContainer bc) {
+    } else if (o instanceof final ByteContainer bc) {
       return bc.toByteArray();
     } else {
       throw new IllegalArgumentException();

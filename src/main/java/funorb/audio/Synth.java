@@ -115,7 +115,7 @@ public final class Synth {
 
       for (int harm_idk = 0; harm_idk < 5; ++harm_idk) {
         if (this.harmVol_idk[harm_idk] != 0) {
-          int index = i + harmDelScaled_idk[harm_idk];
+          final int index = i + harmDelScaled_idk[harm_idk];
           if (index < len) {
             buf[index] += this.sample(
               this.envBaseFreq.waveform,

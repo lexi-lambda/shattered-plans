@@ -14,8 +14,8 @@ public final class MidiPlayer extends AudioSource {
   private static final double P9_TURNS_TO_RADIANS = 0.01227184630308513D;
   private static final double P8_NOTE_TO_OCTAVE = 3.255208333333333E-4D;
 
-  public static final int FLAG_SUSTAIN = 0x0001;
-  public static final int FLAG_PORTAMENTO = 0x0002;
+  private static final int FLAG_SUSTAIN = 0x0001;
+  private static final int FLAG_PORTAMENTO = 0x0002;
   public static final int FLAG_GENERAL_6 = 0x0004;
 
   public final int[] chStartOffset_p6 = new int[16]; // GP controller 1
@@ -101,7 +101,7 @@ public final class MidiPlayer extends AudioSource {
       relNote_p8 += (int) (vibrato_p8 * Math.sin((note.vibratoPhase_p9 & 0x1ff) * P9_TURNS_TO_RADIANS));
     }
 
-    int speed_p8 = (int)(
+    final int speed_p8 = (int)(
       (double)(256 * note.sampleData.sampleRate)
       * Math.pow(2.0D, P8_NOTE_TO_OCTAVE * relNote_p8) / (double) SampledAudioChannelS16.SAMPLE_RATE
       + 0.5D);
@@ -435,13 +435,13 @@ public final class MidiPlayer extends AudioSource {
         }
 
         if (controller == 6) { // data entry msb
-          int rpn = this.chRpn[channel];
+          final int rpn = this.chRpn[channel];
           if (rpn == 0x4000) {
             this.chPitchBendRange[channel] = (this.chPitchBendRange[channel] & 0xffffc07f) + (value << 7);
           }
         }
         if (controller == 38) { // data entry lsb
-          int rpn = this.chRpn[channel];
+          final int rpn = this.chRpn[channel];
           if (rpn == 0x4000) {
             this.chPitchBendRange[channel] = value + (this.chPitchBendRange[channel] & 0xffffff80);
           }

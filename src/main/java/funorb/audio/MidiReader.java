@@ -5,10 +5,10 @@ import funorb.io.Buffer;
 import java.util.Arrays;
 
 public final class MidiReader {
-  public static final int EVENT_SYSEX = 0;
+  private static final int EVENT_SYSEX = 0;
   public static final int EVENT_TRACK_END = 1;
-  public static final int EVENT_TEMPO_CHANGE = 2;
-  public static final int EVENT_UNKNOWN_META = 3;
+  private static final int EVENT_TEMPO_CHANGE = 2;
+  private static final int EVENT_UNKNOWN_META = 3;
 
   private static final byte[] STATUS_BYTE_TO_DATA_BYTE_COUNT = new byte[] {
     // channel voice messages
@@ -162,19 +162,13 @@ public final class MidiReader {
       if (statusByte == 0xf7 && sysexLength > 0) {
         final int firstSysexByte = this.midi.data[this.midi.pos] & 0xff;
         switch (firstSysexByte) {
-          case 241:
-          case 242:
-          case 243:
-          case 246:
-          case 248:
-          case 250:
-          case 252:
-          case 254:
+          case 241, 242, 243, 246, 248, 250, 252, 254 -> {
             ++this.midi.pos;
             this.lastTrackStatusByte[track] = firstSysexByte;
             return this.readNextTrackEventWithStatus(track, firstSysexByte);
-          default:
-            break;
+          }
+          default -> {
+          }
         }
       }
 

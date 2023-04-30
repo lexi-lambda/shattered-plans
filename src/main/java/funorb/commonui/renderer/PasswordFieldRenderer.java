@@ -4,6 +4,8 @@ import funorb.commonui.Component;
 import funorb.commonui.Resources;
 import funorb.graphics.Font;
 
+import java.util.Arrays;
+
 public final class PasswordFieldRenderer extends TextFieldRenderer {
   private PasswordFieldRenderer(final Font font) {
     super(font);
@@ -17,11 +19,7 @@ public final class PasswordFieldRenderer extends TextFieldRenderer {
   protected String getText(final Component component) {
     final int var1 = component.text.length();
     final char[] var21 = new char[var1];
-
-    for (int var3 = 0; var3 < var1; ++var3) {
-      var21[var3] = '*';
-    }
-
+    Arrays.fill(var21, '*');
     return new String(var21);
   }
 }

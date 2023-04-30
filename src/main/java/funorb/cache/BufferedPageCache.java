@@ -25,7 +25,7 @@ public final class BufferedPageCache {
 
   @Override
   public String toString() {
-    return "" + this.pageId;
+    return String.valueOf(this.pageId);
   }
 
   public byte[] read(final int groupId) {

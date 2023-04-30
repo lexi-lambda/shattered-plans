@@ -42,7 +42,7 @@ public class Component {
   }
 
   public final void pack() {
-    if (this.renderer instanceof ITextRenderer textRenderer) {
+    if (this.renderer instanceof final ITextRenderer textRenderer) {
       this.width = textRenderer.getPreferredWidth(this);
       this.height = textRenderer.getPreferredHeight(this);
     }

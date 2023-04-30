@@ -383,11 +383,11 @@ public abstract class AbstractGameView {
         }
 
         for (final TurnEventLog.Event var10 : turnEvents) {
-          if (var10 instanceof BuildFleetsEvent var16) {
+          if (var10 instanceof final BuildFleetsEvent var16) {
             this.clonedRemainingGarrisons[var16.system.index] += var16.quantity;
-          } else if (var10 instanceof StellarBombEvent var15) {
+          } else if (var10 instanceof final StellarBombEvent var15) {
             this.clonedRemainingGarrisons[var15.target.index] -= var15.kill;
-          } else if (var10 instanceof MoveFleetsOrder var14) {
+          } else if (var10 instanceof final MoveFleetsOrder var14) {
             this.clonedRemainingGarrisons[var14.source.index] -= var14.quantity;
           }
         }
@@ -395,7 +395,7 @@ public abstract class AbstractGameView {
         this.gameUI.setActionHint(StringConstants.TEXT_ANIMATING_MOVES);
       } else if (phase == AnimationPhase.COMBAT) {
         for (final TurnEventLog.Event var4 : turnEvents) {
-          if (var4 instanceof MoveFleetsOrder var5) {
+          if (var4 instanceof final MoveFleetsOrder var5) {
             final int var6 = var5.target.index;
             if (var5.player == this.systemOwners[var6]) {
               this.clonedRemainingGarrisons[var6] += var5.quantity;
@@ -418,7 +418,7 @@ public abstract class AbstractGameView {
         }
 
         for (final TurnEventLog.Event var10 : turnEvents) {
-          if (var10 instanceof CombatEngagementLog var12) {
+          if (var10 instanceof final CombatEngagementLog var12) {
 
             for (final CombatLogEvent var7 : var12.events) {
               if (var7.source != null && var7.source.owner == var7.player) {
@@ -431,7 +431,7 @@ public abstract class AbstractGameView {
         this.gameUI.setActionHint(StringConstants.SHOWING_COMBAT_RESULTS);
       } else if (phase == AnimationPhase.RETREAT) {
         for (final TurnEventLog.Event var4 : turnEvents) {
-          if (var4 instanceof FleetRetreatEvent var11) {
+          if (var4 instanceof final FleetRetreatEvent var11) {
             final int var6 = var11.source.index;
             this.clonedSystemOwners[var6] = null;
             this.clonedRemainingGarrisons[var6] = 0;
@@ -508,7 +508,7 @@ public abstract class AbstractGameView {
     this.clearTurnEvents();
 
     for (final TurnEventLog.Event event : eventLog.events) {
-      if (event instanceof MoveFleetsOrder moveOrder) {
+      if (event instanceof final MoveFleetsOrder moveOrder) {
         if (moveOrder.player == null) {
           errorOccurred = true;
           errorMessage.append("Fleet from ").append(moveOrder.source.name)
@@ -519,7 +519,7 @@ public abstract class AbstractGameView {
             this.largestFleetMovement = moveOrder.quantity;
           }
         }
-      } else if (event instanceof CombatEngagementLog combatLog) {
+      } else if (event instanceof final CombatEngagementLog combatLog) {
         this.combatEngagements.add(new CombatEngagementAnimationState(combatLog));
 
         for (final CombatLogEvent combatEvent : combatLog.events) {
@@ -531,7 +531,7 @@ public abstract class AbstractGameView {
             }
           }
         }
-      } else if (event instanceof ProjectOrder projectEvent) {
+      } else if (event instanceof final ProjectOrder projectEvent) {
         if (projectEvent.type == GameState.ResourceType.METAL) {
           this.addBuildProjectEvent(projectEvent.target, projectEvent.player, GameState.ResourceType.METAL);
         } else if (projectEvent.type == GameState.ResourceType.BIOMASS) {
@@ -539,9 +539,9 @@ public abstract class AbstractGameView {
         } else if (projectEvent.type == GameState.ResourceType.EXOTICS) {
           this.addBuildTannhauserEvent(projectEvent.player, projectEvent.source, projectEvent.target);
         }
-      } else if (event instanceof StellarBombEvent bombEvent) {
+      } else if (event instanceof final StellarBombEvent bombEvent) {
         this.addBuildProjectEvent(bombEvent.target, bombEvent.player, GameState.ResourceType.ENERGY);
-      } else if (event instanceof FleetRetreatEvent retreatEvent) {
+      } else if (event instanceof final FleetRetreatEvent retreatEvent) {
         if (retreatEvent.targets != null) {
           for (int i = 0; i < retreatEvent.targets.length; ++i) {
             final MoveFleetsOrder moveOrder = new MoveFleetsOrder(retreatEvent.source.lastOwner, retreatEvent.source, retreatEvent.targets[i], retreatEvent.quantities[i]);
@@ -557,7 +557,7 @@ public abstract class AbstractGameView {
     }
 
     for (final TurnEventLog.Event event : eventLog.events) {
-      if (event instanceof BuildFleetsEvent buildEvent) {
+      if (event instanceof final BuildFleetsEvent buildEvent) {
         if (buildEvent.player == null) {
           errorOccurred = true;
           errorMessage.append("Build event at ").append(buildEvent.system.name).append(" has no owner.\n");

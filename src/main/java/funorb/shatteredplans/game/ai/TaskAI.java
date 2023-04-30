@@ -668,9 +668,9 @@ public final class TaskAI implements AI {
 
   private void satisfyCombatTasks(final boolean var1) {
     for (final AITask task : this.combatTasks) {
-      if (task instanceof DefenseTask defenseTask) {
+      if (task instanceof final DefenseTask defenseTask) {
         this.satisfyDefenseTask(defenseTask, var1);
-      } else if (task instanceof CaptureTask captureTask) {
+      } else if (task instanceof final CaptureTask captureTask) {
         this.satisfyCaptureTask(captureTask, var1);
       } else {
         throw new RuntimeException("prioritizedTasks contains invalid task for Star " + task.system.name + ".");

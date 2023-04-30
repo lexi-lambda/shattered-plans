@@ -21,7 +21,7 @@ public final class FOEventQueue extends EventQueue {
   }
 
   private static MouseEvent fixEvent(final MouseEvent me) {
-    if (me instanceof MouseWheelEvent mwe) {
+    if (me instanceof final MouseWheelEvent mwe) {
       return new MouseWheelEvent(me.getComponent(), me.getID(), me.getWhen(), modifiers(me),
           me.getX(), me.getY(), me.getXOnScreen(), me.getYOnScreen(), me.getClickCount(),
           me.isPopupTrigger(), mwe.getScrollType(), mwe.getScrollAmount(),
@@ -74,7 +74,7 @@ public final class FOEventQueue extends EventQueue {
 
   @Override
   protected void dispatchEvent(final AWTEvent event) {
-    if (event instanceof MouseEvent me) {
+    if (event instanceof final MouseEvent me) {
       final MouseEvent fake = fixEvent(me);
       super.dispatchEvent(fake);
       if (fake.isConsumed()) me.consume();

@@ -72,10 +72,10 @@ public final class VorbisFormat {
     window = new float[blocksize1];
 
     for (int i = 0; i < 2; ++i) {
-      int n = i == 0 ? blocksize0 : blocksize1;
-      int n2 = n >> 1;
-      int n4 = n >> 2;
-      int n8 = n >> 3;
+      final int n = i == 0 ? blocksize0 : blocksize1;
+      final int n2 = n >> 1;
+      final int n4 = n >> 2;
+      final int n8 = n >> 3;
 
       final float[] tbl1 = new float[n2];
       for (int j = 0; j < n4; ++j) {
@@ -111,36 +111,36 @@ public final class VorbisFormat {
       }
     }
 
-    int numCodebooks = readBits(8) + 1;
+    final int numCodebooks = readBits(8) + 1;
     codebooks = new VorbisCodebook[numCodebooks];
     for (int i = 0; i < numCodebooks; ++i) {
       codebooks[i] = new VorbisCodebook();
     }
 
-    int numVorbisTimes = readBits(6) + 1;
+    final int numVorbisTimes = readBits(6) + 1;
     for (int i = 0; i < numVorbisTimes; ++i) {
       readBits(16);
     }
 
-    int numFloors = readBits(6) + 1;
+    final int numFloors = readBits(6) + 1;
     floors = new VorbisFloor1[numFloors];
     for (int i = 0; i < numFloors; ++i) {
       floors[i] = new VorbisFloor1();
     }
 
-    int numResidues = readBits(6) + 1;
+    final int numResidues = readBits(6) + 1;
     residues = new VorbisResidue[numResidues];
     for (int i = 0; i < numResidues; ++i) {
       residues[i] = new VorbisResidue();
     }
 
-    int numMappings = readBits(6) + 1;
+    final int numMappings = readBits(6) + 1;
     mappings = new VorbisMapping[numMappings];
     for (int i = 0; i < numMappings; ++i) {
       mappings[i] = new VorbisMapping();
     }
 
-    int numModes = readBits(6) + 1;
+    final int numModes = readBits(6) + 1;
     modeBlockFlag = new boolean[numModes];
     modeMapping = new int[numModes];
 
@@ -283,7 +283,7 @@ public final class VorbisFormat {
     readBit(); // packet type (assumed audio)
 
     final int modeNumber = readBits(BitMath.lastSet(modeMapping.length - 1));
-    final boolean isLongWindow = VorbisFormat.modeBlockFlag[modeNumber];
+    final boolean isLongWindow = modeBlockFlag[modeNumber];
     final int n = isLongWindow ? blocksize1 : blocksize0;
 
     boolean prevWindowFlag = false;
@@ -376,7 +376,7 @@ public final class VorbisFormat {
         v[4 * i + 1] = (b - d) * e + (a - c) * f;
       }
 
-      int bits = BitMath.lastSet(n - 1);
+      final int bits = BitMath.lastSet(n - 1);
 
       for (int i = 0; i < bits - 3; ++i) {
         final int nI = n >> i + 2;
@@ -493,7 +493,7 @@ public final class VorbisFormat {
       }
     }
 
-    float[] tmp = this.lastWindow;
+    final float[] tmp = this.lastWindow;
     this.lastWindow = window;
     window = tmp;
 

@@ -50,7 +50,7 @@ public final class RawSamplePlayer extends AudioSource {
     if (sample.data_s8 == null || sample.data_s8.length == 0) {
       return null;
     }
-    int speed_p8 = (int) ((long) sample.sampleRate * 256L * (long) 100 / (100L * SampledAudioChannelS16.SAMPLE_RATE));
+    final int speed_p8 = (int) ((long) sample.sampleRate * 256L * (long) 100 / (100L * SampledAudioChannelS16.SAMPLE_RATE));
     return new RawSamplePlayer(sample, speed_p8, vol_p8 << 6, 0x2000);
   }
 
@@ -581,14 +581,12 @@ public final class RawSamplePlayer extends AudioSource {
         if (this.updateAmpRate()) {
           return dstLen;
         }
-      } else {
-        if (this.speed_p8 == 256 && (this.playhead_p8 & 255) == 0) {
-          return Xfer.fwd(this.rawSample.data_s8, dest_s16p8, this.playhead_p8, dstOff, this.ampL_p14, this.ampR_p14,
+      } else if (this.speed_p8 == 256 && (this.playhead_p8 & 255) == 0) {
+        return Xfer.fwd(this.rawSample.data_s8, dest_s16p8, this.playhead_p8, dstOff, this.ampL_p14, this.ampR_p14,
             dstLen, srcEnd_p8, this);
-        } else {
-          return Xfer.fwdPitched(this.rawSample.data_s8, dest_s16p8, this.playhead_p8, dstOff, this.ampL_p14,
+      } else {
+        return Xfer.fwdPitched(this.rawSample.data_s8, dest_s16p8, this.playhead_p8, dstOff, this.ampL_p14,
             this.ampR_p14, dstLen, srcEnd_p8, this, this.speed_p8, stitch_s8);
-        }
       }
     }
   }
@@ -624,14 +622,12 @@ public final class RawSamplePlayer extends AudioSource {
         if (this.updateAmpRate()) {
           return dstLen;
         }
-      } else {
-        if (this.speed_p8 == -256 && (this.playhead_p8 & 255) == 0) {
-          return Xfer.back(this.rawSample.data_s8, dest_s16p8, this.playhead_p8, dstOff, this.ampL_p14, this.ampR_p14,
+      } else if (this.speed_p8 == -256 && (this.playhead_p8 & 255) == 0) {
+        return Xfer.back(this.rawSample.data_s8, dest_s16p8, this.playhead_p8, dstOff, this.ampL_p14, this.ampR_p14,
             dstLen, srcEnd_p8, this);
-        } else {
-          return Xfer.backPitched(this.rawSample.data_s8, dest_s16p8, this.playhead_p8, dstOff, this.ampL_p14,
+      } else {
+        return Xfer.backPitched(this.rawSample.data_s8, dest_s16p8, this.playhead_p8, dstOff, this.ampL_p14,
             this.ampR_p14, dstLen, srcEnd_p8, this, this.speed_p8, stitch_s8);
-        }
       }
 
     }
@@ -704,22 +700,22 @@ public final class RawSamplePlayer extends AudioSource {
     return false;
   }
 
-  private static class Xfer {
+  private static final class Xfer {
     private static int fwd(
-      final byte[] src_s8,
-      final int[] dst_s16p8,
-      int srcOff_p8,
-      int dstOff,
-      int ampL_p14,
-      int ampR_p14,
-      final int dstLen,
-      int srcEnd_p8,
-      final RawSamplePlayer player
+        final byte[] src_s8,
+        final int[] dst_s16p8,
+        final int srcOff_p8,
+        int dstOff,
+        final int ampL_p14,
+        final int ampR_p14,
+        final int dstLen,
+        final int srcEnd_p8,
+        final RawSamplePlayer player
     ) {
       int srcOff = srcOff_p8 >> 8;
-      int srcEnd = srcEnd_p8 >> 8;
-      int ampL_p16 = ampL_p14 << 2;
-      int ampR_p16 = ampR_p14 << 2;
+      final int srcEnd = srcEnd_p8 >> 8;
+      final int ampL_p16 = ampL_p14 << 2;
+      final int ampR_p16 = ampR_p14 << 2;
       int dstEnd = dstOff + srcEnd - srcOff;
       if (dstEnd > dstLen) {
         dstEnd = dstLen;
@@ -757,24 +753,24 @@ public final class RawSamplePlayer extends AudioSource {
     }
 
     private static int fwdRamped(
-      final byte[] src_s8,
-      final int[] dst_s16p8,
-      int playhead_p8,
-      int dstOff,
-      int ampL_p14,
-      int ampR_p14,
-      int ampRateL_p14,
-      int ampRateR_p14,
-      final int dstLen,
-      int srcEnd_p8,
-      final RawSamplePlayer playback
+        final byte[] src_s8,
+        final int[] dst_s16p8,
+        final int playhead_p8,
+        int dstOff,
+        final int ampL_p14,
+        final int ampR_p14,
+        final int ampRateL_p14,
+        final int ampRateR_p14,
+        final int dstLen,
+        final int srcEnd_p8,
+        final RawSamplePlayer playback
     ) {
       int playhead = playhead_p8 >> 8;
-      int srcEnd = srcEnd_p8 >> 8;
+      final int srcEnd = srcEnd_p8 >> 8;
       int ampL_p16 = ampL_p14 << 2;
       int ampR_p16 = ampR_p14 << 2;
-      int ampRateL_p16 = ampRateL_p14 << 2;
-      int ampRateR_p16 = ampRateR_p14 << 2;
+      final int ampRateL_p16 = ampRateL_p14 << 2;
+      final int ampRateR_p16 = ampRateR_p14 << 2;
       int dstEnd = dstOff + srcEnd - playhead;
 
       if (dstEnd > dstLen) {
@@ -843,7 +839,7 @@ public final class RawSamplePlayer extends AudioSource {
       final int stitch_s8
     ) {
       int dstEnd = dstOff + (srcEnd_p8 - playhead_p8 + speed_p8 - 257) / speed_p8;
-      if (speed_p8 == 0 || dstEnd > dstLen) {
+      if (dstEnd > dstLen) {
         dstEnd = dstLen;
       }
 
@@ -862,14 +858,14 @@ public final class RawSamplePlayer extends AudioSource {
         playhead_p8 += speed_p8;
       }
 
-      dstEnd = (dstOff >> 1) + (srcEnd_p8 - playhead_p8 + speed_p8 - 1) / speed_p8;
-      if (speed_p8 == 0 || dstEnd > dstLen) {
-        dstEnd = dstLen;
+      int dstEnd2 = (dstOff >> 1) + (srcEnd_p8 - playhead_p8 + speed_p8 - 1) / speed_p8;
+      if (dstEnd2 > dstLen) {
+        dstEnd2 = dstLen;
       }
 
-      dstEnd <<= 1;
+      dstEnd2 <<= 1;
 
-      while (dstOff < dstEnd) {
+      while (dstOff < dstEnd2) {
         src = src_s8[playhead_p8 >> 8];
         out_s16 = (src << 8) + (stitch_s8 - src) * (playhead_p8 & 255);
         dst_s16p8[dstOff++] += out_s16 * ampL_p14 >> 6;

@@ -74,7 +74,7 @@ public final class GameView extends AbstractGameView {
   public boolean _Gb;
   public boolean _Ab;
   public MoveFleetsOrder _rb;
-  protected TacticalAnalysis tacticalAnalysis;
+  private TacticalAnalysis tacticalAnalysis;
   private Sprite[] _Mb;
   private ArgbSprite _K;
   private double _wb;
@@ -3705,7 +3705,7 @@ public final class GameView extends AbstractGameView {
     }
   }
 
-  public final void setTacticalAnalysis(final TacticalAnalysis tacticalAnalysis) {
+  public void setTacticalAnalysis(final TacticalAnalysis tacticalAnalysis) {
     this.tacticalAnalysis = tacticalAnalysis;
   }
 }

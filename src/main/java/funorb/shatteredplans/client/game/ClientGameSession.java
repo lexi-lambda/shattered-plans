@@ -951,13 +951,13 @@ public final class ClientGameSession extends GameSession {
 
     if (this.turnEventLog != null) {
       for (final TurnEventLog.Event event : this.turnEventLog.events) {
-        if (event instanceof BuildFleetsEvent buildEvent) {
+        if (event instanceof final BuildFleetsEvent buildEvent) {
           if (buildEvent.player != null) {
             var7[buildEvent.player.index] += buildEvent.quantity;
           }
         }
 
-        if (event instanceof CombatEngagementLog combatLog) {
+        if (event instanceof final CombatEngagementLog combatLog) {
           for (int i = 0; i < this.gameState.playerCount; ++i) {
             var8[i] += combatLog.playerKills[i];
           }
@@ -995,16 +995,16 @@ public final class ClientGameSession extends GameSession {
           }
         }
 
-        if (event instanceof StellarBombEvent bombEvent) {
+        if (event instanceof final StellarBombEvent bombEvent) {
           var8[bombEvent.player.index] += bombEvent.kill;
           ++bombEvent.player.stats._s;
         }
 
-        if (event instanceof ProjectOrder projectOrder) {
+        if (event instanceof final ProjectOrder projectOrder) {
           ++projectOrder.player.stats._s;
         }
 
-        if (event instanceof MoveFleetsOrder moveOrder) {
+        if (event instanceof final MoveFleetsOrder moveOrder) {
           moveOrder.player.stats._t++;
           moveOrder.player.stats._i += moveOrder.quantity;
           var9[moveOrder.player.index] += moveOrder.quantity;

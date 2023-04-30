@@ -42,7 +42,7 @@ public final class ClientHandler extends ChannelDuplexHandler {
   public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
     boolean release = true;
     try {
-      if (msg instanceof ByteBuf buf) {
+      if (msg instanceof final ByteBuf buf) {
         this.channelRead0(ctx, buf);
       } else {
         release = false;
@@ -57,7 +57,7 @@ public final class ClientHandler extends ChannelDuplexHandler {
 
   @Override
   public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) throws Exception {
-    if (msg instanceof Packet packet) {
+    if (msg instanceof final Packet packet) {
       final ByteBuf header = ctx.alloc().buffer(1 + packet.lengthType.length);
       if (packet.typeIsCiphered) {
         header.writeByte(packet.type + this.client.s2cCipher.nextInt());

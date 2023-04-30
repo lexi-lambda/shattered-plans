@@ -766,7 +766,7 @@ public final class TutorialState {
   private static CombatEngagementLog a471tl(final StarSystem var1) {
     if (session.turnEventLog != null) {
       for (final TurnEventLog.Event var2 : session.turnEventLog.events) {
-        if (var2 instanceof CombatEngagementLog var3) {
+        if (var2 instanceof final CombatEngagementLog var3) {
           if (var1 == var3.system) {
             final Player[] var4 = var3.players;
 

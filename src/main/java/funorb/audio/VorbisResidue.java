@@ -65,7 +65,7 @@ public final class VorbisResidue {
         }
 
         for (int dim = 0; dim < cbDim; ++dim) {
-          int cls = classes[part];
+          final int cls = classes[part];
           final int bookIndex = this.books[cls * 8 + pass];
 
           if (bookIndex >= 0) {
@@ -73,7 +73,7 @@ public final class VorbisResidue {
             final VorbisCodebook book = VorbisFormat.codebooks[bookIndex];
 
             if (this.type == 0) {
-              int step = this.partitionSize / book.cbDim;
+              final int step = this.partitionSize / book.cbDim;
               for (int i = 0; i < step; ++i) {
                 final float[] vector = book.decodeVector();
                 for (int j = 0; j < book.cbDim; ++j) {

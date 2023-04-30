@@ -99,7 +99,7 @@ public class AbstractTextField extends Button {
 
   private void j423() {
     if (this._M) {
-      if (this.renderer instanceof ITextRenderer var2) {
+      if (this.renderer instanceof final ITextRenderer var2) {
         final AbstractTextLayout var3 = var2.updateLayout(this);
         final int var4 = var3.getWidth();
         final int var5 = var2.getAvailableWidth(this);
@@ -137,7 +137,7 @@ public class AbstractTextField extends Button {
   public final void draw(final int x, final int y) {
     if (this.renderer != null) {
       this.renderer.draw(this, x, y, this.enabled);
-      if (this.renderer instanceof ITextRenderer var5) {
+      if (this.renderer instanceof final ITextRenderer var5) {
         if (this._H != this._N) {
           var5.a132(this._N, y, x, this._H, this);
         }
@@ -275,7 +275,7 @@ public class AbstractTextField extends Button {
     super.tick(x, y, root);
     this.j423();
     if (this.mouseButtonClicked == MouseState.Button.LEFT) {
-      if (this.renderer instanceof ITextRenderer var5) {
+      if (this.renderer instanceof final ITextRenderer var5) {
         int var6 = var5.a242(x, JagexApplet.mouseX, y, this, JagexApplet.mouseY);
         if (var6 != -1) {
           if (this._P && this._R > var6 && var6 > this._N) {
@@ -353,7 +353,7 @@ public class AbstractTextField extends Button {
   }
 
   private void handleEnterKey() {
-    if (this.listener instanceof TextFieldListener l) {
+    if (this.listener instanceof final TextFieldListener l) {
       l.handleTextFieldEnterPressed(this);
     }
   }

@@ -2513,7 +2513,7 @@ public final class GameUI {
     this.processMouseInput(this.components);
     if (this.mouseDownComponent != null) {
       for (final UIComponent<?> var4 : this.components) {
-        if (var4 instanceof FloatingPanel<?> var5) {
+        if (var4 instanceof final FloatingPanel<?> var5) {
           if (var5.visible && var5.hasChild(this.mouseDownComponent)) {
             this.a690(var5);
             var5.flashing = false;
@@ -2543,7 +2543,7 @@ public final class GameUI {
     }
 
     if (this.clickedComponent != null) {
-      if (this.clickedComponent.data instanceof FloatingPanel<?> clickedTarget2) {
+      if (this.clickedComponent.data instanceof final FloatingPanel<?> clickedTarget2) {
         clickedTarget2.visible = false;
         if (clickedTarget2 == this.productionPanel) {
           this.productionButton.tooltip = StringConstants.TOOLTIP_PRODUCTION_BUTTON_SHOW;
@@ -3308,10 +3308,10 @@ public final class GameUI {
    * Like {@link Label}, but highlighted green while placing a terraforming
    * project if the resource is a surplus resource.
    */
-  private class ResourceProductionLabel extends Label {
+  private final class ResourceProductionLabel extends Label {
     private final boolean isSurplus;
 
-    protected ResourceProductionLabel(final int x, final int y, final int width, final int height, final String text, final boolean isSurplus) {
+    private ResourceProductionLabel(final int x, final int y, final int width, final int height, final String text, final boolean isSurplus) {
       super(x, y, width, height, text);
       this.isSurplus = isSurplus;
     }

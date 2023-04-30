@@ -2,6 +2,8 @@ package funorb.audio;
 
 import funorb.util.BitMath;
 
+import java.util.stream.IntStream;
+
 public final class VorbisCodebook {
   public final int cbDim;
   private final int cbSize;
@@ -39,11 +41,11 @@ public final class VorbisCodebook {
 
     this.initHuffmanTree();
 
-    int lookupTableType = VorbisFormat.readBits(4);
+    final int lookupTableType = VorbisFormat.readBits(4);
     if (lookupTableType > 0) {
       final float cbMinValue = VorbisFormat.float32Unpack(VorbisFormat.readBits(32));
       final float cbDeltaValue = VorbisFormat.float32Unpack(VorbisFormat.readBits(32));
-      int cbValueBits = VorbisFormat.readBits(4) + 1;
+      final int cbValueBits = VorbisFormat.readBits(4) + 1;
       final boolean cbSequenceP = VorbisFormat.readBit() != 0;
 
       final int lookupValues;
@@ -53,10 +55,7 @@ public final class VorbisCodebook {
         lookupValues = this.cbSize * this.cbDim;
       }
 
-      final int[] cbMultiplicands = new int[lookupValues];
-      for (int i = 0; i < lookupValues; ++i) {
-        cbMultiplicands[i] = VorbisFormat.readBits(cbValueBits);
-      }
+      final int[] cbMultiplicands = IntStream.range(0, lookupValues).map(i -> VorbisFormat.readBits(cbValueBits)).toArray();
 
       this.vectors = new float[this.cbSize][this.cbDim];
       float last;
@@ -139,7 +138,7 @@ public final class VorbisCodebook {
       final int var6 = var2[cwLength];
       var1[entry] = var6;
       int var9;
-      int var7;
+      final int var7;
       if ((var6 & bitMask) == 0) {
         var7 = var6 | bitMask;
 
@@ -149,7 +148,7 @@ public final class VorbisCodebook {
             break;
           }
 
-          int var10 = 1 << 32 - j;
+          final int var10 = 1 << 32 - j;
           if ((var9 & var10) != 0) {
             var2[j] = var2[j - 1];
             break;
@@ -175,16 +174,16 @@ public final class VorbisCodebook {
     int var11 = 0;
 
     for (int entry = 0; entry < this.cbSize; ++entry) {
-      int cwLength = this.cwLengths[entry];
+      final int cwLength = this.cwLengths[entry];
       if (cwLength == 0) {
         continue;
       }
 
-      int var5 = var1[entry];
+      final int var5 = var1[entry];
       int var6 = 0;
 
       for (int bit = 0; bit < cwLength; ++bit) {
-        int var8 = Integer.MIN_VALUE >>> bit;
+        final int var8 = Integer.MIN_VALUE >>> bit;
         if ((var5 & var8) == 0) {
           ++var6;
         } else {
@@ -197,9 +196,7 @@ public final class VorbisCodebook {
 
         if (var6 >= this.tree.length) {
           final int[] newTree = new int[this.tree.length * 2];
-          for (int k = 0; k < this.tree.length; ++k) {
-            newTree[k] = this.tree[k];
-          }
+          System.arraycopy(this.tree, 0, newTree, 0, this.tree.length);
           this.tree = newTree;
         }
       }

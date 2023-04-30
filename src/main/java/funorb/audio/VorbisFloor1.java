@@ -2,6 +2,8 @@ package funorb.audio;
 
 import funorb.util.BitMath;
 
+import java.util.stream.IntStream;
+
 public final class VorbisFloor1 {
   private static final float[] INVERSE_DB_TABLE = new float[]{
           1.0649863E-7F, 1.1341951E-7F, 1.2079015E-7F, 1.2863978E-7F,
@@ -98,7 +100,7 @@ public final class VorbisFloor1 {
 
     int maxClassPlusOne = 0;
     for (int i = 0; i < numPartitions; ++i) {
-      int cls = VorbisFormat.readBits(4);
+      final int cls = VorbisFormat.readBits(4);
       this.partitionClasses[i] = cls;
       if (cls >= maxClassPlusOne) {
         maxClassPlusOne = cls + 1;
@@ -127,20 +129,16 @@ public final class VorbisFloor1 {
     }
 
     this.multiplier = VorbisFormat.readBits(2) + 1;
-    int rangeBits = VorbisFormat.readBits(4);
+    final int rangeBits = VorbisFormat.readBits(4);
 
-    int xListSize = 2;
-    for (int i = 0; i < numPartitions; ++i) {
-      xListSize += this.classDims[this.partitionClasses[i]];
-    }
-
+    final int xListSize = 2 + IntStream.range(0, numPartitions).map(i -> this.classDims[this.partitionClasses[i]]).sum();
     this.xList = new int[xListSize];
     this.xList[0] = 0;
     this.xList[1] = 1 << rangeBits;
 
     int values = 2;
     for (int i = 0; i < numPartitions; ++i) {
-      int cls = this.partitionClasses[i];
+      final int cls = this.partitionClasses[i];
       for (int j = 0; j < this.classDims[cls]; ++j) {
         this.xList[values++] = VorbisFormat.readBits(rangeBits);
       }
@@ -190,11 +188,9 @@ public final class VorbisFloor1 {
       return false;
     }
 
-    for (int i = 0; i < this.xList.length; ++i) {
-      floorX[i] = this.xList[i];
-    }
+    System.arraycopy(this.xList, 0, floorX, 0, this.xList.length);
 
-    int range = FLOOR_MULTIPLIER_LOOKUP[this.multiplier - 1];
+    final int range = FLOOR_MULTIPLIER_LOOKUP[this.multiplier - 1];
     final int yBits = BitMath.lastSet(range - 1);
     floorY[0] = VorbisFormat.readBits(yBits);
     floorY[1] = VorbisFormat.readBits(yBits);
@@ -278,7 +274,7 @@ public final class VorbisFloor1 {
     final int adx = hx - lx;
     int ady = dy < 0 ? -dy : dy;
     final int base = dy / adx;
-    int x = lx;
+    int x;
     int y = ly;
     int err = 0;
     final int sy = dy < 0 ? base - 1 : base + 1;
@@ -310,19 +306,22 @@ public final class VorbisFloor1 {
     step2Flag[1] = true;
 
     for (int i = 2; i < numValues; ++i) {
-      int lowOffset = lowNeighbor(floorX, i);
-      int highOffset = highNeighbor(floorX, i);
-      int predicted = this.renderPoint(
+      final int lowOffset = lowNeighbor(floorX, i);
+      final int highOffset = highNeighbor(floorX, i);
+      final int predicted = this.renderPoint(
         floorX[lowOffset],
         floorY[lowOffset],
         floorX[highOffset],
         floorY[highOffset],
         floorX[i]
       );
-      int val = floorY[i];
+      final int val = floorY[i];
       final int highroom = range - predicted;
       final int room = (Math.min(highroom, predicted)) << 1;
-      if (val != 0) {
+      if (val == 0) {
+        VorbisFloor1.step2Flag[i] = false;
+        floorY[i] = predicted;
+      } else {
         final boolean[] var14 = VorbisFloor1.step2Flag;
         VorbisFloor1.step2Flag[highOffset] = true;
         var14[lowOffset] = true;
@@ -332,9 +331,6 @@ public final class VorbisFloor1 {
         } else {
           floorY[i] = (val & 1) != 0 ? predicted - (val + 1) / 2 : predicted + val / 2;
         }
-      } else {
-        VorbisFloor1.step2Flag[i] = false;
-        floorY[i] = predicted;
       }
     }
 
@@ -346,8 +342,8 @@ public final class VorbisFloor1 {
       if (!VorbisFloor1.step2Flag[i]) {
         continue;
       }
-      int hx = floorX[i];
-      int hy = floorY[i] * this.multiplier;
+      final int hx = floorX[i];
+      final int hy = floorY[i] * this.multiplier;
       this.renderLinePremultiplied(lx, ly, hx, hy, floor, n);
       if (hx >= n) {
         return;
